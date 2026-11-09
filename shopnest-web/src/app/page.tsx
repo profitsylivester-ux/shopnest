@@ -15,7 +15,7 @@ const t = {
     slide2R: "For Sellers", slide2RTitle: "Grow Your Business", slide2RDesc: "Set up your digital storefront in minutes and reach thousands of buyers.", slide2RBtn: "Become a Seller",
     featL1: "Secure & Fast Checkout", featL2: "Verified Local Vendors", featL3: "Track Orders in Real-Time",
     featR1: "Zero Setup Fees", featR2: "Powerful Analytics Dashboard", featR3: "Reach Thousands of Buyers",
-    slide3Eyebrow: "Trending", slide3Title: "Discover Products You'll Love", slide3Desc: "Shop the latest trending products curated for modern lifestyles.", slide3Btn: "Shop Now",
+    slide3Eyebrow: "Trending", slide3Title: "Discover Products You'll Love", slide3Desc: "Shop the latest trending products curated for modern lifestyles.", slide3Btn: "Shop Now", filterTitle: "Filters", sortBy: "Sort By", newest: "Newest", priceLowHigh: "Price: Low to High", priceHighLow: "Price: High to Low", catTitle: "Category", catAll: "All", catElec: "Electronics", catFash: "Fashion", catShoes: "Shoes", catVeh: "Vehicles", catFood: "Food", catServ: "Services", priceTitle: "Price (TSH)", locTitle: "Location", locAny: "Anywhere", locDar: "Dar es Salaam", locMbeya: "Mbeya", locArusha: "Arusha", condTitle: "Condition", condAny: "Any", condNew: "New", condUsed: "Used", condRef: "Refurbished", reset: "{text.reset}", explore: "Explore Products", exploreDesc: "Discover items from all our trusted sellers.", searchPlace: "Search products...",
     slide4Eyebrow: "Join Us", slide4Title: "Start Shopping Today", slide4Desc: "Create an account and discover what ShopNest has to offer.", slide4Btn: "Sign Up Now",
     sideTitle: "About ShopNest", sideDesc: "ShopNest is your premier multi-vendor marketplace. We connect local sellers with buyers worldwide.", sideLink1: "Browse Categories", sideLink2: "Top Vendors", sideLink3: "Help Center", sideLink4: "Careers",
     footDesc: "Tanzania's trusted multi-vendor marketplace. Connecting local creators with buyers everywhere.", footChat: "Chat with Support",
@@ -38,7 +38,7 @@ const t = {
     slide2R: "Kwa Wauzaji", slide2RTitle: "Kuza Biashara Yako", slide2RDesc: "Weka duka lako la mtandaoni kwa dakika chache na ufikie maelfu ya wanunuzi.", slide2RBtn: "Kuwa Mwuza",
     featL1: "Malipo Salama na ya Haraka", featL2: "Wauzaji wa Ndani Waliothibitishwa", featL3: "Fuatilia Oda kwa Wakati Halisi",
     featR1: "Hakuna Ada ya Kuanzisha", featR2: "Dashibodi ya Uchanganuzi", featR3: "Fikia Maelfu ya Wanunuzi",
-    slide3Eyebrow: "Maarufu", slide3Title: "Gundua Bidhaa Utakazozipenda", slide3Desc: "Nunua bidhaa za hivi punde zilizochaguliwa kwa mtindo wa kisasa.", slide3Btn: "Nunua Sasa",
+    slide3Eyebrow: "Maarufu", slide3Title: "Gundua Bidhaa Utakazozipenda", slide3Desc: "Nunua bidhaa za hivi punde zilizochaguliwa kwa mtindo wa kisasa.", slide3Btn: "Nunua Sasa", filterTitle: "Vichujio", sortBy: "Panga Kwa", newest: "Mpya Zaidi", priceLowHigh: "Bei: Chini hadi Juu", priceHighLow: "Bei: Juu hadi Chini", catTitle: "Kundi", catAll: "Zote", catElec: "Elektroniki", catFash: "Mavazi", catShoes: "Viatu", catVeh: "Magari", catFood: "Chakula", catServ: "Huduma", priceTitle: "Bei (TSH)", locTitle: "Mahali", locAny: "Mahali Popote", locDar: "Dar es Salaam", locMbeya: "Mbeya", locArusha: "Arusha", condTitle: "Hali", condAny: "Yoyote", condNew: "Mpya", condUsed: "Iliyotumika", condRef: "Iliyorekebishwa", reset: "Weka Upya", explore: "Gundua Bidhaa", exploreDesc: "Gundua bidhaa kutoka kwa wauzaji wetu wote.", searchPlace: "Tafuta bidhaa...",
     slide4Eyebrow: "Jiunge Nasi", slide4Title: "Anza Kununua Leo", slide4Desc: "Unda akaunti na ugundue ShopNest inavyokupa.", slide4Btn: "Jiandikishe Sasa",
     sideTitle: "Kuhusu ShopNest", sideDesc: "ShopNest ni soko lako kuu la wauzaji wengi. Tunawaunganisha wauzaji wa ndani na wanunuzi duniani kote.", sideLink1: "Vinjari Makundi", sideLink2: "Wauzaji Bora", sideLink3: "Kituo cha Msaada", sideLink4: "Ajira",
     footDesc: "Soko la kuaminika la wauzaji wengi Tanzania. Kuwaunganisha wabunifu wa ndani na wanunuzi kila mahali.", footChat: "Zungumza na Msaada",
@@ -484,28 +484,28 @@ export default function Home() {
             {/* LEFT SIDEBAR (All Filters & Sorting) */}
             <aside style={{ width: "280px", height: "100%", background: "#110a06", borderRight: "1px solid rgba(185,130,90,0.2)", padding: "6rem 2rem 2rem 2rem", display: "flex", flexDirection: "column", overflowY: "auto", zIndex: 10 }}>
               
-              <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.8rem", color: "var(--cream)", marginBottom: "2rem" }}>Filters</h2>
+              <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.8rem", color: "var(--cream)", marginBottom: "2rem" }}>{text.filterTitle}</h2>
               
               {/* Sort By */}
               <div style={{ marginBottom: "2rem" }}>
-                <h3 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(243,227,208,0.5)", marginBottom: "1rem" }}>Sort By</h3>
+                <h3 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(243,227,208,0.5)", marginBottom: "1rem" }}>{text.sortBy}</h3>
                 <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={{ width: "100%", padding: "0.8rem", background: "transparent", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", color: "var(--cream)", outline: "none", cursor: "pointer" }}>
-                  <option style={{ color: "black" }}>Newest</option>
-                  <option style={{ color: "black" }}>Price: Low to High</option>
-                  <option style={{ color: "black" }}>Price: High to Low</option>
+                  <option style={{ color: "black" }}>{text.newest}</option>
+                  <option style={{ color: "black" }}>{text.priceLowHigh}</option>
+                  <option style={{ color: "black" }}>{text.priceHighLow}</option>
                 </select>
               </div>
 
               {/* Category */}
               <div style={{ marginBottom: "2rem" }}>
-                <h3 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(243,227,208,0.5)", marginBottom: "1rem" }}>Category</h3>
+                <h3 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(243,227,208,0.5)", marginBottom: "1rem" }}>{text.catTitle}</h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}>
-                  {['All', 'Electronics', 'Fashion', 'Shoes', 'Vehicles', 'Food', 'Services'].map((cat, i) => (
-                    <label key={i} onClick={() => setSelectedCategory(cat)} style={{ display: "flex", alignItems: "center", gap: "0.8rem", color: selectedCategory === cat ? "var(--latte)" : "var(--cream)", fontSize: "0.9rem", cursor: "pointer" }}>
-                      <div style={{ width: "16px", height: "16px", borderRadius: "4px", background: selectedCategory === cat ? "var(--latte)" : "transparent", border: selectedCategory === cat ? "none" : "1px solid rgba(185,130,90,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        {selectedCategory === cat && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--espresso)" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                  {[{l: text.catAll, v: 'All'}, {l: text.catElec, v: 'Electronics'}, {l: text.catFash, v: 'Fashion'}, {l: text.catShoes, v: 'Shoes'}, {l: text.catVeh, v: 'Vehicles'}, {l: text.catFood, v: 'Food'}, {l: text.catServ, v: 'Services'}].map((cat, i) => (
+                    <label key={i} onClick={() => setSelectedCategory(cat.v)} style={{ display: "flex", alignItems: "center", gap: "0.8rem", color: selectedCategory === cat.v ? "var(--latte)" : "var(--cream)", fontSize: "0.9rem", cursor: "pointer" }}>
+                      <div style={{ width: "16px", height: "16px", borderRadius: "4px", background: selectedCategory === cat.v ? "var(--latte)" : "transparent", border: selectedCategory === cat.v ? "none" : "1px solid rgba(185,130,90,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        {selectedCategory === cat.v && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--espresso)" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>}
                       </div>
-                      {cat}
+                      {cat.l}
                     </label>
                   ))}
                 </div>
@@ -513,7 +513,7 @@ export default function Home() {
 
               {/* Price Range */}
               <div style={{ marginBottom: "2rem" }}>
-                <h3 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(243,227,208,0.5)", marginBottom: "1rem" }}>Price (TSH)</h3>
+                <h3 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(243,227,208,0.5)", marginBottom: "1rem" }}>{text.priceTitle}</h3>
                 <div style={{ display: "flex", gap: "0.8rem" }}>
                   <input type="number" placeholder="Min" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} style={{ width: "100%", padding: "0.6rem", background: "transparent", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", color: "var(--cream)", outline: "none" }} />
                   <input type="number" placeholder="Max" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} style={{ width: "100%", padding: "0.6rem", background: "transparent", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", color: "var(--cream)", outline: "none" }} />
@@ -522,22 +522,22 @@ export default function Home() {
 
               {/* Location */}
               <div style={{ marginBottom: "2rem" }}>
-                <h3 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(243,227,208,0.5)", marginBottom: "1rem" }}>Location</h3>
+                <h3 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(243,227,208,0.5)", marginBottom: "1rem" }}>{text.locTitle}</h3>
                 <select value={filterLocation} onChange={(e) => setFilterLocation(e.target.value)} style={{ width: "100%", padding: "0.8rem", background: "transparent", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", color: "var(--cream)", outline: "none", cursor: "pointer" }}>
-                  <option value="Anywhere" style={{ color: "black" }}>Anywhere</option>
-                  <option value="Dar es Salaam" style={{ color: "black" }}>Dar es Salaam</option>
-                  <option value="Mbeya" style={{ color: "black" }}>Mbeya</option>
-                  <option value="Arusha" style={{ color: "black" }}>Arusha</option>
+                  <option value="Anywhere" style={{ color: "black" }}>{text.locAny}</option>
+                  <option value="Dar es Salaam" style={{ color: "black" }}>{text.locDar}</option>
+                  <option value="Mbeya" style={{ color: "black" }}>{text.locMbeya}</option>
+                  <option value="Arusha" style={{ color: "black" }}>{text.locArusha}</option>
                 </select>
               </div>
 
               {/* Condition */}
               <div style={{ marginBottom: "2rem" }}>
-                <h3 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(243,227,208,0.5)", marginBottom: "1rem" }}>Condition</h3>
+                <h3 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(243,227,208,0.5)", marginBottom: "1rem" }}>{text.condTitle}</h3>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-                  {['Any', 'New', 'Used', 'Refurbished'].map((cond, i) => (
-                    <button key={i} onClick={() => setSelectedCondition(cond)} style={{ padding: "0.5rem 1rem", borderRadius: "20px", border: "1px solid rgba(185,130,90,0.4)", background: selectedCondition === cond ? "var(--latte)" : "transparent", color: selectedCondition === cond ? "var(--espresso)" : "var(--cream)", fontSize: "0.8rem", cursor: "pointer", fontWeight: selectedCondition === cond ? 600 : 400 }}>
-                      {cond}
+                  {[{l: text.condAny, v: 'Any'}, {l: text.condNew, v: 'New'}, {l: text.condUsed, v: 'Used'}, {l: text.condRef, v: 'Refurbished'}].map((cond, i) => (
+                    <button key={i} onClick={() => setSelectedCondition(cond.v)} style={{ padding: "0.5rem 1rem", borderRadius: "20px", border: "1px solid rgba(185,130,90,0.4)", background: selectedCondition === cond.v ? "var(--latte)" : "transparent", color: selectedCondition === cond.v ? "var(--espresso)" : "var(--cream)", fontSize: "0.8rem", cursor: "pointer", fontWeight: selectedCondition === cond.v ? 600 : 400 }}>
+                      {cond.l}
                     </button>
                   ))}
                 </div>
@@ -553,7 +553,7 @@ export default function Home() {
                 setSearchQuery("");
                 setSortBy("Newest");
               }} style={{ width: "100%", background: "transparent", color: "var(--latte)", border: "1px solid var(--latte)", padding: "1rem", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem", marginTop: "auto", transition: "0.3s" }} onMouseEnter={(e) => e.currentTarget.style.background = "rgba(217,164,124,0.1)"} onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
-                Reset Filters
+                {text.reset}
               </button>
             </aside>
 
@@ -563,13 +563,13 @@ export default function Home() {
               {/* Top Bar (Clean - Just Search) */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
                 <div>
-                  <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "2.5rem", color: "var(--cream)", margin: 0 }}>Explore Products</h1>
-                  <p style={{ color: "rgba(243,227,208,0.5)", fontSize: "0.9rem", marginTop: "0.2rem" }}>Discover items from all our trusted sellers.</p>
+                  <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "2.5rem", color: "var(--cream)", margin: 0 }}>{text.explore}</h1>
+                  <p style={{ color: "rgba(243,227,208,0.5)", fontSize: "0.9rem", marginTop: "0.2rem" }}>{text.exploreDesc}</p>
                 </div>
                 
                 <div style={{ position: "relative" }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--latte)" strokeWidth="2" style={{ position: "absolute", left: "12px", top: "12px" }}><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                  <input type="text" placeholder="Search products..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ padding: "0.8rem 1rem 0.8rem 2.5rem", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", width: "300px", outline: "none", background: "transparent", color: "var(--cream)" }} />
+                  <input type="text" placeholder={text.searchPlace} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ padding: "0.8rem 1rem 0.8rem 2.5rem", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", width: "300px", outline: "none", background: "transparent", color: "var(--cream)" }} />
                 </div>
               </div>
 
