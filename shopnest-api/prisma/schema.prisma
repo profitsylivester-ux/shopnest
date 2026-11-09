@@ -13,6 +13,18 @@ enum Role {
   ADMIN
 }
 
+enum StoreStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+enum ProductStatus {
+  ACTIVE
+  HIDDEN
+  TRASHED
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -26,12 +38,34 @@ model User {
 }
 
 model Store {
-  id          String   @id @default(uuid())
+  id             String      @id @default(uuid())
+  name           String
+  slug           String      @unique @default(uuid())
+  description    String?
+  whatsappNumber String?
+  logoUrl        String?
+  bannerUrl      String?
+  location       String?     // NEW: Mbeya, Dar es Salaam, etc.
+  shopType       String?     // NEW: Online, Physical, Both
+  status         StoreStatus @default(PENDING)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  ownerId        String      @unique
+  owner          User        @relation(fields: [ownerId], references: [id])
+  products       Product[]
+}
+
+model Product {
+  id          String        @id @default(uuid())
   name        String
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  price       Float
+  imageUrl    String?
+  status      ProductStatus @default(ACTIVE)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
-  ownerId     String   @unique
-  owner       User     @relation(fields: [ownerId], references: [id])
+  storeId     String
+  store       Store         @relation(fields: [storeId], references: [id])
 }

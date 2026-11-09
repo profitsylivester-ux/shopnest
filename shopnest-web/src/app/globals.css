@@ -240,3 +240,4 @@ h1,h2,.logo{font-family:'Cormorant Garamond',serif;font-weight:500;letter-spacin
   .chat-window { width: calc(100vw - 4rem); right: 2rem; bottom: 6rem; height: 60vh; }
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
