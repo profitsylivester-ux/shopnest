@@ -1,0 +1,14 @@
+﻿services:
+  db:
+    image: postgres:15
+    container_name: shopnest-db
+    environment:
+      POSTGRES_USER: shopnest_user
+      POSTGRES_PASSWORD: shopnest_password
+      POSTGRES_DB: shopnest_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - shopnest_pgdata:/var/lib/postgresql/data
+volumes:
+  shopnest_pgdata:
