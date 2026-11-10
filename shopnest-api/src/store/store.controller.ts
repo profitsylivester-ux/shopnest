@@ -16,6 +16,20 @@ export class StoreController {
     return this.storeService.getMarketplace();
   }
 
+  @Get('admin/all')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  getAllForAdmin() {
+    return this.storeService.getAllStoresForAdmin();
+  }
+
+  @Patch('admin/:id/status')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  updateStatus(@Param('id') id: string, @Body('status') status: any) {
+    return this.storeService.updateStoreStatus(id, status);
+  }
+
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SELLER')

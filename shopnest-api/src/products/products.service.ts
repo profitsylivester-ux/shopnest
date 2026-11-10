@@ -42,4 +42,34 @@ export class ProductsService {
     if (!product) throw new NotFoundException('Product not found');
     return product;
   }
+
+  // --- ADMIN METHODS ---
+  async getAllProductsAdmin() {
+    return this.prisma.product.findMany({
+      where: { status: { not: 'TRASHED' } },
+      include: { store: { select: { name: true } } },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+
+  async updateProductStatusAdmin(id: string, status: any) {
+    return this.prisma.product.update({
+      where: { id },
+      data: { status }
+    });
+  }
+
+  async getTrashed() {
+    return this.prisma.product.findMany({
+      where: { status: 'TRASHED' },
+      include: { store: { select: { name: true } } }
+    });
+  }
+
+  async restoreProduct(id: string) {
+    return this.prisma.product.update({
+      where: { id },
+      data: { status: 'ACTIVE' }
+    });
+  }
 }

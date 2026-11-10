@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -15,7 +14,7 @@ const t = {
     slide2R: "For Sellers", slide2RTitle: "Grow Your Business", slide2RDesc: "Set up your digital storefront in minutes and reach thousands of buyers.", slide2RBtn: "Become a Seller",
     featL1: "Secure & Fast Checkout", featL2: "Verified Local Vendors", featL3: "Track Orders in Real-Time",
     featR1: "Zero Setup Fees", featR2: "Powerful Analytics Dashboard", featR3: "Reach Thousands of Buyers",
-    slide3Eyebrow: "Trending", slide3Title: "Discover Products You'll Love", slide3Desc: "Shop the latest trending products curated for modern lifestyles.", slide3Btn: "Shop Now", filterTitle: "Filters", sortBy: "Sort By", newest: "Newest", priceLowHigh: "Price: Low to High", priceHighLow: "Price: High to Low", catTitle: "Category", catAll: "All", catElec: "Electronics", catFash: "Fashion", catShoes: "Shoes", catVeh: "Vehicles", catFood: "Food", catServ: "Services", priceTitle: "Price (TSH)", locTitle: "Location", locAny: "Anywhere", locDar: "Dar es Salaam", locMbeya: "Mbeya", locArusha: "Arusha", condTitle: "Condition", condAny: "Any", condNew: "New", condUsed: "Used", condRef: "Refurbished", reset: "{text.reset}", explore: "Explore Products", exploreDesc: "Discover items from all our trusted sellers.", searchPlace: "Search products...",
+    slide3Eyebrow: "Trending", slide3Title: "Discover Products You'll Love", slide3Desc: "Shop the latest trending products curated for modern lifestyles.", slide3Btn: "Shop Now",
     slide4Eyebrow: "Join Us", slide4Title: "Start Shopping Today", slide4Desc: "Create an account and discover what ShopNest has to offer.", slide4Btn: "Sign Up Now",
     sideTitle: "About ShopNest", sideDesc: "ShopNest is your premier multi-vendor marketplace. We connect local sellers with buyers worldwide.", sideLink1: "Browse Categories", sideLink2: "Top Vendors", sideLink3: "Help Center", sideLink4: "Careers",
     footDesc: "Tanzania's trusted multi-vendor marketplace. Connecting local creators with buyers everywhere.", footChat: "Chat with Support",
@@ -26,7 +25,8 @@ const t = {
     authTitle: "Join ShopNest", authDesc: "Choose your account type to get started.", authBtn: "Create Account",
     authLoginTitle: "Welcome Back", authLoginDesc: "Enter your details to access your account.", authLoginBtn: "Sign In",
     roleBuyer: "Buyer", roleSeller: "Seller",
-    chatTitle: "ShopNest Assistant", chatPlaceholder: "Ask about ShopNest..."
+    chatTitle: "ShopNest Assistant", chatPlaceholder: "Ask about ShopNest...",
+    filterTitle: "Filters", sortBy: "Sort By", newest: "Newest", priceLowHigh: "Price: Low to High", priceHighLow: "Price: High to Low", catTitle: "Category", catAll: "All", catElec: "Electronics", catFash: "Fashion", catShoes: "Shoes", catVeh: "Vehicles", catFood: "Food", catServ: "Services", priceTitle: "Price (TSH)", locTitle: "Location", locAny: "Anywhere", locDar: "Dar es Salaam", locMbeya: "Mbeya", locArusha: "Arusha", condTitle: "Condition", condAny: "Any", condNew: "New", condUsed: "Used", condRef: "Refurbished", reset: "Reset Filters", explore: "Explore Products", exploreDesc: "Discover items from all our trusted sellers.", searchPlace: "Search products..."
   },
   SW: {
     navHome: "Mwanzo", navProducts: "Bidhaa", navVendors: "Wauzaji", navContact: "Mawasiliano", navSignup: "Jiandikishe",
@@ -38,7 +38,7 @@ const t = {
     slide2R: "Kwa Wauzaji", slide2RTitle: "Kuza Biashara Yako", slide2RDesc: "Weka duka lako la mtandaoni kwa dakika chache na ufikie maelfu ya wanunuzi.", slide2RBtn: "Kuwa Mwuza",
     featL1: "Malipo Salama na ya Haraka", featL2: "Wauzaji wa Ndani Waliothibitishwa", featL3: "Fuatilia Oda kwa Wakati Halisi",
     featR1: "Hakuna Ada ya Kuanzisha", featR2: "Dashibodi ya Uchanganuzi", featR3: "Fikia Maelfu ya Wanunuzi",
-    slide3Eyebrow: "Maarufu", slide3Title: "Gundua Bidhaa Utakazozipenda", slide3Desc: "Nunua bidhaa za hivi punde zilizochaguliwa kwa mtindo wa kisasa.", slide3Btn: "Nunua Sasa", filterTitle: "Vichujio", sortBy: "Panga Kwa", newest: "Mpya Zaidi", priceLowHigh: "Bei: Chini hadi Juu", priceHighLow: "Bei: Juu hadi Chini", catTitle: "Kundi", catAll: "Zote", catElec: "Elektroniki", catFash: "Mavazi", catShoes: "Viatu", catVeh: "Magari", catFood: "Chakula", catServ: "Huduma", priceTitle: "Bei (TSH)", locTitle: "Mahali", locAny: "Mahali Popote", locDar: "Dar es Salaam", locMbeya: "Mbeya", locArusha: "Arusha", condTitle: "Hali", condAny: "Yoyote", condNew: "Mpya", condUsed: "Iliyotumika", condRef: "Iliyorekebishwa", reset: "Weka Upya", explore: "Gundua Bidhaa", exploreDesc: "Gundua bidhaa kutoka kwa wauzaji wetu wote.", searchPlace: "Tafuta bidhaa...",
+    slide3Eyebrow: "Maarufu", slide3Title: "Gundua Bidhaa Utakazozipenda", slide3Desc: "Nunua bidhaa za hivi punde zilizochaguliwa kwa mtindo wa kisasa.", slide3Btn: "Nunua Sasa",
     slide4Eyebrow: "Jiunge Nasi", slide4Title: "Anza Kununua Leo", slide4Desc: "Unda akaunti na ugundue ShopNest inavyokupa.", slide4Btn: "Jiandikishe Sasa",
     sideTitle: "Kuhusu ShopNest", sideDesc: "ShopNest ni soko lako kuu la wauzaji wengi. Tunawaunganisha wauzaji wa ndani na wanunuzi duniani kote.", sideLink1: "Vinjari Makundi", sideLink2: "Wauzaji Bora", sideLink3: "Kituo cha Msaada", sideLink4: "Ajira",
     footDesc: "Soko la kuaminika la wauzaji wengi Tanzania. Kuwaunganisha wabunifu wa ndani na wanunuzi kila mahali.", footChat: "Zungumza na Msaada",
@@ -49,11 +49,13 @@ const t = {
     authTitle: "Jiunge na ShopNest", authDesc: "Chagua aina ya akaunti yako kuanza.", authBtn: "Unda Akaunti",
     authLoginTitle: "Karibu Tena", authLoginDesc: "Weka maelezo yako kufikia akaunti yako.", authLoginBtn: "Ingia",
     roleBuyer: "Mnunuzi", roleSeller: "Mwuza",
-    chatTitle: "Msaidizi wa ShopNest", chatPlaceholder: "Uliza kuhusu ShopNest..."
+    chatTitle: "Msaidizi wa ShopNest", chatPlaceholder: "Uliza kuhusu ShopNest...",
+    filterTitle: "Vichujio", sortBy: "Panga Kwa", newest: "Mpya Zaidi", priceLowHigh: "Bei: Chini hadi Juu", priceHighLow: "Bei: Juu hadi Chini", catTitle: "Kundi", catAll: "Zote", catElec: "Elektroniki", catFash: "Mavazi", catShoes: "Viatu", catVeh: "Magari", catFood: "Chakula", catServ: "Huduma", priceTitle: "Bei (TSH)", locTitle: "Mahali", locAny: "Mahali Popote", locDar: "Dar es Salaam", locMbeya: "Mbeya", locArusha: "Arusha", condTitle: "Hali", condAny: "Yoyote", condNew: "Mpya", condUsed: "Iliyotumika", condRef: "Iliyorekebishwa", reset: "Weka Upya", explore: "Gundua Bidhaa", exploreDesc: "Gundua bidhaa kutoka kwa wauzaji wetu wote.", searchPlace: "Tafuta bidhaa..."
   }
 };
 
 export default function Home() {
+  const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [lang, setLang] = useState<"EN" | "SW">("EN");
@@ -76,24 +78,29 @@ export default function Home() {
   const [chatInput, setChatInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
-  // Marketplace State
+  // Marketplace & Settings State
   const [stores, setStores] = useState<any[]>([]);
-  const router = useRouter();
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [filterLocation, setFilterLocation] = useState("Anywhere");
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [sysSettings, setSysSettings] = useState<any>({});
+  
+  // Filtering State
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("Newest");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedCondition, setSelectedCondition] = useState("Any");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [filterLocation, setFilterLocation] = useState("Anywhere");
 
   const text = t[lang];
   const storyRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Fetch Marketplace Data for Slide 3
+    fetch("http://localhost:3001/settings")
+      .then(res => res.json())
+      .then(data => setSysSettings(data))
+      .catch(console.error);
+
     fetch("http://localhost:3001/stores/marketplace")
       .then(async (res) => {
         if (res.status === 200) setStores(await res.json());
@@ -115,9 +122,7 @@ export default function Home() {
   }, [currentSlide]);
 
   useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    if (chatEndRef.current) chatEndRef.current.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages, isTyping]);
 
   const scrollTo = (index: number) => {
@@ -126,134 +131,62 @@ export default function Home() {
     setOpenDropdown(null);
   };
 
-  const toggleDropdown = (name: string) => {
-    setOpenDropdown(openDropdown === name ? null : name);
-  };
-
-  const handleLinkClick = (e: React.MouseEvent, slideIndex: number) => {
-    e.preventDefault();
-    scrollTo(slideIndex);
-  };
-
+  const toggleDropdown = (name: string) => setOpenDropdown(openDropdown === name ? null : name);
+  const handleLinkClick = (e: React.MouseEvent, slideIndex: number) => { e.preventDefault(); scrollTo(slideIndex); };
   const openAuthModal = (mode: "BUYER" | "SELLER", login: boolean = false) => {
-    setAuthMode(mode);
-    setIsLogin(login);
-    setIsAuthOpen(true);
-    setErrorMsg("");
+    setAuthMode(mode); setIsLogin(login); setIsAuthOpen(true); setErrorMsg("");
   };
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg("");
+    e.preventDefault(); setErrorMsg("");
     const endpoint = isLogin ? "login" : "register";
     const body = isLogin ? { email, password } : { email, password, name, role: authMode };
-
     try {
       const response = await fetch(`http://localhost:3001/auth/${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Authentication failed");
-      }
-
+      if (!response.ok) throw new Error(data.message || "Authentication failed");
       localStorage.setItem("shopnest_token", data.access_token);
       localStorage.setItem("shopnest_user", JSON.stringify(data.user));
-
-      if (data.user.role === "SELLER") {
-        window.location.href = "/seller/dashboard";
-        return;
-      }
-      alert(`Success! Logged in as ${data.user.email} (${data.user.role})`);
+      
+      if (data.user.role === "SELLER") { window.location.href = "/seller/dashboard"; return; }
+      if (data.user.role === "ADMIN") { window.location.href = "/admin"; return; }
+      
+      alert(`Success! Logged in as ${data.user.email}`);
       setIsAuthOpen(false);
-
-    } catch (err: any) {
-      setErrorMsg(err.message);
-    }
+    } catch (err: any) { setErrorMsg(err.message); }
   };
 
   const handleChatSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatInput.trim()) return;
-
+    e.preventDefault(); if (!chatInput.trim()) return;
     const userMsg = chatInput.trim();
     setChatMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-    setChatInput("");
-    setIsTyping(true);
-
+    setChatInput(""); setIsTyping(true);
     setTimeout(() => {
-      let botResponse = "";
-      const lowerMsg = userMsg.toLowerCase();
-
-      if (lowerMsg.includes("ship") || lowerMsg.includes("delivery")) {
-        botResponse = "Delivery times depend on the vendor, but usually takes 2-5 business days. You can track your order from your dashboard!";
-      } else if (lowerMsg.includes("sell") || lowerMsg.includes("vendor")) {
-        botResponse = "To become a seller, just click 'Become a Seller' at the top of the page! Setup takes only a few minutes and has zero upfront fees.";
-      } else if (lowerMsg.includes("pay") || lowerMsg.includes("checkout")) {
-        botResponse = "We use secure, encrypted payment gateways to ensure your checkout is 100% safe.";
-      } else {
-        botResponse = "I'm here to help you with anything related to ShopNest. What would you like to know?";
-      }
-
+      let botResponse = "I'm here to help you with anything related to ShopNest.";
       setChatMessages(prev => [...prev, { role: 'bot', text: botResponse }]);
       setIsTyping(false);
     }, 1500);
   };
 
-  // Flatten products for the Slide 3 Marketplace
-  // Flatten products and add mock data for demo purposes
+  // --- MARKETPLACE LOGIC ---
   let allProducts = stores.flatMap(store => 
     store.products.map((prod: any) => ({ 
-      ...prod, 
-      storeName: store.name, 
-      storeSlug: store.slug, 
-      whatsapp: store.whatsappNumber, 
-      location: store.location || "Tanzania",
-      category: "Fashion", // Mock category
-      condition: "New" // Mock condition
+      ...prod, storeName: store.name, storeSlug: store.slug, whatsapp: store.whatsappNumber, location: store.location || "Tanzania", category: "Fashion", condition: "New"
     }))
   );
 
-  // 1. Search Filter
-  if (searchQuery) {
-    allProducts = allProducts.filter(p => 
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      p.storeName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }
-
-  // 2. Category Filter
-  if (selectedCategory !== "All") {
-    allProducts = allProducts.filter(p => p.category === selectedCategory);
-  }
-
-  // 3. Price Filter
+  if (searchQuery) allProducts = allProducts.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.storeName.toLowerCase().includes(searchQuery.toLowerCase()));
+  if (selectedCategory !== "All") allProducts = allProducts.filter(p => p.category === selectedCategory);
   if (minPrice) allProducts = allProducts.filter(p => p.price >= parseInt(minPrice));
   if (maxPrice) allProducts = allProducts.filter(p => p.price <= parseInt(maxPrice));
+  if (filterLocation !== "Anywhere") allProducts = allProducts.filter(p => p.location === filterLocation);
+  if (selectedCondition !== "Any") allProducts = allProducts.filter(p => p.condition === selectedCondition);
 
-  // 4. Location Filter
-  if (filterLocation !== "Anywhere") {
-    allProducts = allProducts.filter(p => p.location === filterLocation);
-  }
-
-  // 5. Condition Filter
-  if (selectedCondition !== "Any") {
-    allProducts = allProducts.filter(p => p.condition === selectedCondition);
-  }
-
-  // 6. Sorting
-  if (sortBy === "Price: Low to High") {
-    allProducts.sort((a, b) => a.price - b.price);
-  } else if (sortBy === "Price: High to Low") {
-    allProducts.sort((a, b) => b.price - a.price);
-  } else {
-    // Newest
-    allProducts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }
+  if (sortBy === "Price: Low to High") allProducts.sort((a, b) => a.price - b.price);
+  else if (sortBy === "Price: High to Low") allProducts.sort((a, b) => b.price - a.price);
+  else allProducts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const handleWhatsApp = (product: any) => {
     const phone = product.whatsapp?.replace(/[^0-9]/g, "");
@@ -300,9 +233,9 @@ export default function Home() {
                 <input type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
                 <button type="button" className="eye-icon" onClick={() => setShowPassword(!showPassword)}>
                   {showPassword ? (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
                   ) : (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                   )}
                 </button>
               </div>
@@ -320,8 +253,7 @@ export default function Home() {
       <div className={`sidebar-backdrop ${isMenuOpen ? 'open' : ''}`} onClick={() => setIsMenuOpen(false)}></div>
       <div className={`sidebar ${isMenuOpen ? 'open' : ''}`}>
         <button className="close-btn" onClick={() => setIsMenuOpen(false)}>×</button>
-        <h2>{text.sideTitle}</h2>
-        <p>{text.sideDesc}</p>
+        <h2>{text.sideTitle}</h2><p>{text.sideDesc}</p>
         <ul className="sidebar-links">
           <li><a href="#" onClick={(e) => handleLinkClick(e, 1)}>{text.sideLink1}</a></li>
           <li><a href="#" onClick={(e) => handleLinkClick(e, 1)}>{text.sideLink2}</a></li>
@@ -332,11 +264,8 @@ export default function Home() {
 
       {/* NAVBAR */}
       <header className="nav" id="nav">
-        <button className="burger" aria-label="Menu" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          <span></span><span></span><span></span>
-        </button>
+        <button className="burger" aria-label="Menu" onClick={() => setIsMenuOpen(!isMenuOpen)}><span></span><span></span><span></span></button>
         <a className="logo" href="#" onClick={(e) => handleLinkClick(e, 0)}>ShopNest</a>
-
         <div className="nav-controls" style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "2rem" }}>
           <ul style={{ margin: 0, padding: 0, display: "flex", gap: "1.5rem" }}>
             <li><a className="active" href="#" onClick={(e) => handleLinkClick(e, 0)}>{text.navHome}</a></li>
@@ -372,30 +301,35 @@ export default function Home() {
         </div>
       </header>
 
-      {/* SIDE DOTS */}
       <nav className="dots" aria-label="Sections">
         {[0, 1, 2, 3].map((i) => (
-          <button key={i} aria-label={`Go to section ${i + 1}`} className={currentSlide === i ? 'active' : ''} onClick={() => scrollTo(i)}></button>
+          <button key={i} className={currentSlide === i ? 'active' : ''} onClick={() => scrollTo(i)}></button>
         ))}
       </nav>
 
-      {/* SCROLL STORY */}
       <main className="story" ref={storyRef}>
+        {String(sysSettings.announcementActive) === "true" && (
+          <div style={{ position: "fixed", top: "80px", left: 0, right: 0, background: "var(--latte)", color: "var(--espresso)", textAlign: "center", padding: "0.8rem", fontSize: "0.9rem", fontWeight: 600, zIndex: 100, letterSpacing: "0.05em" }}>
+            📢 {sysSettings.announcementText}
+          </div>
+        )}
         <div className="stage">
           
-          {/* SLIDE 1: INTRO */}
+          {/* SLIDE 1 */}
           <section className={`slide ${currentSlide === 0 ? 'active' : ''}`} data-theme="dark">
             <div className="bg" style={{ backgroundColor: '#1a0f0a' }}>
-              <video autoPlay muted loop playsInline className="bg">
-                <source src="/7287924-uhd_3840_2160_25fps.mp4" type="video/mp4" />
+              <video autoPlay muted loop playsInline className="bg" key={sysSettings.slide1Video || "default"}>
+                <source src={sysSettings.slide1Video || "/7287924-uhd_3840_2160_25fps.mp4"} type="video/mp4" />
               </video>
             </div>
             <div>
               <div className="eyebrow">{text.slide1Eyebrow}</div>
-              <h1>{text.slide1Title}</h1>
-              <p>{text.slide1Desc}</p>
+              <h1>{sysSettings.slide1Title || text.slide1Title}</h1>
+              <p>{sysSettings.slide1Desc || text.slide1Desc}</p>
               <a className="btn-ghost" href="#" onClick={(e) => { e.preventDefault(); openAuthModal("BUYER", false); }}>{text.slide1Btn}</a>
             </div>
+            
+            {/* RESTORED MOCKUPS */}
             <div className="mockup-container">
               <div className="browser-mockup">
                 <div className="browser-header">
@@ -426,6 +360,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+              
               <div className="phone-mockup">
                 <div className="phone-notch"></div>
                 <div className="phone-screen">
@@ -449,28 +384,24 @@ export default function Home() {
             </div>
           </section>
 
-          {/* SLIDE 2: SPLIT (BUYERS & SELLERS) */}
+          {/* SLIDE 2 */}
           <section className={`slide split ${currentSlide === 1 ? 'active' : ''}`} data-theme="light">
             <div className="split-left">
-              <div className="eyebrow">{text.slide2L}</div>
-              <h2>{text.slide2LTitle}</h2>
-              <p>{text.slide2LDesc}</p>
+              <div className="eyebrow">{text.slide2L}</div><h2>{text.slide2LTitle}</h2><p>{text.slide2LDesc}</p>
               <ul className="feature-list">
-                <li><svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg> {text.featL1}</li>
-                <li><svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg> {text.featL2}</li>
-                <li><svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg> {text.featL3}</li>
+                <li><svg viewBox="0 0 24 24" fill="none" strokeWidth="2"><path d="M5 13l4 4L19 7"/></svg> {text.featL1}</li>
+                <li><svg viewBox="0 0 24 24" fill="none" strokeWidth="2"><path d="M5 13l4 4L19 7"/></svg> {text.featL2}</li>
+                <li><svg viewBox="0 0 24 24" fill="none" strokeWidth="2"><path d="M5 13l4 4L19 7"/></svg> {text.featL3}</li>
               </ul>
               <a className="btn-ghost" href="#" onClick={(e) => { e.preventDefault(); openAuthModal("BUYER", false); }}>{text.slide2LBtn}</a>
             </div>
             <div className="split-right">
               <div className="content-wrapper">
-                <div className="eyebrow">{text.slide2R}</div>
-                <h2>{text.slide2RTitle}</h2>
-                <p>{text.slide2RDesc}</p>
+                <div className="eyebrow">{text.slide2R}</div><h2>{text.slide2RTitle}</h2><p>{text.slide2RDesc}</p>
                 <ul className="feature-list">
-                  <li><svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg> {text.featR1}</li>
-                  <li><svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg> {text.featR2}</li>
-                  <li><svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg> {text.featR3}</li>
+                  <li><svg viewBox="0 0 24 24" fill="none" strokeWidth="2"><path d="M5 13l4 4L19 7"/></svg> {text.featR1}</li>
+                  <li><svg viewBox="0 0 24 24" fill="none" strokeWidth="2"><path d="M5 13l4 4L19 7"/></svg> {text.featR2}</li>
+                  <li><svg viewBox="0 0 24 24" fill="none" strokeWidth="2"><path d="M5 13l4 4L19 7"/></svg> {text.featR3}</li>
                 </ul>
                 <a className="btn-ghost" href="#" onClick={(e) => { e.preventDefault(); openAuthModal("SELLER", false); }}>{text.slide2RBtn}</a>
               </div>
@@ -478,15 +409,11 @@ export default function Home() {
             <h1 className="big-title">{text.slide2Title}</h1>
           </section>
 
-          {/* SLIDE 3: THE NEW MARKETPLACE (Fixed Left Sidebar) */}
+          {/* SLIDE 3: MARKETPLACE */}
           <section className={`slide ${currentSlide === 2 ? 'active' : ''}`} data-theme="dark" style={{ background: "var(--espresso)", display: "flex", flexDirection: "row", padding: 0 }}>
-            
-            {/* LEFT SIDEBAR (All Filters & Sorting) */}
             <aside style={{ width: "280px", height: "100%", background: "#110a06", borderRight: "1px solid rgba(185,130,90,0.2)", padding: "6rem 2rem 2rem 2rem", display: "flex", flexDirection: "column", overflowY: "auto", zIndex: 10 }}>
-              
               <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.8rem", color: "var(--cream)", marginBottom: "2rem" }}>{text.filterTitle}</h2>
               
-              {/* Sort By */}
               <div style={{ marginBottom: "2rem" }}>
                 <h3 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(243,227,208,0.5)", marginBottom: "1rem" }}>{text.sortBy}</h3>
                 <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={{ width: "100%", padding: "0.8rem", background: "transparent", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", color: "var(--cream)", outline: "none", cursor: "pointer" }}>
@@ -496,7 +423,6 @@ export default function Home() {
                 </select>
               </div>
 
-              {/* Category */}
               <div style={{ marginBottom: "2rem" }}>
                 <h3 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(243,227,208,0.5)", marginBottom: "1rem" }}>{text.catTitle}</h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}>
@@ -511,7 +437,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Price Range */}
               <div style={{ marginBottom: "2rem" }}>
                 <h3 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(243,227,208,0.5)", marginBottom: "1rem" }}>{text.priceTitle}</h3>
                 <div style={{ display: "flex", gap: "0.8rem" }}>
@@ -520,90 +445,43 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Location */}
               <div style={{ marginBottom: "2rem" }}>
                 <h3 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(243,227,208,0.5)", marginBottom: "1rem" }}>{text.locTitle}</h3>
                 <select value={filterLocation} onChange={(e) => setFilterLocation(e.target.value)} style={{ width: "100%", padding: "0.8rem", background: "transparent", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", color: "var(--cream)", outline: "none", cursor: "pointer" }}>
                   <option value="Anywhere" style={{ color: "black" }}>{text.locAny}</option>
-                  <option value="Dar es Salaam" style={{ color: "black" }}>{text.locDar}</option>
-                  <option value="Mbeya" style={{ color: "black" }}>{text.locMbeya}</option>
-                  <option value="Arusha" style={{ color: "black" }}>{text.locArusha}</option>
+                  {["Arusha", "Dar es Salaam", "Dodoma", "Geita", "Iringa", "Kagera", "Katavi", "Kigoma", "Kilimanjaro", "Lindi", "Manyara", "Mara", "Mbeya", "Morogoro", "Mtwara", "Mwanza", "Njombe", "Pemba North", "Pemba South", "Pwani", "Rukwa", "Ruvuma", "Shinyanga", "Simiyu", "Singida", "Songwe", "Tabora", "Tanga", "Unguja North", "Unguja South", "Zanzibar Urban/West"].map(loc => (
+                    <option key={loc} value={loc} style={{ color: "black" }}>{loc}</option>
+                  ))}
                 </select>
               </div>
-
-              {/* Condition */}
-              <div style={{ marginBottom: "2rem" }}>
-                <h3 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(243,227,208,0.5)", marginBottom: "1rem" }}>{text.condTitle}</h3>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-                  {[{l: text.condAny, v: 'Any'}, {l: text.condNew, v: 'New'}, {l: text.condUsed, v: 'Used'}, {l: text.condRef, v: 'Refurbished'}].map((cond, i) => (
-                    <button key={i} onClick={() => setSelectedCondition(cond.v)} style={{ padding: "0.5rem 1rem", borderRadius: "20px", border: "1px solid rgba(185,130,90,0.4)", background: selectedCondition === cond.v ? "var(--latte)" : "transparent", color: selectedCondition === cond.v ? "var(--espresso)" : "var(--cream)", fontSize: "0.8rem", cursor: "pointer", fontWeight: selectedCondition === cond.v ? 600 : 400 }}>
-                      {cond.l}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Reset Button */}
-              <button onClick={() => { 
-                setMinPrice(""); 
-                setMaxPrice(""); 
-                setFilterLocation("Anywhere"); 
-                setSelectedCategory("All");
-                setSelectedCondition("Any");
-                setSearchQuery("");
-                setSortBy("Newest");
-              }} style={{ width: "100%", background: "transparent", color: "var(--latte)", border: "1px solid var(--latte)", padding: "1rem", borderRadius: "8px", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem", marginTop: "auto", transition: "0.3s" }} onMouseEnter={(e) => e.currentTarget.style.background = "rgba(217,164,124,0.1)"} onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
-                {text.reset}
-              </button>
             </aside>
 
-            {/* MAIN CONTENT */}
             <main style={{ flex: 1, height: "100%", padding: "6rem 4rem 2rem 4rem", display: "flex", flexDirection: "column", overflowY: "auto" }}>
-              
-              {/* Top Bar (Clean - Just Search) */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
                 <div>
-                  <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "2.5rem", color: "var(--cream)", margin: 0 }}>{text.explore}</h1>
-                  <p style={{ color: "rgba(243,227,208,0.5)", fontSize: "0.9rem", marginTop: "0.2rem" }}>{text.exploreDesc}</p>
+                  <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "2.5rem", color: "var(--cream)", margin: 0 }}>{sysSettings.heroTitle || text.explore}</h1>
+                  <p style={{ color: "rgba(243,227,208,0.5)", fontSize: "0.9rem", marginTop: "0.2rem" }}>{sysSettings.heroSubtitle || text.exploreDesc}</p>
                 </div>
-                
                 <div style={{ position: "relative" }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--latte)" strokeWidth="2" style={{ position: "absolute", left: "12px", top: "12px" }}><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                   <input type="text" placeholder={text.searchPlace} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ padding: "0.8rem 1rem 0.8rem 2.5rem", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", width: "300px", outline: "none", background: "transparent", color: "var(--cream)" }} />
                 </div>
               </div>
 
-              {/* Full Width Product Grid */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "2rem" }}>
                 {allProducts.length === 0 ? (
-                  <p style={{ gridColumn: "1 / -1", textAlign: "center", color: "rgba(243,227,208,0.4)", padding: "4rem 0" }}>No products found matching your filters.</p>
+                  <p style={{ gridColumn: "1 / -1", textAlign: "center", color: "rgba(243,227,208,0.4)", padding: "4rem 0" }}>No products found.</p>
                 ) : (
                   allProducts.map((prod) => (
                     <div key={prod.id} onClick={() => router.push(`/product/${prod.id}`)} style={{ background: "#1a0f0a", borderRadius: "16px", border: "1px solid rgba(185,130,90,0.1)", padding: "1.2rem", cursor: "pointer", transition: "transform 0.2s, border 0.2s" }} onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.borderColor = "var(--copper)"; }} onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = "rgba(185,130,90,0.1)"; }}>
-                      
-                      {/* Image */}
-                      <div style={{ height: "220px", background: prod.imageUrl ? `url(${prod.imageUrl}) center/cover` : "#110a06", borderRadius: "12px", marginBottom: "1rem", position: "relative" }}>
-                        <div style={{ position: "absolute", top: "0.5rem", right: "0.5rem", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)", borderRadius: "50%", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                        </div>
-                      </div>
-
-                      {/* Details */}
-                      <h3 style={{ margin: "0 0 0.3rem 0", fontSize: "1.1rem", fontWeight: 500, color: "var(--cream)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{prod.name}</h3>
+                      <div style={{ height: "220px", background: prod.imageUrl ? `url(${prod.imageUrl}) center/cover` : "#110a06", borderRadius: "12px", marginBottom: "1rem" }} />
+                      <h3 style={{ margin: "0 0 0.3rem 0", fontSize: "1.1rem", fontWeight: 500, color: "var(--cream)" }}>{prod.name}</h3>
                       <p style={{ margin: "0 0 1rem 0", fontSize: "1.2rem", fontWeight: 600, color: "var(--latte)" }}>TZS {prod.price.toLocaleString()}</p>
-
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(185,130,90,0.1)", paddingTop: "1rem" }}>
                         <div>
-                          <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.85rem", color: "rgba(243,227,208,0.8)", display: "flex", alignItems: "center", gap: "4px" }}>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#27c93f" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                            {prod.storeName}
-                          </p>
-                          <p style={{ margin: 0, fontSize: "0.8rem", color: "rgba(243,227,208,0.5)", display: "flex", alignItems: "center", gap: "4px" }}>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            {prod.location}
-                          </p>
+                          <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.85rem", color: "rgba(243,227,208,0.8)" }}>{prod.storeName}</p>
+                          <p style={{ margin: 0, fontSize: "0.8rem", color: "rgba(243,227,208,0.5)" }}>{prod.location}</p>
                         </div>
-                        
                         <button onClick={(e) => { e.stopPropagation(); handleWhatsApp(prod); }} style={{ background: "rgba(39, 201, 63, 0.1)", border: "none", color: "#27c93f", width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                         </button>
@@ -614,17 +492,14 @@ export default function Home() {
               </div>
             </main>
           </section>
-          {/* SLIDE 4: JOIN */}
+
+          {/* SLIDE 4 */}
           <section className={`slide ${currentSlide === 3 ? 'active' : ''}`} data-theme="dark">
             <div className="bg" style={{ backgroundColor: '#1a0f0a' }}>
-              <video autoPlay muted loop playsInline className="bg">
-                <source src="/8938253-hd_1080_1920_30fps.mp4" type="video/mp4" />
-              </video>
+              <video autoPlay muted loop playsInline className="bg"><source src="/8938253-hd_1080_1920_30fps.mp4" type="video/mp4" /></video>
             </div>
             <div>
-              <div className="eyebrow">{text.slide4Eyebrow}</div>
-              <h1>{text.slide4Title}</h1>
-              <p>{text.slide4Desc}</p>
+              <div className="eyebrow">{text.slide4Eyebrow}</div><h1>{text.slide4Title}</h1><p>{text.slide4Desc}</p>
               <a className="btn-ghost" href="#" onClick={(e) => { e.preventDefault(); openAuthModal("BUYER", false); }}>{text.slide4Btn}</a>
             </div>
           </section>
@@ -675,31 +550,19 @@ export default function Home() {
 
       {/* CHATBOT UI */}
       <div className={`chat-window ${isChatOpen ? 'open' : ''}`}>
-        <div className="chat-header">
-          <h3>{text.chatTitle}</h3>
-          <button className="chat-close" onClick={() => setIsChatOpen(false)}>×</button>
-        </div>
+        <div className="chat-header"><h3>{text.chatTitle}</h3><button className="chat-close" onClick={() => setIsChatOpen(false)}>×</button></div>
         <div className="chat-messages">
-          {chatMessages.map((msg, idx) => (
-            <div key={idx} className={`message ${msg.role}`}>
-              {msg.text}
-            </div>
-          ))}
+          {chatMessages.map((msg, idx) => <div key={idx} className={`message ${msg.role}`}>{msg.text}</div>)}
           {isTyping && <div className="message bot"><span className="typing-dots">...</span></div>}
           <div ref={chatEndRef} />
         </div>
         <form onSubmit={handleChatSubmit} className="chat-input-area">
           <input type="text" value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder={text.chatPlaceholder} />
-          <button type="submit" className="chat-send">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-          </button>
+          <button type="submit" className="chat-send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
         </form>
       </div>
-
       <button className="chat" aria-label="Chat" onClick={() => setIsChatOpen(!isChatOpen)}>
-        <svg viewBox="0 0 24 24">
-          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-        </svg>
+        <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
       </button>
     </>
   );

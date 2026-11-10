@@ -51,11 +51,22 @@ export class StoreService {
   async getMarketplace() {
     return this.prisma.store.findMany({
       where: { status: 'ACTIVE' },
-      include: {
-        products: {
-          where: { status: 'ACTIVE' },
-        }
-      }
+      include: { products: { where: { status: 'ACTIVE' } } }
+    });
+  }
+
+  // NEW: Admin Methods
+  async getAllStoresForAdmin() {
+    return this.prisma.store.findMany({
+      include: { owner: { select: { name: true, email: true } } },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+
+  async updateStoreStatus(id: string, status: any) {
+    return this.prisma.store.update({
+      where: { id },
+      data: { status }
     });
   }
 }

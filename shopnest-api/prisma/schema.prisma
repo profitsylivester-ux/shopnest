@@ -33,7 +33,6 @@ model User {
   role      Role     @default(BUYER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   store     Store?
 }
 
@@ -45,12 +44,11 @@ model Store {
   whatsappNumber String?
   logoUrl        String?
   bannerUrl      String?
-  location       String?     // NEW: Mbeya, Dar es Salaam, etc.
-  shopType       String?     // NEW: Online, Physical, Both
+  location       String?
+  shopType       String?
   status         StoreStatus @default(PENDING)
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
-
   ownerId        String      @unique
   owner          User        @relation(fields: [ownerId], references: [id])
   products       Product[]
@@ -65,7 +63,12 @@ model Product {
   status      ProductStatus @default(ACTIVE)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
-
   storeId     String
   store       Store         @relation(fields: [storeId], references: [id])
+}
+
+model Setting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String
 }

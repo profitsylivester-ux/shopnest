@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
 import { ProductsService } from './products.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
@@ -16,6 +16,36 @@ export class ProductsController {
     return this.productsService.findPublic(id);
   }
 
+  // --- ADMIN ROUTES ---
+  @Get('admin/all')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  getAllAdmin() {
+    return this.productsService.getAllProductsAdmin();
+  }
+
+  @Patch('admin/:id/status')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  updateStatusAdmin(@Param('id') id: string, @Body('status') status: any) {
+    return this.productsService.updateProductStatusAdmin(id, status);
+  }
+
+  @Get('admin/trash')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  getTrashed() {
+    return this.productsService.getTrashed();
+  }
+
+  @Patch('admin/restore/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  restore(@Param('id') id: string) {
+    return this.productsService.restoreProduct(id);
+  }
+
+  // --- SELLER ROUTES ---
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SELLER')
