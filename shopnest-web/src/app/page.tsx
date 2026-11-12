@@ -476,13 +476,13 @@ export default function Home() {
                     <div key={prod.id} onClick={() => router.push(`/product/${prod.id}`)} style={{ background: "#1a0f0a", borderRadius: "16px", border: "1px solid rgba(185,130,90,0.1)", padding: "1.2rem", cursor: "pointer", transition: "transform 0.2s, border 0.2s" }} onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.borderColor = "var(--copper)"; }} onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = "rgba(185,130,90,0.1)"; }}>
                       <div style={{ height: "220px", background: prod.imageUrl ? `url(${prod.imageUrl}) center/cover` : "#110a06", borderRadius: "12px", marginBottom: "1rem" }} />
                       <h3 style={{ margin: "0 0 0.3rem 0", fontSize: "1.1rem", fontWeight: 500, color: "var(--cream)" }}>{prod.name}</h3>
-                      <p style={{ margin: "0 0 1rem 0", fontSize: "1.2rem", fontWeight: 600, color: "var(--latte)" }}>TZS {prod.price.toLocaleString()}</p>
+                      <p style={{ margin: "0 0 0.3rem 0", fontSize: "1.2rem", fontWeight: 600, color: "var(--latte)" }}>TZS {prod.price.toLocaleString()}</p><p style={{ margin: "0 0 1rem 0", fontSize: "0.75rem", color: (prod.stockQuantity ?? 1) > 0 ? "#27c93f" : "#ff5f56" }}>{(prod.stockQuantity ?? 1) > 0 ? "In Stock (" + (prod.stockQuantity ?? 1) + ")" : "Sold Out"}</p>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(185,130,90,0.1)", paddingTop: "1rem" }}>
                         <div>
                           <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.85rem", color: "rgba(243,227,208,0.8)" }}>{prod.storeName}</p>
                           <p style={{ margin: 0, fontSize: "0.8rem", color: "rgba(243,227,208,0.5)" }}>{prod.location}</p>
                         </div>
-                        <button onClick={(e) => { e.stopPropagation(); handleWhatsApp(prod); }} style={{ background: "rgba(39, 201, 63, 0.1)", border: "none", color: "#27c93f", width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                        <button onClick={(e) => { e.stopPropagation(); handleWhatsApp(prod); }} disabled={(prod.stockQuantity ?? 1) <= 0} style={{ opacity: (prod.stockQuantity ?? 1) <= 0 ? 0.3 : 1, background: "rgba(39, 201, 63, 0.1)", border: "none", color: "#27c93f", width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                         </button>
                       </div>

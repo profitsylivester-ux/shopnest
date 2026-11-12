@@ -39,6 +39,7 @@ export default function SellerDashboard() {
   const [pPrice, setPPrice] = useState("");
   const [pDesc, setPDesc] = useState("");
   const [pImage, setPImage] = useState("");
+  const [pStock, setPStock] = useState("1");
   const [pSubmitting, setPSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -137,17 +138,17 @@ export default function SellerDashboard() {
       const res = await fetch("http://localhost:3001/products", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-        body: JSON.stringify({ name: pName, price: parseFloat(pPrice), description: pDesc, imageUrl: pImage }),
+        body: JSON.stringify({ name: pName, price: parseFloat(pPrice), description: pDesc, imageUrl: pImage, stockQuantity: parseInt(pStock || "0", 10) }),
       });
       if (res.status === 201) {
-        setIsPanelOpen(false); setPName(""); setPPrice(""); setPDesc(""); setPImage("");
+        setIsPanelOpen(false); setPName(""); setPPrice(""); setPDesc(""); setPImage(""); setPStock("1");
         fetchData();
       } else { alert("Failed to add product."); }
     } catch { alert("Network error."); } finally { setPSubmitting(false); }
   };
 
   const openAddPanel = () => {
-    if (editingId) { setPName(""); setPPrice(""); setPDesc(""); setPImage(""); }
+    if (editingId) { setPName(""); setPPrice(""); setPDesc(""); setPImage(""); setPStock("1"); }
     setEditingId(null);
     setIsPanelOpen(true);
   };
@@ -158,6 +159,7 @@ export default function SellerDashboard() {
     setPPrice(String(prod.price ?? ""));
     setPDesc(prod.description || "");
     setPImage(prod.imageUrl || "");
+    setPStock(String(prod.stockQuantity ?? 1));
     setIsPanelOpen(true);
   };
 
@@ -169,10 +171,10 @@ export default function SellerDashboard() {
       const res = await fetch(`http://localhost:3001/products/${editingId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-        body: JSON.stringify({ name: pName, price: parseFloat(pPrice), description: pDesc, imageUrl: pImage }),
+        body: JSON.stringify({ name: pName, price: parseFloat(pPrice), description: pDesc, imageUrl: pImage, stockQuantity: parseInt(pStock || "0", 10) }),
       });
       if (res.status === 200) {
-        setIsPanelOpen(false); setEditingId(null); setPName(""); setPPrice(""); setPDesc(""); setPImage("");
+        setIsPanelOpen(false); setEditingId(null); setPName(""); setPPrice(""); setPDesc(""); setPImage(""); setPStock("1");
         fetchData();
       } else if (res.status === 403) { alert("You can only edit your own products."); }
       else if (res.status === 404) { alert("Product not found."); }
@@ -405,7 +407,7 @@ export default function SellerDashboard() {
                         <div style={{ height: "100px", background: prod.imageUrl ? `url(${prod.imageUrl}) center/cover` : "var(--espresso)" }} />
                         <div style={{ padding: "0.8rem" }}>
                           <p style={{ color: "var(--cream)", fontSize: "0.9rem", margin: "0 0 0.2rem 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{prod.name}</p>
-                          <p style={{ color: "var(--latte)", fontSize: "0.85rem", margin: 0 }}>TZS {prod.price.toLocaleString()}</p>
+                          <p style={{ color: "var(--latte)", fontSize: "0.85rem", margin: 0 }}>TZS {prod.price.toLocaleString()}</p><p style={{ color: (prod.stockQuantity ?? 1) > 0 ? "#27c93f" : "#ff5f56", fontSize: "0.7rem", margin: "0.2rem 0 0 0" }}>{(prod.stockQuantity ?? 1) > 0 ? "In Stock (" + (prod.stockQuantity ?? 1) + ")" : "Sold Out"}</p>
                         </div>
                       </div>
                     ))
@@ -419,13 +421,13 @@ export default function SellerDashboard() {
                     <thead>
                       <tr style={{ borderBottom: "1px solid rgba(185,130,90,0.2)", color: "rgba(243,227,208,0.5)", textAlign: "left" }}>
                         <th style={{ paddingBottom: "0.8rem", fontWeight: 500 }}>Product</th>
-                        <th style={{ paddingBottom: "0.8rem", fontWeight: 500 }}>Status</th>
+                        <th style={{ paddingBottom: "0.8rem", fontWeight: 500 }}>Status</th><th style={{ paddingBottom: "0.8rem", fontWeight: 500 }}>Stock</th>
                         <th style={{ paddingBottom: "0.8rem", fontWeight: 500, textAlign: "right" }}>Price</th>
                       </tr>
                     </thead>
                     <tbody>
                       {products.length === 0 ? (
-                        <tr><td colSpan={3} style={{ padding: "1rem 0", textAlign: "center", color: "rgba(243,227,208,0.4)" }}>No products.</td></tr>
+                        <tr><td colSpan={4} style={{ padding: "1rem 0", textAlign: "center", color: "rgba(243,227,208,0.4)" }}>No products.</td></tr>
                       ) : (
                         products.slice(0, 4).map((prod) => (
                           <tr key={prod.id} style={{ borderBottom: "1px solid rgba(185,130,90,0.05)" }}>
@@ -435,7 +437,7 @@ export default function SellerDashboard() {
                                 {prod.status}
                               </button>
                             </td>
-                            <td style={{ padding: "0.8rem 0", color: "var(--latte)", textAlign: "right" }}>TZS {prod.price.toLocaleString()}</td>
+                            <td style={{ padding: "0.8rem 0", color: (prod.stockQuantity ?? 1) > 0 ? "var(--cream)" : "#ff5f56", fontSize: "0.75rem" }}>{(prod.stockQuantity ?? 1) > 0 ? (prod.stockQuantity ?? 1) : "Sold Out"}</td><td style={{ padding: "0.8rem 0", color: "var(--latte)", textAlign: "right" }}>TZS {prod.price.toLocaleString()}</td>
                           </tr>
                         ))
                       )}
@@ -466,7 +468,8 @@ export default function SellerDashboard() {
                           <p style={{ color: "var(--cream)", fontSize: "1rem", margin: 0, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{prod.name}</p>
                           <span style={{ color: prod.status === "ACTIVE" ? "#27c93f" : "#ff5f56", fontSize: "0.7rem", textTransform: "uppercase" }}>{prod.status}</span>
                         </div>
-                        <p style={{ color: "var(--latte)", fontSize: "1rem", margin: "0 0 1rem 0" }}>TZS {prod.price.toLocaleString()}</p>
+                        <p style={{ color: "var(--latte)", fontSize: "1rem", margin: "0 0 0.3rem 0" }}>TZS {prod.price.toLocaleString()}</p>
+                        <p style={{ color: prod.stockQuantity > 0 ? "#27c93f" : "#ff5f56", fontSize: "0.75rem", margin: "0 0 1rem 0" }}>{prod.stockQuantity > 0 ? "In Stock (" + prod.stockQuantity + ")" : "Sold Out"}</p>
                         <button onClick={() => openEditPanel(prod)} style={{ width: "100%", padding: "0.5rem", marginBottom: "0.5rem", background: "transparent", border: "1px solid var(--copper)", color: "var(--latte)", borderRadius: "4px", fontSize: "0.8rem", cursor: "pointer", transition: "0.3s" }}>Edit Product</button>
                         <button onClick={() => toggleProductStatus(prod.id, prod.status)} style={{ width: "100%", padding: "0.5rem", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--cream)", borderRadius: "4px", fontSize: "0.8rem", cursor: "pointer", transition: "0.3s" }}>
                           {prod.status === "ACTIVE" ? "Hide Product" : "Make Active"}
@@ -571,6 +574,10 @@ export default function SellerDashboard() {
           <div className="form-group">
             <label>Description</label>
             <input value={pDesc} onChange={(e) => setPDesc(e.target.value)} placeholder="Brief details..." />
+          </div>
+          <div className="form-group">
+            <label>Stock Quantity</label>
+            <input required type="number" min="0" value={pStock} onChange={(e) => setPStock(e.target.value)} placeholder="1" />
           </div>
           <div className="form-group">
             <label>Image</label>
