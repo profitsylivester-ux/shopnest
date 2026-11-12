@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
 import { JwtModule } from '@nestjs/jwt';
@@ -12,6 +13,7 @@ if (!jwtSecret || jwtSecret.length < 32) {
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 5 }]),
     JwtModule.register({
       global: true,
       secret: jwtSecret,
