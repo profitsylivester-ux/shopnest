@@ -62,6 +62,8 @@ model Product {
   imageUrl    String?
   status      ProductStatus @default(ACTIVE)
   stockQuantity Int         @default(1)
+  category      String?
+  condition     String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   storeId     String

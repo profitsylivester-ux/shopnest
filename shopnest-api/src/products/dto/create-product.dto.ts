@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min, Matches } from 'class-validator';
+import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min, Matches, IsIn } from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
@@ -22,4 +22,12 @@ export class CreateProductDto {
   @IsInt()
   @Min(0)
   stockQuantity?: number;
+
+  @IsOptional()
+  @IsIn(['Electronics', 'Fashion', 'Shoes', 'Vehicles', 'Food', 'Services'])
+  category?: string;
+
+  @IsOptional()
+  @IsIn(['New', 'Used', 'Refurbished'])
+  condition?: string;
 }

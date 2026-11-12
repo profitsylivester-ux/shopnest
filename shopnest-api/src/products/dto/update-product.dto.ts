@@ -26,6 +26,14 @@ export class UpdateProductDto {
   stockQuantity?: number;
 
   @IsOptional()
+  @IsIn(['Electronics', 'Fashion', 'Shoes', 'Vehicles', 'Food', 'Services'])
+  category?: string;
+
+  @IsOptional()
+  @IsIn(['New', 'Used', 'Refurbished'])
+  condition?: string;
+
+  @IsOptional()
   @IsIn(['ACTIVE', 'HIDDEN'])
   status?: ProductStatus;
 }
