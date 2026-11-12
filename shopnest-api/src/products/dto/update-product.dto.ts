@@ -1,4 +1,4 @@
-import { IsIn, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsIn, IsInt, IsNumber, IsOptional, IsString, Min, Matches } from 'class-validator';
 import { ProductStatus } from '@prisma/client';
 
 export class UpdateProductDto {
@@ -17,6 +17,7 @@ export class UpdateProductDto {
 
   @IsOptional()
   @IsString()
+  @Matches(/^(?:|https?:\/\/[^\s"'()<>\\]+|data:image\/(?:png|jpeg|webp|gif|avif);base64,[A-Za-z0-9+\/=]+)$/, { message: 'imageUrl must be an http(s) link or a png/jpeg/webp/gif/avif data image' })
   imageUrl?: string;
 
   @IsOptional()
