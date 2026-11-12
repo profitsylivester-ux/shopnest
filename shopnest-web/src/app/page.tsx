@@ -54,6 +54,8 @@ const t = {
   }
 };
 
+const MAIN_CATS = ["Electronics", "Phones & Tablets", "Computers", "Fashion", "Shoes", "Bags & Accessories", "Beauty & Health", "Home & Furniture", "Appliances", "Vehicles", "Auto Parts", "Property", "Food & Drinks", "Books & Stationery", "Sports & Fitness", "Baby & Kids", "Agriculture", "Services"];
+
 export default function Home() {
   const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -178,7 +180,7 @@ export default function Home() {
   );
 
   if (searchQuery) allProducts = allProducts.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.storeName.toLowerCase().includes(searchQuery.toLowerCase()));
-  if (selectedCategory !== "All") allProducts = allProducts.filter(p => p.category === selectedCategory);
+  if (selectedCategory === "__other") allProducts = allProducts.filter(p => p.category && !MAIN_CATS.includes(p.category)); else if (selectedCategory !== "All") allProducts = allProducts.filter(p => p.category === selectedCategory);
   if (minPrice) allProducts = allProducts.filter(p => p.price >= parseInt(minPrice));
   if (maxPrice) allProducts = allProducts.filter(p => p.price <= parseInt(maxPrice));
   if (filterLocation !== "Anywhere") allProducts = allProducts.filter(p => p.location === filterLocation);
@@ -425,8 +427,8 @@ export default function Home() {
 
               <div style={{ marginBottom: "2rem" }}>
                 <h3 style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(243,227,208,0.5)", marginBottom: "1rem" }}>{text.catTitle}</h3>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}>
-                  {[{l: text.catAll, v: 'All'}, {l: text.catElec, v: 'Electronics'}, {l: text.catFash, v: 'Fashion'}, {l: text.catShoes, v: 'Shoes'}, {l: text.catVeh, v: 'Vehicles'}, {l: text.catFood, v: 'Food'}, {l: text.catServ, v: 'Services'}].map((cat, i) => (
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.8rem", maxHeight: "300px", overflowY: "auto" }}>
+                  {[{l: text.catAll, v: 'All'}, ...MAIN_CATS.map((c) => ({l: c, v: c})), {l: "Other", v: '__other'}].map((cat, i) => (
                     <label key={i} onClick={() => setSelectedCategory(cat.v)} style={{ display: "flex", alignItems: "center", gap: "0.8rem", color: selectedCategory === cat.v ? "var(--latte)" : "var(--cream)", fontSize: "0.9rem", cursor: "pointer" }}>
                       <div style={{ width: "16px", height: "16px", borderRadius: "4px", background: selectedCategory === cat.v ? "var(--latte)" : "transparent", border: selectedCategory === cat.v ? "none" : "1px solid rgba(185,130,90,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                         {selectedCategory === cat.v && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--espresso)" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>}
