@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+const CATS = ["Electronics", "Phones & Tablets", "Computers", "Fashion", "Shoes", "Bags & Accessories", "Beauty & Health", "Home & Furniture", "Appliances", "Vehicles", "Auto Parts", "Property", "Food & Drinks", "Books & Stationery", "Sports & Fitness", "Baby & Kids", "Agriculture", "Services"];
+
 export default function SellerDashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -42,6 +44,7 @@ export default function SellerDashboard() {
   const [pStock, setPStock] = useState("1");
   const [pCategory, setPCategory] = useState("");
   const [pCondition, setPCondition] = useState("");
+  const [pCatOther, setPCatOther] = useState(false);
   const [pSubmitting, setPSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -143,14 +146,14 @@ export default function SellerDashboard() {
         body: JSON.stringify({ name: pName, price: parseFloat(pPrice), description: pDesc, imageUrl: pImage, stockQuantity: parseInt(pStock || "0", 10), category: pCategory || undefined, condition: pCondition || undefined }),
       });
       if (res.status === 201) {
-        setIsPanelOpen(false); setPName(""); setPPrice(""); setPDesc(""); setPImage(""); setPStock("1"); setPCategory(""); setPCondition("");
+        setIsPanelOpen(false); setPName(""); setPPrice(""); setPDesc(""); setPImage(""); setPStock("1"); setPCategory(""); setPCondition(""); setPCatOther(false);
         fetchData();
       } else { alert("Failed to add product."); }
     } catch { alert("Network error."); } finally { setPSubmitting(false); }
   };
 
   const openAddPanel = () => {
-    if (editingId) { setPName(""); setPPrice(""); setPDesc(""); setPImage(""); setPStock("1"); setPCategory(""); setPCondition(""); }
+    if (editingId) { setPName(""); setPPrice(""); setPDesc(""); setPImage(""); setPStock("1"); setPCategory(""); setPCondition(""); setPCatOther(false); }
     setEditingId(null);
     setIsPanelOpen(true);
   };
@@ -162,7 +165,7 @@ export default function SellerDashboard() {
     setPDesc(prod.description || "");
     setPImage(prod.imageUrl || "");
     setPStock(String(prod.stockQuantity ?? 1));
-    setPCategory(prod.category || ""); setPCondition(prod.condition || "");
+    setPCategory(prod.category || ""); setPCondition(prod.condition || ""); setPCatOther(!!prod.category && !CATS.includes(prod.category));
     setIsPanelOpen(true);
   };
 
@@ -177,7 +180,7 @@ export default function SellerDashboard() {
         body: JSON.stringify({ name: pName, price: parseFloat(pPrice), description: pDesc, imageUrl: pImage, stockQuantity: parseInt(pStock || "0", 10), category: pCategory || undefined, condition: pCondition || undefined }),
       });
       if (res.status === 200) {
-        setIsPanelOpen(false); setEditingId(null); setPName(""); setPPrice(""); setPDesc(""); setPImage(""); setPStock("1"); setPCategory(""); setPCondition("");
+        setIsPanelOpen(false); setEditingId(null); setPName(""); setPPrice(""); setPDesc(""); setPImage(""); setPStock("1"); setPCategory(""); setPCondition(""); setPCatOther(false);
         fetchData();
       } else if (res.status === 403) { alert("You can only edit your own products."); }
       else if (res.status === 404) { alert("Product not found."); }
@@ -584,10 +587,12 @@ export default function SellerDashboard() {
           </div>
           <div className="form-group">
             <label>Category</label>
-            <select required value={pCategory} onChange={(e) => setPCategory(e.target.value)} style={{ width: "100%", padding: "0.9rem 1rem", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", color: "var(--cream)", outline: "none", fontFamily: "inherit", fontSize: "0.95rem" }}>
+            <select required value={pCatOther ? "Other" : pCategory} onChange={(e) => { if (e.target.value === "Other") { setPCatOther(true); setPCategory(""); } else { setPCatOther(false); setPCategory(e.target.value); } }} style={{ width: "100%", padding: "0.9rem 1rem", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", color: "var(--cream)", outline: "none", fontFamily: "inherit", fontSize: "0.95rem" }}>
               <option value="" style={{ color: "black" }}>Select category</option>
-              {["Electronics", "Fashion", "Shoes", "Vehicles", "Food", "Services"].map((c) => <option key={c} value={c} style={{ color: "black" }}>{c}</option>)}
+              {CATS.map((c) => <option key={c} value={c} style={{ color: "black" }}>{c}</option>)}
+              <option value="Other" style={{ color: "black" }}>Other (type your own)</option>
             </select>
+            {pCatOther && <input required maxLength={40} value={pCategory} onChange={(e) => setPCategory(e.target.value)} placeholder="Type your category, e.g. Musical instruments" style={{ marginTop: "0.6rem" }} />}
           </div>
           <div className="form-group">
             <label>Condition</label>

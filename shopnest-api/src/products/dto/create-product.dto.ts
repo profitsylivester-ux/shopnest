@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min, Matches, IsIn } from 'class-validator';
+import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min, Matches, IsIn, MaxLength } from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
@@ -24,7 +24,9 @@ export class CreateProductDto {
   stockQuantity?: number;
 
   @IsOptional()
-  @IsIn(['Electronics', 'Fashion', 'Shoes', 'Vehicles', 'Food', 'Services'])
+  @IsString()
+  @MaxLength(40)
+  @Matches(/^[\p{L}\p{N}][\p{L}\p{N} &,'\/\-]*$/u, { message: 'category contains invalid characters' })
   category?: string;
 
   @IsOptional()

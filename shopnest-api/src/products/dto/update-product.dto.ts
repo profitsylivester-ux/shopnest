@@ -1,4 +1,4 @@
-import { IsIn, IsInt, IsNumber, IsOptional, IsString, Min, Matches } from 'class-validator';
+import { IsIn, IsInt, IsNumber, IsOptional, IsString, Min, Matches, MaxLength } from 'class-validator';
 import { ProductStatus } from '@prisma/client';
 
 export class UpdateProductDto {
@@ -26,7 +26,9 @@ export class UpdateProductDto {
   stockQuantity?: number;
 
   @IsOptional()
-  @IsIn(['Electronics', 'Fashion', 'Shoes', 'Vehicles', 'Food', 'Services'])
+  @IsString()
+  @MaxLength(40)
+  @Matches(/^[\p{L}\p{N}][\p{L}\p{N} &,'\/\-]*$/u, { message: 'category contains invalid characters' })
   category?: string;
 
   @IsOptional()
