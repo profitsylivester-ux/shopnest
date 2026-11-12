@@ -5,11 +5,16 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { RolesGuard } from './guards/roles.guard.js';
 
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret || jwtSecret.length < 32) {
+  throw new Error("JWT_SECRET is missing or too short (min 32 characters). Set it in shopnest-api/.env");
+}
+
 @Module({
   imports: [
     JwtModule.register({
       global: true,
-      secret: process.env.JWT_SECRET || 'shopnest-super-secret-key-2026',
+      secret: jwtSecret,
       signOptions: { expiresIn: '1d' },
     }),
   ],
