@@ -42,17 +42,19 @@ export class StoreService {
   async findPublic(slug: string) {
     const store = await this.prisma.store.findUnique({
       where: { slug },
-      include: { products: { where: { status: 'ACTIVE' }, orderBy: { createdAt: 'desc' } } }
+      include: { products: { where: { status: 'ACTIVE' }, orderBy: { createdAt: 'desc' } } },
     });
-    if (!store) throw new NotFoundException('Store not found');
-    return store;
+    if (!store || store.status !== 'ACTIVE') throw new NotFoundException('Store not found');
+    const { ownerId, ...publicStore } = store;
+    return publicStore;
   }
 
   async getMarketplace() {
-    return this.prisma.store.findMany({
+    const stores = await this.prisma.store.findMany({
       where: { status: 'ACTIVE' },
-      include: { products: { where: { status: 'ACTIVE' } } }
+      include: { products: { where: { status: 'ACTIVE' } } },
     });
+    return stores.map(({ ownerId, ...publicStore }) => publicStore);
   }
 
   // NEW: Admin Methods

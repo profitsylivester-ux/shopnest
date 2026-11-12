@@ -38,10 +38,13 @@ export class ProductsService {
   async findPublic(id: string) {
     const product = await this.prisma.product.findUnique({
       where: { id },
-      include: { store: true }
+      include: { store: true },
     });
-    if (!product) throw new NotFoundException('Product not found');
-    return product;
+    if (!product || product.status !== 'ACTIVE' || product.store.status !== 'ACTIVE') {
+      throw new NotFoundException('Product not found');
+    }
+    const { ownerId, ...publicStore } = product.store;
+    return { ...product, store: publicStore };
   }
 
   // --- ADMIN METHODS ---
