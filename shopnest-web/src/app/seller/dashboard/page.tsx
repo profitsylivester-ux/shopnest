@@ -97,10 +97,32 @@ export default function SellerDashboard() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { alert("Image must be less than 5MB."); return; }
-    const reader = new FileReader();
-    reader.onloadend = () => { setter(reader.result as string); };
-    reader.readAsDataURL(file);
+    if (!file.type.startsWith("image/")) { alert("Please choose an image file."); return; }
+    if (file.size > 15 * 1024 * 1024) { alert("Image must be less than 15MB."); return; }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const maxSide = 1280;
+      const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+      const w = Math.max(1, Math.round(img.width * scale));
+      const h = Math.max(1, Math.round(img.height * scale));
+      const canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { URL.revokeObjectURL(url); alert("Could not process this image."); return; }
+      ctx.drawImage(img, 0, 0, w, h);
+      let out = canvas.toDataURL("image/webp", 0.82);
+      if (!out.startsWith("data:image/webp")) {
+        ctx.globalCompositeOperation = "destination-over";
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, w, h);
+        out = canvas.toDataURL("image/jpeg", 0.82);
+      }
+      URL.revokeObjectURL(url);
+      setter(out);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); alert("Could not read this image. Try a JPG, PNG or WebP photo."); };
+    img.src = url;
   };
 
   const handleCreateStore = async (e: React.FormEvent) => {
