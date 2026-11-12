@@ -57,7 +57,7 @@ export default function ProductDetail() {
             top: "8rem", 
             height: "75vh", 
             width: "100%", 
-            background: product.imageUrl ? `url(${product.imageUrl}) center/cover` : "var(--roast)", 
+            background: product.imageUrl ? `url(${product.imageUrl}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${product.imageUrl}) center/cover` : "var(--roast)", 
             borderRadius: "24px", 
             boxShadow: "0 25px 50px rgba(0,0,0,0.6)",
             border: "1px solid rgba(185,130,90,0.2)"

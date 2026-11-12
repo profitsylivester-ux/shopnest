@@ -30,7 +30,7 @@ export default function Marketplace() {
     <Link href={`/store/${prod.storeSlug}`} style={{ textDecoration: "none" }}>
       <div style={{ background: "#23130c", borderRadius: "20px", overflow: "hidden", boxShadow: "0 10px 25px rgba(0,0,0,0.3)", transition: "transform 0.3s" }} onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-5px)"} onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}>
         
-        <div style={{ height: "220px", position: "relative", background: prod.imageUrl ? `url(${prod.imageUrl}) center/cover` : "var(--espresso)" }}>
+        <div style={{ height: "220px", position: "relative", background: prod.imageUrl ? `url(${prod.imageUrl}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${prod.imageUrl}) center/cover` : "var(--espresso)" }}>
           {tag && (
             <div style={{ position: "absolute", top: "1rem", left: "1rem", background: "var(--latte)", color: "var(--espresso)", padding: "0.2rem 0.6rem", borderRadius: "10px", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.05em" }}>
               {tag}

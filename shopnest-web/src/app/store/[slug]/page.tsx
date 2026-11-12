@@ -81,7 +81,7 @@ export default function PublicStorefront() {
               <div key={prod.id} onClick={() => setSelectedProduct(prod)} style={{ background: "#23130c", borderRadius: "24px", overflow: "hidden", boxShadow: "0 15px 35px rgba(0,0,0,0.4)", cursor: "pointer", transition: "transform 0.3s" }} onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-8px)"} onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}>
                 
                 {/* Image with Floating Tag */}
-                <div style={{ height: "240px", position: "relative", background: prod.imageUrl ? `url(${prod.imageUrl}) center/cover` : "var(--espresso)" }}>
+                <div style={{ height: "240px", position: "relative", background: prod.imageUrl ? `url(${prod.imageUrl}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${prod.imageUrl}) center/cover` : "var(--espresso)" }}>
                   <div style={{ position: "absolute", top: "1rem", left: "1rem", background: "rgba(255,255,255,0.9)", color: "var(--espresso)", padding: "0.3rem 0.8rem", borderRadius: "20px", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.05em" }}>
                     NEW ARRIVAL
                   </div>
@@ -114,7 +114,7 @@ export default function PublicStorefront() {
             
             <button onClick={() => setSelectedProduct(null)} style={{ position: "absolute", top: "1.5rem", right: "1.5rem", background: "#000", border: "none", color: "#fff", width: "36px", height: "36px", borderRadius: "50%", fontSize: "1.2rem", cursor: "pointer", zIndex: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
 
-            <div style={{ flex: 1, minHeight: "400px", background: selectedProduct.imageUrl ? `url(${selectedProduct.imageUrl}) center/cover` : "var(--espresso)" }} />
+            <div style={{ flex: 1, minHeight: "400px", background: selectedProduct.imageUrl ? `url(${selectedProduct.imageUrl}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${selectedProduct.imageUrl}) center/cover` : "var(--espresso)" }} />
 
             <div style={{ flex: 1, padding: "3rem", display: "flex", flexDirection: "column", justifyContent: "center" }}>
               <p style={{ color: "var(--latte)", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1rem" }}>Product Details</p>

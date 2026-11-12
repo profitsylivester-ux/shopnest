@@ -404,7 +404,7 @@ export default function SellerDashboard() {
                   ) : (
                     activeProducts.slice(0, 3).map((prod) => (
                       <div key={prod.id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(185,130,90,0.2)", borderRadius: "12px", overflow: "hidden" }}>
-                        <div style={{ height: "100px", background: prod.imageUrl ? `url(${prod.imageUrl}) center/cover` : "var(--espresso)" }} />
+                        <div style={{ height: "100px", background: prod.imageUrl ? `url(${prod.imageUrl}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${prod.imageUrl}) center/cover` : "var(--espresso)" }} />
                         <div style={{ padding: "0.8rem" }}>
                           <p style={{ color: "var(--cream)", fontSize: "0.9rem", margin: "0 0 0.2rem 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{prod.name}</p>
                           <p style={{ color: "var(--latte)", fontSize: "0.85rem", margin: 0 }}>TZS {prod.price.toLocaleString()}</p><p style={{ color: (prod.stockQuantity ?? 1) > 0 ? "#27c93f" : "#ff5f56", fontSize: "0.7rem", margin: "0.2rem 0 0 0" }}>{(prod.stockQuantity ?? 1) > 0 ? "In Stock (" + (prod.stockQuantity ?? 1) + ")" : "Sold Out"}</p>
@@ -462,7 +462,7 @@ export default function SellerDashboard() {
                ) : (
                   products.map((prod) => (
                     <div key={prod.id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(185,130,90,0.2)", borderRadius: "12px", overflow: "hidden" }}>
-                      <div style={{ height: "160px", background: prod.imageUrl ? `url(${prod.imageUrl}) center/cover` : "var(--espresso)" }} />
+                      <div style={{ height: "160px", background: prod.imageUrl ? `url(${prod.imageUrl}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${prod.imageUrl}) center/cover` : "var(--espresso)" }} />
                       <div style={{ padding: "1rem" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
                           <p style={{ color: "var(--cream)", fontSize: "1rem", margin: 0, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{prod.name}</p>
