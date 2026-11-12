@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { ProductStatus } from '@prisma/client';
 
 export class UpdateProductDto {
@@ -20,6 +20,6 @@ export class UpdateProductDto {
   imageUrl?: string;
 
   @IsOptional()
-  @IsEnum(ProductStatus)
+  @IsIn(['ACTIVE', 'HIDDEN'])
   status?: ProductStatus;
 }

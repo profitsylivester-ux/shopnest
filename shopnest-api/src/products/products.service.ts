@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
@@ -30,7 +30,8 @@ export class ProductsService {
       include: { store: true },
     });
     if (!product) throw new NotFoundException('Product not found.');
-    if (product.store.ownerId !== ownerId) throw new Error('Unauthorized');
+    if (product.store.ownerId !== ownerId) throw new ForbiddenException('You can only edit your own products.');
+    if (product.status === 'TRASHED') throw new NotFoundException('Product not found.');
     return this.prisma.product.update({ where: { id: productId }, data: dto });
   }
 

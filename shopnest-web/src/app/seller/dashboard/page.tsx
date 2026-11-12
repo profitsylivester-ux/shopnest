@@ -40,6 +40,7 @@ export default function SellerDashboard() {
   const [pDesc, setPDesc] = useState("");
   const [pImage, setPImage] = useState("");
   const [pSubmitting, setPSubmitting] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const getToken = () => localStorage.getItem("shopnest_token");
 
@@ -142,6 +143,40 @@ export default function SellerDashboard() {
         setIsPanelOpen(false); setPName(""); setPPrice(""); setPDesc(""); setPImage("");
         fetchData();
       } else { alert("Failed to add product."); }
+    } catch { alert("Network error."); } finally { setPSubmitting(false); }
+  };
+
+  const openAddPanel = () => {
+    if (editingId) { setPName(""); setPPrice(""); setPDesc(""); setPImage(""); }
+    setEditingId(null);
+    setIsPanelOpen(true);
+  };
+
+  const openEditPanel = (prod: any) => {
+    setEditingId(prod.id);
+    setPName(prod.name || "");
+    setPPrice(String(prod.price ?? ""));
+    setPDesc(prod.description || "");
+    setPImage(prod.imageUrl || "");
+    setIsPanelOpen(true);
+  };
+
+  const handleUpdateProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingId) return;
+    setPSubmitting(true);
+    try {
+      const res = await fetch(`http://localhost:3001/products/${editingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify({ name: pName, price: parseFloat(pPrice), description: pDesc, imageUrl: pImage }),
+      });
+      if (res.status === 200) {
+        setIsPanelOpen(false); setEditingId(null); setPName(""); setPPrice(""); setPDesc(""); setPImage("");
+        fetchData();
+      } else if (res.status === 403) { alert("You can only edit your own products."); }
+      else if (res.status === 404) { alert("Product not found."); }
+      else { alert("Failed to update product."); }
     } catch { alert("Network error."); } finally { setPSubmitting(false); }
   };
 
@@ -359,7 +394,7 @@ export default function SellerDashboard() {
               <div style={{ background: "var(--roast)", borderRadius: "16px", padding: "1.5rem", border: "1px solid rgba(185,130,90,0.1)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
                   <h3 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.2rem", color: "var(--cream)", margin: 0 }}>Our Top Collection</h3>
-                  <button onClick={() => setIsPanelOpen(true)} style={{ background: "transparent", border: "1px solid var(--copper)", color: "var(--latte)", padding: "0.4rem 1rem", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem", transition: "0.3s" }}>+ Add Product</button>
+                  <button onClick={openAddPanel} style={{ background: "transparent", border: "1px solid var(--copper)", color: "var(--latte)", padding: "0.4rem 1rem", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem", transition: "0.3s" }}>+ Add Product</button>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" }}>
                   {activeProducts.length === 0 ? (
@@ -416,7 +451,7 @@ export default function SellerDashboard() {
           <div style={{ background: "var(--roast)", borderRadius: "16px", padding: "2rem", border: "1px solid rgba(185,130,90,0.1)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
               <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.5rem", color: "var(--cream)", margin: 0 }}>All Inventory</h2>
-              <button onClick={() => setIsPanelOpen(true)} style={{ background: "transparent", border: "1px solid var(--copper)", color: "var(--latte)", padding: "0.6rem 1.5rem", borderRadius: "4px", cursor: "pointer", fontSize: "0.85rem", transition: "0.3s" }}>+ Add New Product</button>
+              <button onClick={openAddPanel} style={{ background: "transparent", border: "1px solid var(--copper)", color: "var(--latte)", padding: "0.6rem 1.5rem", borderRadius: "4px", cursor: "pointer", fontSize: "0.85rem", transition: "0.3s" }}>+ Add New Product</button>
             </div>
             
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1.5rem" }}>
@@ -432,6 +467,7 @@ export default function SellerDashboard() {
                           <span style={{ color: prod.status === "ACTIVE" ? "#27c93f" : "#ff5f56", fontSize: "0.7rem", textTransform: "uppercase" }}>{prod.status}</span>
                         </div>
                         <p style={{ color: "var(--latte)", fontSize: "1rem", margin: "0 0 1rem 0" }}>TZS {prod.price.toLocaleString()}</p>
+                        <button onClick={() => openEditPanel(prod)} style={{ width: "100%", padding: "0.5rem", marginBottom: "0.5rem", background: "transparent", border: "1px solid var(--copper)", color: "var(--latte)", borderRadius: "4px", fontSize: "0.8rem", cursor: "pointer", transition: "0.3s" }}>Edit Product</button>
                         <button onClick={() => toggleProductStatus(prod.id, prod.status)} style={{ width: "100%", padding: "0.5rem", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--cream)", borderRadius: "4px", fontSize: "0.8rem", cursor: "pointer", transition: "0.3s" }}>
                           {prod.status === "ACTIVE" ? "Hide Product" : "Make Active"}
                         </button>
@@ -520,10 +556,10 @@ export default function SellerDashboard() {
       }}>
         <button onClick={() => setIsPanelOpen(false)} style={{ position: "absolute", top: "2rem", right: "2rem", background: "none", border: "none", color: "var(--cream)", fontSize: "2rem", cursor: "pointer", fontFamily: "Cormorant Garamond, serif" }}>×</button>
         
-        <h2 style={{ fontFamily: "Playfair Display, serif", fontSize: "2.5rem", color: "var(--cream)", fontStyle: "italic", marginBottom: "1rem" }}>New Masterpiece</h2>
-        <p style={{ color: "var(--copper)", fontSize: "0.85rem", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "3rem" }}>Add to your collection</p>
+        <h2 style={{ fontFamily: "Playfair Display, serif", fontSize: "2.5rem", color: "var(--cream)", fontStyle: "italic", marginBottom: "1rem" }}>{editingId ? "Edit Product" : "New Masterpiece"}</h2>
+        <p style={{ color: "var(--copper)", fontSize: "0.85rem", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "3rem" }}>{editingId ? "Update your product details" : "Add to your collection"}</p>
         
-        <form onSubmit={handleCreateProduct} style={{ flex: 1 }}>
+        <form onSubmit={editingId ? handleUpdateProduct : handleCreateProduct} style={{ flex: 1 }}>
           <div className="form-group">
             <label>Product Name</label>
             <input required value={pName} onChange={(e) => setPName(e.target.value)} placeholder="e.g. Vintage Leather Bag" />
@@ -549,7 +585,7 @@ export default function SellerDashboard() {
           </div>
           
           <button type="submit" disabled={pSubmitting} style={{ width: "100%", marginTop: "2rem", background: "var(--latte)", color: "var(--espresso)", border: "none", padding: "1rem", fontSize: "0.9rem", letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", fontWeight: 600 }}>
-            {pSubmitting ? "Saving..." : "Save Product"}
+            {pSubmitting ? "Saving..." : editingId ? "Save Changes" : "Save Product"}
           </button>
         </form>
       </div>
