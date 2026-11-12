@@ -173,7 +173,7 @@ export default function Home() {
   // --- MARKETPLACE LOGIC ---
   let allProducts = stores.flatMap(store => 
     store.products.map((prod: any) => ({ 
-      ...prod, storeName: store.name, storeSlug: store.slug, whatsapp: store.whatsappNumber, location: store.location || "Tanzania", category: "Fashion", condition: "New"
+      ...prod, storeName: store.name, storeSlug: store.slug, whatsapp: store.whatsappNumber, location: store.location || "Tanzania"
     }))
   );
 
@@ -476,7 +476,7 @@ export default function Home() {
                     <div key={prod.id} onClick={() => router.push(`/product/${prod.id}`)} style={{ background: "#1a0f0a", borderRadius: "16px", border: "1px solid rgba(185,130,90,0.1)", padding: "1.2rem", cursor: "pointer", transition: "transform 0.2s, border 0.2s" }} onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.borderColor = "var(--copper)"; }} onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = "rgba(185,130,90,0.1)"; }}>
                       <div style={{ height: "220px", background: prod.imageUrl ? `url(${prod.imageUrl}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${prod.imageUrl}) center/cover` : "#110a06", borderRadius: "12px", marginBottom: "1rem" }} />
                       <h3 style={{ margin: "0 0 0.3rem 0", fontSize: "1.1rem", fontWeight: 500, color: "var(--cream)" }}>{prod.name}</h3>
-                      <p style={{ margin: "0 0 0.3rem 0", fontSize: "1.2rem", fontWeight: 600, color: "var(--latte)" }}>TZS {prod.price.toLocaleString()}</p><p style={{ margin: "0 0 1rem 0", fontSize: "0.75rem", color: (prod.stockQuantity ?? 1) > 0 ? "#27c93f" : "#ff5f56" }}>{(prod.stockQuantity ?? 1) > 0 ? "In Stock (" + (prod.stockQuantity ?? 1) + ")" : "Sold Out"}</p>
+                      <p style={{ margin: "0 0 0.3rem 0", fontSize: "1.2rem", fontWeight: 600, color: "var(--latte)" }}>TZS {prod.price.toLocaleString()}</p><p style={{ margin: "0 0 1rem 0", fontSize: "0.75rem", color: (prod.stockQuantity ?? 1) <= 0 ? "#ff5f56" : (prod.stockQuantity ?? 1) <= 3 ? "#e8a33d" : "#27c93f" }}>{(prod.stockQuantity ?? 1) > 0 ? ((prod.stockQuantity ?? 1) <= 3 ? "Low Stock (" : "In Stock (") + (prod.stockQuantity ?? 1) + ")" : "Sold Out"}</p>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(185,130,90,0.1)", paddingTop: "1rem" }}>
                         <div>
                           <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.85rem", color: "rgba(243,227,208,0.8)" }}>{prod.storeName}</p>

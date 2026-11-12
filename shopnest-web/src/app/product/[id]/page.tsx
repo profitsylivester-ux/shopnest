@@ -92,7 +92,7 @@ export default function ProductDetail() {
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "rgba(243,227,208,0.6)", fontSize: "0.9rem" }}>
               <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#27c93f" }} />
-              In Stock
+              {(product.stockQuantity ?? 1) <= 0 ? "Sold Out" : (product.stockQuantity ?? 1) <= 3 ? "Low Stock" : "In Stock"}
             </div>
           </div>
 

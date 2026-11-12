@@ -95,7 +95,7 @@ export default function PublicStorefront() {
                   </p>
                   
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <p style={{ margin: 0, color: "var(--latte)", fontSize: "1.2rem", fontWeight: 600 }}>TZS {prod.price.toLocaleString()}{(prod.stockQuantity ?? 1) <= 0 ? " - Sold Out" : ""}</p>
+                    <p style={{ margin: 0, color: "var(--latte)", fontSize: "1.2rem", fontWeight: 600 }}>TZS {prod.price.toLocaleString()}{(prod.stockQuantity ?? 1) <= 0 ? " - Sold Out" : (prod.stockQuantity ?? 1) <= 3 ? " - Low Stock" : ""}</p>
                     <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--latte)", color: "var(--espresso)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.5rem", fontWeight: "bold" }}>
                       +
                     </div>

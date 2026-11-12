@@ -45,7 +45,7 @@ export default function Marketplace() {
           <h3 style={{ margin: "0 0 0.3rem 0", fontSize: "1.1rem", fontWeight: 500, color: "var(--cream)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{prod.name}</h3>
           <p style={{ margin: "0 0 1rem 0", color: "rgba(243,227,208,0.5)", fontSize: "0.8rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{prod.storeName}</p>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <p style={{ margin: 0, color: "var(--latte)", fontSize: "1.1rem", fontWeight: 600 }}>TZS {prod.price.toLocaleString()}{(prod.stockQuantity ?? 1) <= 0 ? " - Sold Out" : ""}</p>
+            <p style={{ margin: 0, color: "var(--latte)", fontSize: "1.1rem", fontWeight: 600 }}>TZS {prod.price.toLocaleString()}{(prod.stockQuantity ?? 1) <= 0 ? " - Sold Out" : (prod.stockQuantity ?? 1) <= 3 ? " - Low Stock" : ""}</p>
             <div style={{ width: "30px", height: "30px", borderRadius: "50%", background: "rgba(255,255,255,0.05)", color: "var(--cream)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.2rem" }}>+</div>
           </div>
         </div>

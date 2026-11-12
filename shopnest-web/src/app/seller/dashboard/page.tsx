@@ -40,6 +40,8 @@ export default function SellerDashboard() {
   const [pDesc, setPDesc] = useState("");
   const [pImage, setPImage] = useState("");
   const [pStock, setPStock] = useState("1");
+  const [pCategory, setPCategory] = useState("");
+  const [pCondition, setPCondition] = useState("");
   const [pSubmitting, setPSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -138,17 +140,17 @@ export default function SellerDashboard() {
       const res = await fetch("http://localhost:3001/products", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-        body: JSON.stringify({ name: pName, price: parseFloat(pPrice), description: pDesc, imageUrl: pImage, stockQuantity: parseInt(pStock || "0", 10) }),
+        body: JSON.stringify({ name: pName, price: parseFloat(pPrice), description: pDesc, imageUrl: pImage, stockQuantity: parseInt(pStock || "0", 10), category: pCategory || undefined, condition: pCondition || undefined }),
       });
       if (res.status === 201) {
-        setIsPanelOpen(false); setPName(""); setPPrice(""); setPDesc(""); setPImage(""); setPStock("1");
+        setIsPanelOpen(false); setPName(""); setPPrice(""); setPDesc(""); setPImage(""); setPStock("1"); setPCategory(""); setPCondition("");
         fetchData();
       } else { alert("Failed to add product."); }
     } catch { alert("Network error."); } finally { setPSubmitting(false); }
   };
 
   const openAddPanel = () => {
-    if (editingId) { setPName(""); setPPrice(""); setPDesc(""); setPImage(""); setPStock("1"); }
+    if (editingId) { setPName(""); setPPrice(""); setPDesc(""); setPImage(""); setPStock("1"); setPCategory(""); setPCondition(""); }
     setEditingId(null);
     setIsPanelOpen(true);
   };
@@ -160,6 +162,7 @@ export default function SellerDashboard() {
     setPDesc(prod.description || "");
     setPImage(prod.imageUrl || "");
     setPStock(String(prod.stockQuantity ?? 1));
+    setPCategory(prod.category || ""); setPCondition(prod.condition || "");
     setIsPanelOpen(true);
   };
 
@@ -171,10 +174,10 @@ export default function SellerDashboard() {
       const res = await fetch(`http://localhost:3001/products/${editingId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-        body: JSON.stringify({ name: pName, price: parseFloat(pPrice), description: pDesc, imageUrl: pImage, stockQuantity: parseInt(pStock || "0", 10) }),
+        body: JSON.stringify({ name: pName, price: parseFloat(pPrice), description: pDesc, imageUrl: pImage, stockQuantity: parseInt(pStock || "0", 10), category: pCategory || undefined, condition: pCondition || undefined }),
       });
       if (res.status === 200) {
-        setIsPanelOpen(false); setEditingId(null); setPName(""); setPPrice(""); setPDesc(""); setPImage(""); setPStock("1");
+        setIsPanelOpen(false); setEditingId(null); setPName(""); setPPrice(""); setPDesc(""); setPImage(""); setPStock("1"); setPCategory(""); setPCondition("");
         fetchData();
       } else if (res.status === 403) { alert("You can only edit your own products."); }
       else if (res.status === 404) { alert("Product not found."); }
@@ -407,7 +410,7 @@ export default function SellerDashboard() {
                         <div style={{ height: "100px", background: prod.imageUrl ? `url(${prod.imageUrl}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${prod.imageUrl}) center/cover` : "var(--espresso)" }} />
                         <div style={{ padding: "0.8rem" }}>
                           <p style={{ color: "var(--cream)", fontSize: "0.9rem", margin: "0 0 0.2rem 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{prod.name}</p>
-                          <p style={{ color: "var(--latte)", fontSize: "0.85rem", margin: 0 }}>TZS {prod.price.toLocaleString()}</p><p style={{ color: (prod.stockQuantity ?? 1) > 0 ? "#27c93f" : "#ff5f56", fontSize: "0.7rem", margin: "0.2rem 0 0 0" }}>{(prod.stockQuantity ?? 1) > 0 ? "In Stock (" + (prod.stockQuantity ?? 1) + ")" : "Sold Out"}</p>
+                          <p style={{ color: "var(--latte)", fontSize: "0.85rem", margin: 0 }}>TZS {prod.price.toLocaleString()}</p><p style={{ color: (prod.stockQuantity ?? 1) <= 0 ? "#ff5f56" : (prod.stockQuantity ?? 1) <= 3 ? "#e8a33d" : "#27c93f", fontSize: "0.7rem", margin: "0.2rem 0 0 0" }}>{(prod.stockQuantity ?? 1) > 0 ? ((prod.stockQuantity ?? 1) <= 3 ? "Low Stock (" : "In Stock (") + (prod.stockQuantity ?? 1) + ")" : "Sold Out"}</p>
                         </div>
                       </div>
                     ))
@@ -437,7 +440,7 @@ export default function SellerDashboard() {
                                 {prod.status}
                               </button>
                             </td>
-                            <td style={{ padding: "0.8rem 0", color: (prod.stockQuantity ?? 1) > 0 ? "var(--cream)" : "#ff5f56", fontSize: "0.75rem" }}>{(prod.stockQuantity ?? 1) > 0 ? (prod.stockQuantity ?? 1) : "Sold Out"}</td><td style={{ padding: "0.8rem 0", color: "var(--latte)", textAlign: "right" }}>TZS {prod.price.toLocaleString()}</td>
+                            <td style={{ padding: "0.8rem 0", color: (prod.stockQuantity ?? 1) <= 0 ? "#ff5f56" : (prod.stockQuantity ?? 1) <= 3 ? "#e8a33d" : "var(--cream)", fontSize: "0.75rem" }}>{(prod.stockQuantity ?? 1) <= 0 ? "Sold Out" : (prod.stockQuantity ?? 1) <= 3 ? (prod.stockQuantity ?? 1) + " (Low)" : (prod.stockQuantity ?? 1)}</td><td style={{ padding: "0.8rem 0", color: "var(--latte)", textAlign: "right" }}>TZS {prod.price.toLocaleString()}</td>
                           </tr>
                         ))
                       )}
@@ -469,7 +472,7 @@ export default function SellerDashboard() {
                           <span style={{ color: prod.status === "ACTIVE" ? "#27c93f" : "#ff5f56", fontSize: "0.7rem", textTransform: "uppercase" }}>{prod.status}</span>
                         </div>
                         <p style={{ color: "var(--latte)", fontSize: "1rem", margin: "0 0 0.3rem 0" }}>TZS {prod.price.toLocaleString()}</p>
-                        <p style={{ color: prod.stockQuantity > 0 ? "#27c93f" : "#ff5f56", fontSize: "0.75rem", margin: "0 0 1rem 0" }}>{prod.stockQuantity > 0 ? "In Stock (" + prod.stockQuantity + ")" : "Sold Out"}</p>
+                        <p style={{ color: prod.stockQuantity <= 0 ? "#ff5f56" : prod.stockQuantity <= 3 ? "#e8a33d" : "#27c93f", fontSize: "0.75rem", margin: "0 0 1rem 0" }}>{prod.stockQuantity > 0 ? ((prod.stockQuantity ?? 1) <= 3 ? "Low Stock (" : "In Stock (") + prod.stockQuantity + ")" : "Sold Out"}</p>
                         <button onClick={() => openEditPanel(prod)} style={{ width: "100%", padding: "0.5rem", marginBottom: "0.5rem", background: "transparent", border: "1px solid var(--copper)", color: "var(--latte)", borderRadius: "4px", fontSize: "0.8rem", cursor: "pointer", transition: "0.3s" }}>Edit Product</button>
                         <button onClick={() => toggleProductStatus(prod.id, prod.status)} style={{ width: "100%", padding: "0.5rem", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--cream)", borderRadius: "4px", fontSize: "0.8rem", cursor: "pointer", transition: "0.3s" }}>
                           {prod.status === "ACTIVE" ? "Hide Product" : "Make Active"}
@@ -550,7 +553,7 @@ export default function SellerDashboard() {
 
       {/* SLIDE-OUT PANEL FOR ADDING PRODUCTS */}
       <div style={{ 
-        position: "fixed", top: 0, right: isPanelOpen ? 0 : "-100%", 
+        position: "fixed", top: 0, right: isPanelOpen ? 0 : "-100%", overflowY: "auto", 
         width: "500px", height: "100vh", background: "var(--roast)", 
         borderLeft: "1px solid var(--copper)", zIndex: 100, 
         transition: "right 0.4s cubic-bezier(0.22, 0.8, 0.24, 1)",
@@ -578,6 +581,20 @@ export default function SellerDashboard() {
           <div className="form-group">
             <label>Stock Quantity</label>
             <input required type="number" min="0" value={pStock} onChange={(e) => setPStock(e.target.value)} placeholder="1" />
+          </div>
+          <div className="form-group">
+            <label>Category</label>
+            <select required value={pCategory} onChange={(e) => setPCategory(e.target.value)} style={{ width: "100%", padding: "0.9rem 1rem", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", color: "var(--cream)", outline: "none", fontFamily: "inherit", fontSize: "0.95rem" }}>
+              <option value="" style={{ color: "black" }}>Select category</option>
+              {["Electronics", "Fashion", "Shoes", "Vehicles", "Food", "Services"].map((c) => <option key={c} value={c} style={{ color: "black" }}>{c}</option>)}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Condition</label>
+            <select required value={pCondition} onChange={(e) => setPCondition(e.target.value)} style={{ width: "100%", padding: "0.9rem 1rem", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", color: "var(--cream)", outline: "none", fontFamily: "inherit", fontSize: "0.95rem" }}>
+              <option value="" style={{ color: "black" }}>Select condition</option>
+              {["New", "Used", "Refurbished"].map((c) => <option key={c} value={c} style={{ color: "black" }}>{c}</option>)}
+            </select>
           </div>
           <div className="form-group">
             <label>Image</label>
