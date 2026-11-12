@@ -22,7 +22,7 @@ export class AuthService {
         email: dto.email,
         password: hashedPassword,
         name: dto.name,
-        role: (dto.role as any) || 'BUYER',
+        role: dto.role === 'SELLER' ? 'SELLER' : 'BUYER',
       },
     });
 
