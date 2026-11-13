@@ -23,4 +23,11 @@ export class EventsController {
   summary(@CurrentUser('sub') ownerId: string, @Query('period') period?: string) {
     return this.eventsService.summary(ownerId, period);
   }
+
+  @Get('me/recent')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('SELLER')
+  recent(@CurrentUser('sub') ownerId: string, @Query('limit') limit?: string) {
+    return this.eventsService.recent(ownerId, limit);
+  }
 }

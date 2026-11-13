@@ -103,6 +103,23 @@ export class EventsService {
     };
   }
 
+  async recent(ownerId: string, limit?: string) {
+    const store = await this.prisma.store.findUnique({ where: { ownerId }, select: { id: true } });
+    if (!store) throw new NotFoundException('No store');
+    const n = Math.min(Math.max(parseInt(String(limit ?? '20'), 10) || 20, 1), 50);
+    const where = { storeId: store.id, type: 'WHATSAPP_CLICK' as const };
+    const [total, rows] = await Promise.all([
+      this.prisma.storeEvent.count({ where }),
+      this.prisma.storeEvent.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take: n,
+        select: { id: true, source: true, createdAt: true, product: { select: { id: true, name: true, price: true } } },
+      }),
+    ]);
+    return { total, items: rows };
+  }
+
   private shift(d: Date) {
     return new Date(d.getTime() + TZ_OFFSET_MS);
   }
