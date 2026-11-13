@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { API_URL } from "../../../lib/seo";
+import TrendChart from "./TrendChart";
 
 type Props = {
   store: any;
@@ -109,6 +110,10 @@ export default function HomeTab({ store, products, onAddProduct, onOpenTab }: Pr
         ))}
       </div>
       <p style={{ color: MUTED, fontSize: "0.8rem", margin: "0 0 1.5rem 0", lineHeight: 1.5 }}>A WhatsApp click means a buyer opened a chat with you from your shop or listings. It is not a completed sale - deals are agreed on WhatsApp. Your own visits are not counted.</p>
+
+      <div style={{ marginBottom: "1.5rem" }}>
+        <TrendChart buckets={summary ? summary.buckets : []} granularity={summary ? summary.granularity : "day"} />
+      </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem", marginBottom: "1.5rem" }}>
         <div style={card}>
