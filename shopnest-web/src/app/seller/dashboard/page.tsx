@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import HomeTab from "./HomeTab";
 
 const CATS = ["Electronics", "Phones & Tablets", "Computers", "Fashion", "Shoes", "Bags & Accessories", "Beauty & Health", "Home & Furniture", "Appliances", "Vehicles", "Auto Parts", "Property", "Food & Drinks", "Books & Stationery", "Sports & Fitness", "Baby & Kids", "Agriculture", "Services"];
 
@@ -14,7 +15,7 @@ export default function SellerDashboard() {
   const [userName, setUserName] = useState("Seller");
   
   // Navigation State
-  const [activeTab, setActiveTab] = useState("Dashboard");
+  const [activeTab, setActiveTab] = useState("Home");
 
   // Store Form State (Onboarding)
   const [name, setName] = useState("");
@@ -390,6 +391,10 @@ export default function SellerDashboard() {
           </div>
         )}
 
+        {activeTab === "Home" && (
+          <HomeTab store={store} products={products} onAddProduct={openAddPanel} onOpenTab={setActiveTab} />
+        )}
+
         {/* --- DASHBOARD TAB --- */}
         {activeTab === "Dashboard" && (
           <>
@@ -511,7 +516,7 @@ export default function SellerDashboard() {
         )}
 
         {/* --- PLACEHOLDER TABS --- */}
-        {activeTab !== "Dashboard" && activeTab !== "Products" && (
+        {activeTab !== "Home" && activeTab !== "Dashboard" && activeTab !== "Products" && (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "50vh", flexDirection: "column" }}>
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--copper)" strokeWidth="1"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
             <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "2rem", color: "var(--cream)", marginTop: "1rem" }}>{activeTab} Module</h2>
