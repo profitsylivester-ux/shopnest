@@ -52,7 +52,7 @@ export default function TrendChart({ buckets, granularity }: { buckets: Bucket[]
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem", marginBottom: "1rem" }}>
         <div>
           <h3 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.2rem", color: "var(--cream)", margin: 0 }}>Activity trend</h3>
-          <p style={{ color: MUTED, fontSize: "0.8rem", margin: "0.25rem 0 0 0" }}>{total.toLocaleString()} {m.label.toLowerCase()} in this period</p>
+          <p style={{ color: MUTED, fontSize: "0.8rem", margin: "0.25rem 0 0 0" }}>{total.toLocaleString()} {total === 1 ? m.label.toLowerCase().slice(0, -1) : m.label.toLowerCase()} in this period</p>
         </div>
         <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
           <select aria-label="What to show" value={metric} onChange={(e) => setMetric(e.target.value)} style={selectStyle}>
