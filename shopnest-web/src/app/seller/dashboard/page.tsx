@@ -318,18 +318,15 @@ export default function SellerDashboard() {
 
         <nav style={{ display: "flex", flexDirection: "column", gap: "0.5rem", flex: 1, overflowY: "auto" }}>
           {[
-            { icon: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z", label: "Home" },
-            { icon: "M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z", label: "Dashboard" },
-            { icon: "M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z", label: "Products" },
-            { icon: "M18 20V10M12 20V4M6 20v-6", label: "All Stats" },
+            { icon: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z", label: "Home", title: "Overview" },
+            { icon: "M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z", label: "Products", title: "My products" },
+            { icon: "M18 20V10M12 20V4M6 20v-6", label: "All Stats", title: "Analytics" },
             { icon: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z", label: "Messages" },
-            { icon: "M8 2v4M16 2v4M3 10h18M21 14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8z", label: "Schedule" },
-            { icon: "M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z", label: "Favorite" },
-            { icon: "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z", label: "Settings" },
+            { icon: "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z", label: "Settings", title: "Shop settings" },
           ].map((item, i) => (
             <div key={i} onClick={() => setActiveTab(item.label)} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "0.8rem 1rem", borderRadius: "8px", background: activeTab === item.label ? "rgba(185,130,90,0.15)" : "transparent", color: activeTab === item.label ? "var(--latte)" : "rgba(243,227,208,0.6)", cursor: "pointer", transition: "0.3s" }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={item.icon}></path></svg>
-              <span style={{ fontSize: "0.9rem", fontWeight: activeTab === item.label ? 600 : 400 }}>{item.label}</span>
+              <span style={{ fontSize: "0.9rem", fontWeight: activeTab === item.label ? 600 : 400 }}>{item.title || item.label}</span>
             </div>
           ))}
         </nav>
@@ -355,7 +352,7 @@ export default function SellerDashboard() {
             </div>
             
             <div>
-              <p style={{ color: "var(--text-light)", opacity: 0.7, fontSize: "0.85rem", margin: 0, marginBottom: "0.2rem" }}>Good evening, {userName}</p>
+              <p style={{ color: "var(--text-light)", opacity: 0.7, fontSize: "0.85rem", margin: 0, marginBottom: "0.2rem" }}>{new Date().getHours() < 12 ? "Good morning" : new Date().getHours() < 17 ? "Good afternoon" : "Good evening"}, {userName}</p>
               <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                 <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.8rem", color: "var(--cream)", margin: 0, textTransform: "uppercase", letterSpacing: "0.05em" }}>{store.name}</h1>
                 <span style={{ background: store.status === "ACTIVE" ? "rgba(39,201,63,0.15)" : "rgba(185,130,90,0.15)", color: store.status === "ACTIVE" ? "#27c93f" : "var(--latte)", padding: "0.2rem 0.6rem", borderRadius: "12px", fontSize: "0.75rem", border: store.status === "ACTIVE" ? "1px solid rgba(39,201,63,0.3)" : "1px solid rgba(185,130,90,0.3)" }}>
@@ -393,92 +390,6 @@ export default function SellerDashboard() {
 
         {activeTab === "Home" && (
           <HomeTab store={store} products={products} onAddProduct={openAddPanel} onOpenTab={setActiveTab} />
-        )}
-
-        {/* --- DASHBOARD TAB --- */}
-        {activeTab === "Dashboard" && (
-          <>
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }}>
-              {/* HERO BANNER */}
-              <div style={{ background: store.bannerUrl ? `url(${store.bannerUrl}) center/cover` : "linear-gradient(135deg, var(--roast), var(--copper))", borderRadius: "16px", padding: "3rem", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "center", minHeight: "220px" }}>
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(26,15,10,0.95) 0%, rgba(26,15,10,0.6) 100%)" }} />
-                <div style={{ position: "relative", zIndex: 1, maxWidth: "60%" }}>
-                  <p style={{ color: "var(--latte)", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Your Storefront</p>
-                  <h2 style={{ fontFamily: "Playfair Display, serif", fontSize: "2.5rem", color: "var(--cream)", margin: "0 0 1rem 0", lineHeight: 1.1, fontStyle: "italic" }}>{store.name}</h2>
-                  <p style={{ color: "rgba(243,227,208,0.9)", fontSize: "1rem", lineHeight: 1.5, fontStyle: "italic", maxWidth: "400px" }}>
-                    "{store.description || "Welcome to our boutique. Explore our premium selection."}"
-                  </p>
-                </div>
-              </div>
-
-              {/* CHART */}
-              <div style={{ background: "var(--roast)", borderRadius: "16px", padding: "1.5rem", border: "1px solid rgba(185,130,90,0.1)" }}>
-                <h3 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.2rem", color: "var(--cream)", margin: "0 0 1.5rem 0" }}>Product Sold</h3>
-                <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", height: "120px", gap: "10px", paddingBottom: "1rem", borderBottom: "1px solid rgba(185,130,90,0.1)" }}>
-                  {[10, 30, 20, 60, 40, 20, 50].map((h, i) => (
-                    <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}>
-                      <div style={{ width: "100%", height: `${h}%`, background: i === 3 ? "var(--latte)" : "rgba(185,130,90,0.2)", borderRadius: "4px 4px 0 0" }} />
-                      <span style={{ fontSize: "0.65rem", color: "rgba(243,227,208,0.5)" }}>{["M","T","W","T","F","S","S"][i]}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }}>
-              <div style={{ background: "var(--roast)", borderRadius: "16px", padding: "1.5rem", border: "1px solid rgba(185,130,90,0.1)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-                  <h3 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.2rem", color: "var(--cream)", margin: 0 }}>Our Top Collection</h3>
-                  <button onClick={openAddPanel} style={{ background: "transparent", border: "1px solid var(--copper)", color: "var(--latte)", padding: "0.4rem 1rem", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem", transition: "0.3s" }}>+ Add Product</button>
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" }}>
-                  {activeProducts.length === 0 ? (
-                    <p style={{ color: "rgba(243,227,208,0.4)", fontSize: "0.9rem", gridColumn: "span 3", textAlign: "center", padding: "2rem 0" }}>No active products yet.</p>
-                  ) : (
-                    activeProducts.slice(0, 3).map((prod) => (
-                      <div key={prod.id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(185,130,90,0.2)", borderRadius: "12px", overflow: "hidden" }}>
-                        <div style={{ height: "100px", background: prod.imageUrl ? `url(${prod.imageUrl}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${prod.imageUrl}) center/cover` : "var(--espresso)" }} />
-                        <div style={{ padding: "0.8rem" }}>
-                          <p style={{ color: "var(--cream)", fontSize: "0.9rem", margin: "0 0 0.2rem 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{prod.name}</p>
-                          <p style={{ color: "var(--latte)", fontSize: "0.85rem", margin: 0 }}>TZS {prod.price.toLocaleString()}</p><p style={{ color: (prod.stockQuantity ?? 1) <= 0 ? "#ff5f56" : (prod.stockQuantity ?? 1) <= 3 ? "#e8a33d" : "#27c93f", fontSize: "0.7rem", margin: "0.2rem 0 0 0" }}>{(prod.stockQuantity ?? 1) > 0 ? ((prod.stockQuantity ?? 1) <= 3 ? "Low Stock (" : "In Stock (") + (prod.stockQuantity ?? 1) + ")" : "Sold Out"}</p>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-
-              <div style={{ background: "var(--roast)", borderRadius: "16px", padding: "1.5rem", border: "1px solid rgba(185,130,90,0.1)" }}>
-                 <h3 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.2rem", color: "var(--cream)", margin: "0 0 1.5rem 0" }}>Stock Report</h3>
-                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem" }}>
-                    <thead>
-                      <tr style={{ borderBottom: "1px solid rgba(185,130,90,0.2)", color: "rgba(243,227,208,0.5)", textAlign: "left" }}>
-                        <th style={{ paddingBottom: "0.8rem", fontWeight: 500 }}>Product</th>
-                        <th style={{ paddingBottom: "0.8rem", fontWeight: 500 }}>Status</th><th style={{ paddingBottom: "0.8rem", fontWeight: 500 }}>Stock</th>
-                        <th style={{ paddingBottom: "0.8rem", fontWeight: 500, textAlign: "right" }}>Price</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {products.length === 0 ? (
-                        <tr><td colSpan={4} style={{ padding: "1rem 0", textAlign: "center", color: "rgba(243,227,208,0.4)" }}>No products.</td></tr>
-                      ) : (
-                        products.slice(0, 4).map((prod) => (
-                          <tr key={prod.id} style={{ borderBottom: "1px solid rgba(185,130,90,0.05)" }}>
-                            <td style={{ padding: "0.8rem 0", color: "var(--cream)", maxWidth: "100px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{prod.name}</td>
-                            <td style={{ padding: "0.8rem 0" }}>
-                              <button onClick={() => toggleProductStatus(prod.id, prod.status)} style={{ background: "none", border: "none", color: prod.status === "ACTIVE" ? "#27c93f" : "#ff5f56", cursor: "pointer", fontSize: "0.75rem", textDecoration: "underline" }}>
-                                {prod.status}
-                              </button>
-                            </td>
-                            <td style={{ padding: "0.8rem 0", color: (prod.stockQuantity ?? 1) <= 0 ? "#ff5f56" : (prod.stockQuantity ?? 1) <= 3 ? "#e8a33d" : "var(--cream)", fontSize: "0.75rem" }}>{(prod.stockQuantity ?? 1) <= 0 ? "Sold Out" : (prod.stockQuantity ?? 1) <= 3 ? (prod.stockQuantity ?? 1) + " (Low)" : (prod.stockQuantity ?? 1)}</td><td style={{ padding: "0.8rem 0", color: "var(--latte)", textAlign: "right" }}>TZS {prod.price.toLocaleString()}</td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                 </table>
-              </div>
-            </div>
-          </>
         )}
 
         {/* --- PRODUCTS TAB --- */}

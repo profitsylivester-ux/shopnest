@@ -138,7 +138,7 @@ export default function HomeTab({ store, products, onAddProduct, onOpenTab }: Pr
                 <div key={p.id} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                   <span style={{ fontFamily: "Playfair Display, serif", color: "var(--latte)", width: "18px" }}>{i + 1}</span>
                   <span style={{ color: "var(--cream)", fontSize: "0.9rem", flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</span>
-                  <span style={{ color: MUTED, fontSize: "0.8rem", whiteSpace: "nowrap" }}>{p.views} views | {p.clicks} clicks</span>
+                  <span style={{ color: MUTED, fontSize: "0.8rem", whiteSpace: "nowrap" }}>{p.views} {p.views === 1 ? "view" : "views"} | {p.clicks} {p.clicks === 1 ? "click" : "clicks"}</span>
                 </div>
               ))}
             </div>
