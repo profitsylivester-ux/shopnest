@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { trackEvent } from "../lib/track";
 
 const t = {
   EN: {
@@ -215,6 +216,7 @@ export default function Home() {
   const handleWhatsApp = (product: any) => {
     const phone = product.whatsapp?.replace(/[^0-9]/g, "");
     const msg = encodeURIComponent(`Hi ${product.storeName}, I am interested in buying "${product.name}" (TZS ${product.price.toLocaleString()}) from your ShopNest storefront.`);
+    trackEvent({ type: "WHATSAPP_CLICK", productId: product.id, source: "home" });
     window.open(`https://wa.me/${phone}?text=${msg}`, "_blank");
   };
 

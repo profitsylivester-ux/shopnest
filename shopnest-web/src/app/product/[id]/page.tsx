@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { trackEvent, trackViewOnce } from "../../../lib/track";
 
 export default function ProductDetail() {
   const params = useParams();
@@ -16,7 +17,7 @@ export default function ProductDetail() {
     if (!id) return;
     fetch(`http://localhost:3001/products/public/${id}`)
       .then(async (res) => {
-        if (res.status === 200) setProduct(await res.json());
+        if (res.status === 200) { setProduct(await res.json()); trackViewOnce({ type: "PRODUCT_VIEW", productId: id, source: "product" }); }
         else setError("Product not found.");
       })
       .catch(() => setError("Network error."))
@@ -29,6 +30,7 @@ export default function ProductDetail() {
   const handleWhatsApp = () => {
     const phone = product.store?.whatsappNumber?.replace(/[^0-9]/g, "");
     const msg = encodeURIComponent(`Hi ${product.store?.name}, I am interested in buying "${product.name}" (TZS ${product.price.toLocaleString()}) from your ShopNest storefront.`);
+    trackEvent({ type: "WHATSAPP_CLICK", productId: product.id, source: "product" });
     window.open(`https://wa.me/${phone}?text=${msg}`, "_blank");
   };
 
