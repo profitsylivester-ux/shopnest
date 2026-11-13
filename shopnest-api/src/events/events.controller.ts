@@ -27,7 +27,7 @@ export class EventsController {
   @Get('me/recent')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SELLER')
-  recent(@CurrentUser('sub') ownerId: string, @Query('limit') limit?: string) {
-    return this.eventsService.recent(ownerId, limit);
+  recent(@CurrentUser('sub') ownerId: string, @Query('limit') limit?: string, @Query('skip') skip?: string) {
+    return this.eventsService.recent(ownerId, limit, skip);
   }
 }

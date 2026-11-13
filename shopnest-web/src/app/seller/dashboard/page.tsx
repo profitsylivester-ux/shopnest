@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import HomeTab from "./HomeTab";
 import AnalyticsTab from "./AnalyticsTab";
+import MessagesTab from "./MessagesTab";
 
 const CATS = ["Electronics", "Phones & Tablets", "Computers", "Fashion", "Shoes", "Bags & Accessories", "Beauty & Health", "Home & Furniture", "Appliances", "Vehicles", "Auto Parts", "Property", "Food & Drinks", "Books & Stationery", "Sports & Fitness", "Baby & Kids", "Agriculture", "Services"];
 
@@ -397,6 +398,10 @@ export default function SellerDashboard() {
           <AnalyticsTab />
         )}
 
+        {activeTab === "Messages" && (
+          <MessagesTab />
+        )}
+
         {/* --- PRODUCTS TAB --- */}
         {activeTab === "Products" && (
           <div style={{ background: "var(--roast)", borderRadius: "16px", padding: "2rem", border: "1px solid rgba(185,130,90,0.1)" }}>
@@ -432,7 +437,7 @@ export default function SellerDashboard() {
         )}
 
         {/* --- PLACEHOLDER TABS --- */}
-        {activeTab !== "Home" && activeTab !== "All Stats" && activeTab !== "Dashboard" && activeTab !== "Products" && (
+        {activeTab !== "Home" && activeTab !== "All Stats" && activeTab !== "Messages" && activeTab !== "Dashboard" && activeTab !== "Products" && (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "50vh", flexDirection: "column" }}>
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--copper)" strokeWidth="1"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
             <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "2rem", color: "var(--cream)", marginTop: "1rem" }}>{activeTab} Module</h2>

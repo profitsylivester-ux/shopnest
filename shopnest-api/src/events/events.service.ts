@@ -103,7 +103,7 @@ export class EventsService {
     };
   }
 
-  async recent(ownerId: string, limit?: string) {
+  async recent(ownerId: string, limit?: string, skip?: string) {
     const store = await this.prisma.store.findUnique({ where: { ownerId }, select: { id: true } });
     if (!store) throw new NotFoundException('No store');
     const n = Math.min(Math.max(parseInt(String(limit ?? '20'), 10) || 20, 1), 50);
@@ -113,6 +113,7 @@ export class EventsService {
       this.prisma.storeEvent.findMany({
         where,
         orderBy: { createdAt: 'desc' },
+        skip: Math.max(parseInt(String(skip ?? '0'), 10) || 0, 0),
         take: n,
         select: { id: true, source: true, createdAt: true, product: { select: { id: true, name: true, price: true } } },
       }),
