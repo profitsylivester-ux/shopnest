@@ -1,4 +1,5 @@
-import { Controller, Post, Get, Patch, Delete, Body, Param, UseGuards, Query, Header, StreamableFile } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Body, Param, UseGuards, Query, Header, StreamableFile, Req } from '@nestjs/common';
+import { reqMeta } from '../audit/request-meta.js';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { ProductsService } from './products.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
@@ -48,8 +49,8 @@ export class ProductsController {
   @Patch('admin/:id/status')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
-  updateStatusAdmin(@Param('id') id: string, @Body('status') status: any) {
-    return this.productsService.updateProductStatusAdmin(id, status);
+  updateStatusAdmin(@Param('id') id: string, @Body('status') status: any, @CurrentUser('sub') adminId: string) {
+    return this.productsService.updateProductStatusAdmin(id, status, adminId);
   }
 
   @Get('admin/trash')
@@ -62,16 +63,16 @@ export class ProductsController {
   @Patch('admin/restore/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
-  restore(@Param('id') id: string) {
-    return this.productsService.restoreProduct(id);
+  restore(@Param('id') id: string, @CurrentUser('sub') adminId: string) {
+    return this.productsService.restoreProduct(id, adminId);
   }
 
   // --- SELLER ROUTES ---
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SELLER')
-  create(@CurrentUser('sub') userId: string, @Body() dto: CreateProductDto) {
-    return this.productsService.create(userId, dto);
+  create(@CurrentUser('sub') userId: string, @Body() dto: CreateProductDto, @Req() req: any) {
+    return this.productsService.create(userId, dto, reqMeta(req));
   }
 
   @Get('me')
@@ -84,7 +85,7 @@ export class ProductsController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SELLER')
-  update(@CurrentUser('sub') userId: string, @Param('id') productId: string, @Body() dto: UpdateProductDto) {
-    return this.productsService.update(userId, productId, dto);
+  update(@CurrentUser('sub') userId: string, @Param('id') productId: string, @Body() dto: UpdateProductDto, @Req() req: any) {
+    return this.productsService.update(userId, productId, dto, reqMeta(req));
   }
 }

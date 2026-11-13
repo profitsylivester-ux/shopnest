@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import HomeTab from "./HomeTab";
 import AnalyticsTab from "./AnalyticsTab";
-import MessagesTab from "./MessagesTab";
+import MessagesAndAudit from "./MessagesAndAudit";
+import SettingsTab from "./settings/SettingsTab";
 
 const CATS = ["Electronics", "Phones & Tablets", "Computers", "Fashion", "Shoes", "Bags & Accessories", "Beauty & Health", "Home & Furniture", "Appliances", "Vehicles", "Auto Parts", "Property", "Food & Drinks", "Books & Stationery", "Sports & Fitness", "Baby & Kids", "Agriculture", "Services"];
 
@@ -18,6 +19,7 @@ export default function SellerDashboard() {
   
   // Navigation State
   const [activeTab, setActiveTab] = useState("Home");
+  const [msgView, setMsgView] = useState("inquiries");
 
   // Store Form State (Onboarding)
   const [name, setName] = useState("");
@@ -28,15 +30,6 @@ export default function SellerDashboard() {
   const [location, setLocation] = useState("");
   const [shopType, setShopType] = useState("Online");
   const [submitting, setSubmitting] = useState(false);
-
-  // Edit Store State
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [eName, setEName] = useState("");
-  const [eDesc, setEDesc] = useState("");
-  const [eWhatsapp, setEWhatsapp] = useState("");
-  const [eLogo, setELogo] = useState("");
-  const [eBanner, setEBanner] = useState("");
-  const [eSubmitting, setESubmitting] = useState(false);
 
   // Product Panel State
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -71,12 +64,6 @@ export default function SellerDashboard() {
         const storeData = await resStore.json();
         setStore(storeData);
         
-        setEName(storeData.name || "");
-        setEDesc(storeData.description || "");
-        setEWhatsapp(storeData.whatsappNumber || "");
-        setELogo(storeData.logoUrl || "");
-        setEBanner(storeData.bannerUrl || "");
-
         const resProd = await fetch("http://localhost:3001/products/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -84,7 +71,7 @@ export default function SellerDashboard() {
           setProducts(await resProd.json());
         }
       } else if (resStore.status === 401) {
-        localStorage.removeItem("shopnest_token"); router.push("/");
+        localStorage.removeItem("shopnest_user"); localStorage.removeItem("shopnest_token"); router.push("/");
       } else if (resStore.status === 404) {
         setStore(null);
       }
@@ -143,22 +130,6 @@ export default function SellerDashboard() {
         const d = await res.json(); setError(d.message || "Failed.");
       }
     } catch { setError("Network error."); } finally { setSubmitting(false); }
-  };
-
-  const handleUpdateStore = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setESubmitting(true);
-    try {
-      const res = await fetch("http://localhost:3001/stores/me", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-        body: JSON.stringify({ name: eName, description: eDesc, whatsappNumber: eWhatsapp, logoUrl: eLogo, bannerUrl: eBanner }),
-      });
-      if (res.status === 200) {
-        setIsEditOpen(false);
-        fetchData();
-      } else { alert("Failed to update store."); }
-    } catch { alert("Network error."); } finally { setESubmitting(false); }
   };
 
   const handleCreateProduct = async (e: React.FormEvent) => {
@@ -226,6 +197,8 @@ export default function SellerDashboard() {
   };
 
   const handleLogout = () => {
+    const token = getToken();
+    if (token) { fetch("http://localhost:3001/auth/logout", { method: "POST", headers: { Authorization: `Bearer ${token}` }, keepalive: true }).catch(() => {}); }
     localStorage.removeItem("shopnest_token"); localStorage.removeItem("shopnest_user"); router.push("/");
   };
 
@@ -323,7 +296,7 @@ export default function SellerDashboard() {
             { icon: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z", label: "Home", title: "Overview" },
             { icon: "M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z", label: "Products", title: "My products" },
             { icon: "M18 20V10M12 20V4M6 20v-6", label: "All Stats", title: "Analytics" },
-            { icon: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z", label: "Messages" },
+            { icon: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z", label: "Messages", title: "Messages & Audit log" },
             { icon: "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z", label: "Settings", title: "Shop settings" },
           ].map((item, i) => (
             <div key={i} onClick={() => setActiveTab(item.label)} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "0.8rem 1rem", borderRadius: "8px", background: activeTab === item.label ? "rgba(185,130,90,0.15)" : "transparent", color: activeTab === item.label ? "var(--latte)" : "rgba(243,227,208,0.6)", cursor: "pointer", transition: "0.3s" }}>
@@ -366,7 +339,7 @@ export default function SellerDashboard() {
 
           <div style={{ display: "flex", gap: "1rem" }}>
             <Link href={`/store/${store.slug}`} target="_blank" style={{ background: "var(--latte)", border: "none", color: "var(--espresso)", padding: "0.6rem 1.2rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.85rem", fontWeight: 600, textDecoration: "none", display: "flex", alignItems: "center" }}>Visit Public Store</Link>
-            <button onClick={() => setIsEditOpen(true)} style={{ background: "transparent", border: "1px solid rgba(185,130,90,0.4)", color: "var(--latte)", padding: "0.6rem 1.2rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.85rem", transition: "0.3s" }}>Edit Profile</button>
+            
           </div>
         </div>
 
@@ -399,7 +372,7 @@ export default function SellerDashboard() {
         )}
 
         {activeTab === "Messages" && (
-          <MessagesTab />
+          <MessagesAndAudit view={msgView} onView={setMsgView} />
         )}
 
         {/* --- PRODUCTS TAB --- */}
@@ -436,71 +409,11 @@ export default function SellerDashboard() {
           </div>
         )}
 
-        {/* --- PLACEHOLDER TABS --- */}
-        {activeTab !== "Home" && activeTab !== "All Stats" && activeTab !== "Messages" && activeTab !== "Dashboard" && activeTab !== "Products" && (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "50vh", flexDirection: "column" }}>
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--copper)" strokeWidth="1"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-            <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "2rem", color: "var(--cream)", marginTop: "1rem" }}>{activeTab} Module</h2>
-            <p style={{ color: "rgba(243,227,208,0.5)" }}>This feature is coming in the next sprint.</p>
-          </div>
+        {activeTab === "Settings" && (
+          <SettingsTab onOpenActivity={() => { setMsgView("activity"); setActiveTab("Messages"); }} onChanged={fetchData} />
         )}
 
       </main>
-
-      {/* MODAL FOR EDITING STORE */}
-      {isEditOpen && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}>
-          <div className="auth-modal" style={{ maxWidth: "600px", width: "100%", position: "relative", maxHeight: "90vh", overflowY: "auto" }}>
-            <button onClick={() => setIsEditOpen(false)} style={{ position: "absolute", top: "1.5rem", right: "1.5rem", background: "none", border: "none", color: "var(--text-light)", fontSize: "1.5rem", cursor: "pointer" }}>×</button>
-            <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "2rem", color: "var(--cream)", marginBottom: "0.5rem" }}>Edit Profile</h2>
-            <p style={{ color: "var(--text-light)", opacity: 0.6, marginBottom: "2rem" }}>Update your store details and branding.</p>
-            
-            <form onSubmit={handleUpdateStore}>
-              <div className="form-group">
-                <label>Store Name</label>
-                <input required value={eName} onChange={(e) => setEName(e.target.value)} />
-              </div>
-              <div className="form-group">
-                <label>WhatsApp Number</label>
-                <input required value={eWhatsapp} onChange={(e) => setEWhatsapp(e.target.value)} />
-              </div>
-              <div className="form-group">
-                <label>Description</label>
-                <input value={eDesc} onChange={(e) => setEDesc(e.target.value)} />
-              </div>
-              
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
-                <div>
-                  <label style={{ display: "block", color: "var(--latte)", fontSize: "0.8rem", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Store Logo (Optional)</label>
-                  <label style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "0.8rem", border: "1px dashed rgba(185,130,90,0.4)", borderRadius: "8px", background: "rgba(255,255,255,0.02)", cursor: "pointer", transition: "0.3s" }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--copper)" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                    <div>
-                      <p style={{ color: "var(--cream)", margin: 0, fontSize: "0.85rem" }}>Browse</p>
-                      {eLogo ? <p style={{ color: "#27c93f", margin: 0, fontSize: "0.7rem" }}>✓ Selected</p> : <p style={{ color: "rgba(243,227,208,0.4)", margin: 0, fontSize: "0.7rem" }}>Upload</p>}
-                    </div>
-                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setELogo)} style={{ display: "none" }} />
-                  </label>
-                </div>
-                <div>
-                  <label style={{ display: "block", color: "var(--latte)", fontSize: "0.8rem", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Cover Banner (Optional)</label>
-                  <label style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "0.8rem", border: "1px dashed rgba(185,130,90,0.4)", borderRadius: "8px", background: "rgba(255,255,255,0.02)", cursor: "pointer", transition: "0.3s" }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--copper)" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                    <div>
-                      <p style={{ color: "var(--cream)", margin: 0, fontSize: "0.85rem" }}>Browse</p>
-                      {eBanner ? <p style={{ color: "#27c93f", margin: 0, fontSize: "0.7rem" }}>✓ Selected</p> : <p style={{ color: "rgba(243,227,208,0.4)", margin: 0, fontSize: "0.7rem" }}>Upload</p>}
-                    </div>
-                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setEBanner)} style={{ display: "none" }} />
-                  </label>
-                </div>
-              </div>
-
-              <button type="submit" disabled={eSubmitting} className="auth-submit" style={{ marginTop: "2rem" }}>
-                {eSubmitting ? "Saving..." : "Save Changes"}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* SLIDE-OUT PANEL FOR ADDING PRODUCTS */}
       <div style={{ 

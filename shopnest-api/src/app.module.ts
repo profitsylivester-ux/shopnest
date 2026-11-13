@@ -7,9 +7,10 @@ import { StoreModule } from './store/store.module.js';
 import { ProductsModule } from './products/products.module.js';
 import { SettingsModule } from './settings/settings.module.js';
 import { EventsModule } from './events/events.module.js';
+import { AuditModule } from './audit/audit.module.js';
 
 @Module({
-  imports: [PrismaModule, AuthModule, StoreModule, ProductsModule, SettingsModule, EventsModule],
+  imports: [PrismaModule, AuthModule, StoreModule, ProductsModule, SettingsModule, EventsModule, AuditModule],
   controllers: [AppController],
   providers: [AppService],
 })

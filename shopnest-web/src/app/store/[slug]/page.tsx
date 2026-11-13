@@ -4,6 +4,19 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { trackEvent, trackViewOnce } from "../../../lib/track";
 
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const TYPE_LABEL: Record<string, string> = { Online: "Online shop", Physical: "Physical shop", Both: "Online and physical shop" };
+const infoH: React.CSSProperties = { fontFamily: "Cormorant Garamond, serif", fontSize: "1.4rem", color: "var(--cream)", margin: "0 0 1rem 0" };
+const infoP: React.CSSProperties = { margin: 0, color: "rgba(243,227,208,0.75)", fontSize: "0.95rem", lineHeight: 1.6 };
+type Day = { closed: boolean; open: string; close: string };
+
+function parseHours(raw: string | null): Day[] | null {
+  try {
+    const a = JSON.parse(raw || "");
+    return Array.isArray(a) && a.length === 7 ? a : null;
+  } catch { return null; }
+}
+
 export default function PublicStorefront() {
   const params = useParams();
   const slug = params.slug as string;
@@ -28,6 +41,9 @@ export default function PublicStorefront() {
   if (loading) return <div style={{ minHeight: "100vh", background: "var(--espresso)", color: "var(--cream)", display: "grid", placeItems: "center", fontFamily: "Jost, sans-serif" }}>Loading Storefront...</div>;
   if (error || !store) return <div style={{ minHeight: "100vh", background: "var(--espresso)", color: "#ff5f56", display: "grid", placeItems: "center", fontFamily: "Jost, sans-serif" }}>{error}</div>;
 
+  const hours = parseHours(store.openingHours);
+  const socials = [["Instagram", store.instagramUrl], ["Facebook", store.facebookUrl], ["TikTok", store.tiktokUrl]].filter((s) => typeof s[1] === "string" && s[1].startsWith("https://"));
+
   const handleWhatsApp = (product: any) => {
     const phone = store.whatsappNumber?.replace(/[^0-9]/g, "");
     const text = encodeURIComponent(`Hi ${store.name}, I am interested in buying "${product.name}" (TZS ${product.price.toLocaleString()}) from your ShopNest storefront.`);
@@ -48,6 +64,10 @@ export default function PublicStorefront() {
           Marketplace
         </Link>
       </nav>
+
+      {store.announcement && (
+        <div role="note" style={{ background: "var(--latte)", color: "var(--espresso)", textAlign: "center", padding: "0.7rem 1rem", fontSize: "0.9rem", fontWeight: 600, letterSpacing: "0.02em" }}>{store.announcement}</div>
+      )}
 
       {/* HERO BANNER */}
       <header style={{ height: "350px", background: store.bannerUrl ? `url(${store.bannerUrl}) center/cover` : "linear-gradient(135deg, var(--roast), var(--copper))", position: "relative", display: "flex", alignItems: "flex-end", padding: "3rem" }}>
@@ -75,7 +95,7 @@ export default function PublicStorefront() {
 
         {store.products.length === 0 ? (
           <div style={{ textAlign: "center", padding: "5rem 0", opacity: 0.5 }}>
-            <p>This store hasn't added any products yet.</p>
+            <p>{store.isPaused ? "This shop is on a break right now. Please check back later." : "This store hasn't added any products yet."}</p>
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "2.5rem" }}>
@@ -108,6 +128,41 @@ export default function PublicStorefront() {
           </div>
         )}
       </main>
+
+      {(hours || store.deliveryReturns || store.location || socials.length > 0) && (
+        <section style={{ borderTop: "1px solid rgba(185,130,90,0.15)", background: "var(--roast)", padding: "3rem" }}>
+          <div style={{ maxWidth: "1400px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "2.5rem" }}>
+            {store.location && (
+              <div>
+                <h3 style={infoH}>Find us</h3>
+                <p style={infoP}>{store.location}{store.shopType && TYPE_LABEL[store.shopType] ? " - " + TYPE_LABEL[store.shopType] : ""}</p>
+              </div>
+            )}
+            {hours && (
+              <div>
+                <h3 style={infoH}>Opening hours</h3>
+                {hours.map((d, i) => (
+                  <div key={DAYS[i]} style={{ ...infoP, display: "flex", justifyContent: "space-between", gap: "1rem", padding: "0.25rem 0" }}><span>{DAYS[i]}</span><span>{d.closed ? "Closed" : d.open + " - " + d.close}</span></div>
+                ))}
+              </div>
+            )}
+            {store.deliveryReturns && (
+              <div>
+                <h3 style={infoH}>Delivery and returns</h3>
+                <p style={{ ...infoP, whiteSpace: "pre-line" }}>{store.deliveryReturns}</p>
+              </div>
+            )}
+            {socials.length > 0 && (
+              <div>
+                <h3 style={infoH}>Follow us</h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                  {socials.map((s) => (<a key={s[0]} href={s[1]} target="_blank" rel="noopener noreferrer" style={{ color: "var(--latte)", textDecoration: "none", fontSize: "0.95rem" }}>{s[0]}</a>))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* PRODUCT DETAIL MODAL (Glassmorphism) */}
       {selectedProduct && (

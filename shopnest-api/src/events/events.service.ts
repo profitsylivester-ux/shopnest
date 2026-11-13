@@ -26,7 +26,7 @@ export class EventsService {
     if (dto.type === 'SHOP_VIEW') {
       if (!dto.storeSlug) throw new BadRequestException('storeSlug is required');
       const store = await this.prisma.store.findFirst({
-        where: { slug: dto.storeSlug, status: 'ACTIVE' },
+        where: { slug: dto.storeSlug, status: 'ACTIVE', isPaused: false },
         select: { id: true },
       });
       if (!store) throw new NotFoundException();
@@ -34,7 +34,7 @@ export class EventsService {
     } else {
       if (!dto.productId) throw new BadRequestException('productId is required');
       const product = await this.prisma.product.findFirst({
-        where: { id: dto.productId, status: 'ACTIVE', store: { status: 'ACTIVE' } },
+        where: { id: dto.productId, status: 'ACTIVE', store: { status: 'ACTIVE', isPaused: false } },
         select: { id: true, storeId: true },
       });
       if (!product) throw new NotFoundException();

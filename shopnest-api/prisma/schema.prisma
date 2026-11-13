@@ -34,6 +34,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   store     Store?
+  tokenVersion Int    @default(0)
+  auditLogs AuditLog[]
 }
 
 model Store {
@@ -46,6 +48,13 @@ model Store {
   bannerUrl      String?
   location       String?
   shopType       String?
+  instagramUrl   String?
+  facebookUrl    String?
+  tiktokUrl      String?
+  openingHours   String?
+  deliveryReturns String?
+  announcement   String?
+  isPaused       Boolean     @default(false)
   status         StoreStatus @default(PENDING)
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
@@ -96,4 +105,20 @@ model Setting {
   id    String @id @default(uuid())
   key   String @unique
   value String
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actorId   String
+  actorRole String
+  action    String
+  summary   String
+  details   Json?
+  ip        String?
+  userAgent String?
+
+  @@index([userId, createdAt])
 }
