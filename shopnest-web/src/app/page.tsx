@@ -26,7 +26,7 @@ const t = {
     authLoginTitle: "Welcome Back", authLoginDesc: "Enter your details to access your account.", authLoginBtn: "Sign In",
     roleBuyer: "Buyer", roleSeller: "Seller",
     chatTitle: "ShopNest Assistant", chatPlaceholder: "Ask about ShopNest...",
-    filterTitle: "Filters", sortBy: "Sort By", newest: "Newest", priceLowHigh: "Price: Low to High", priceHighLow: "Price: High to Low", catTitle: "Category", catAll: "All", catElec: "Electronics", catFash: "Fashion", catShoes: "Shoes", catVeh: "Vehicles", catFood: "Food", catServ: "Services", priceTitle: "Price (TSH)", locTitle: "Location", locAny: "Anywhere", locDar: "Dar es Salaam", locMbeya: "Mbeya", locArusha: "Arusha", condTitle: "Condition", condAny: "Any", condNew: "New", condUsed: "Used", condRef: "Refurbished", reset: "Reset Filters", explore: "Explore Products", exploreDesc: "Discover items from all our trusted sellers.", searchPlace: "Search products..."
+    filterTitle: "Filters", sortBy: "Sort By", newest: "Newest", priceLowHigh: "Price: Low to High", priceHighLow: "Price: High to Low", catTitle: "Category", catAll: "All", noResA: "No results for", noResB: "Try fewer words, check the spelling, or pick another category.", clearSearch: "Clear search", catElec: "Electronics", catFash: "Fashion", catShoes: "Shoes", catVeh: "Vehicles", catFood: "Food", catServ: "Services", priceTitle: "Price (TSH)", locTitle: "Location", locAny: "Anywhere", locDar: "Dar es Salaam", locMbeya: "Mbeya", locArusha: "Arusha", condTitle: "Condition", condAny: "Any", condNew: "New", condUsed: "Used", condRef: "Refurbished", reset: "Reset Filters", explore: "Explore Products", exploreDesc: "Discover items from all our trusted sellers.", searchPlace: "Search products..."
   },
   SW: {
     navHome: "Mwanzo", navProducts: "Bidhaa", navVendors: "Wauzaji", navContact: "Mawasiliano", navSignup: "Jiandikishe",
@@ -50,7 +50,7 @@ const t = {
     authLoginTitle: "Karibu Tena", authLoginDesc: "Weka maelezo yako kufikia akaunti yako.", authLoginBtn: "Ingia",
     roleBuyer: "Mnunuzi", roleSeller: "Mwuza",
     chatTitle: "Msaidizi wa ShopNest", chatPlaceholder: "Uliza kuhusu ShopNest...",
-    filterTitle: "Vichujio", sortBy: "Panga Kwa", newest: "Mpya Zaidi", priceLowHigh: "Bei: Chini hadi Juu", priceHighLow: "Bei: Juu hadi Chini", catTitle: "Kundi", catAll: "Zote", catElec: "Elektroniki", catFash: "Mavazi", catShoes: "Viatu", catVeh: "Magari", catFood: "Chakula", catServ: "Huduma", priceTitle: "Bei (TSH)", locTitle: "Mahali", locAny: "Mahali Popote", locDar: "Dar es Salaam", locMbeya: "Mbeya", locArusha: "Arusha", condTitle: "Hali", condAny: "Yoyote", condNew: "Mpya", condUsed: "Iliyotumika", condRef: "Iliyorekebishwa", reset: "Weka Upya", explore: "Gundua Bidhaa", exploreDesc: "Gundua bidhaa kutoka kwa wauzaji wetu wote.", searchPlace: "Tafuta bidhaa..."
+    filterTitle: "Vichujio", sortBy: "Panga Kwa", newest: "Mpya Zaidi", priceLowHigh: "Bei: Chini hadi Juu", priceHighLow: "Bei: Juu hadi Chini", catTitle: "Kundi", catAll: "Zote", noResA: "Hakuna matokeo ya", noResB: "Jaribu maneno machache, angalia tahajia, au chagua kundi lingine.", clearSearch: "Futa utafutaji", catElec: "Elektroniki", catFash: "Mavazi", catShoes: "Viatu", catVeh: "Magari", catFood: "Chakula", catServ: "Huduma", priceTitle: "Bei (TSH)", locTitle: "Mahali", locAny: "Mahali Popote", locDar: "Dar es Salaam", locMbeya: "Mbeya", locArusha: "Arusha", condTitle: "Hali", condAny: "Yoyote", condNew: "Mpya", condUsed: "Iliyotumika", condRef: "Iliyorekebishwa", reset: "Weka Upya", explore: "Gundua Bidhaa", exploreDesc: "Gundua bidhaa kutoka kwa wauzaji wetu wote.", searchPlace: "Tafuta bidhaa..."
   }
 };
 
@@ -86,6 +86,27 @@ export default function Home() {
   
   // Filtering State
   const [searchQuery, setSearchQuery] = useState("");
+  const [serverResults, setServerResults] = useState<{ q: string; items: any[] } | null>(null);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [showSuggest, setShowSuggest] = useState(false);
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (!q) { setServerResults(null); setSuggestions([]); return; }
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`http://localhost:3001/products/search?q=${encodeURIComponent(q)}`);
+        if (res.ok) { const items = await res.json(); if (!cancelled && Array.isArray(items)) setServerResults({ q, items }); }
+      } catch { /* local search stays as the fallback */ }
+      if (q.length >= 2) {
+        try {
+          const res2 = await fetch(`http://localhost:3001/products/suggest?q=${encodeURIComponent(q)}`);
+          if (res2.ok) { const sug = await res2.json(); if (!cancelled && Array.isArray(sug)) setSuggestions(sug); }
+        } catch { /* ignore */ }
+      } else if (!cancelled) { setSuggestions([]); }
+    }, 300);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [searchQuery]);
   const [sortBy, setSortBy] = useState("Newest");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedCondition, setSelectedCondition] = useState("Any");
@@ -173,13 +194,14 @@ export default function Home() {
   };
 
   // --- MARKETPLACE LOGIC ---
-  let allProducts = stores.flatMap(store => 
+  const useServer = searchQuery.trim() !== "" && serverResults !== null && serverResults.q === searchQuery.trim();
+  let allProducts = useServer ? serverResults!.items.map((prod: any) => ({ ...prod, storeName: prod.store?.name ?? "", storeSlug: prod.store?.slug ?? "", whatsapp: prod.store?.whatsappNumber, location: prod.store?.location || "Tanzania" })) : stores.flatMap(store => 
     store.products.map((prod: any) => ({ 
       ...prod, storeName: store.name, storeSlug: store.slug, whatsapp: store.whatsappNumber, location: store.location || "Tanzania"
     }))
   );
 
-  if (searchQuery) allProducts = allProducts.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.storeName.toLowerCase().includes(searchQuery.toLowerCase()));
+  if (searchQuery && !useServer) allProducts = allProducts.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.storeName.toLowerCase().includes(searchQuery.toLowerCase()));
   if (selectedCategory === "__other") allProducts = allProducts.filter(p => p.category && !MAIN_CATS.includes(p.category)); else if (selectedCategory !== "All") allProducts = allProducts.filter(p => p.category === selectedCategory);
   if (minPrice) allProducts = allProducts.filter(p => p.price >= parseInt(minPrice));
   if (maxPrice) allProducts = allProducts.filter(p => p.price <= parseInt(maxPrice));
@@ -466,13 +488,33 @@ export default function Home() {
                 </div>
                 <div style={{ position: "relative" }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--latte)" strokeWidth="2" style={{ position: "absolute", left: "12px", top: "12px" }}><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                  <input type="text" placeholder={text.searchPlace} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ padding: "0.8rem 1rem 0.8rem 2.5rem", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", width: "300px", outline: "none", background: "transparent", color: "var(--cream)" }} />
+                  <input type="text" placeholder={text.searchPlace} value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setShowSuggest(true); }} onFocus={() => setShowSuggest(true)} onBlur={() => setTimeout(() => setShowSuggest(false), 150)} style={{ padding: "0.8rem 1rem 0.8rem 2.5rem", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", width: "300px", outline: "none", background: "transparent", color: "var(--cream)" }} />
+                  {showSuggest && suggestions.length > 0 && searchQuery.trim().length >= 2 && (
+                    <div style={{ position: "absolute", top: "100%", left: 0, right: 0, marginTop: "4px", background: "var(--roast)", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", zIndex: 20, overflow: "hidden" }}>
+                      {suggestions.map((s: any, i: number) => (
+                        <div key={i} onMouseDown={() => { setSearchQuery(s.name); setShowSuggest(false); }} style={{ padding: "0.6rem 1rem", cursor: "pointer", color: "var(--cream)", fontSize: "0.85rem", display: "flex", justifyContent: "space-between", gap: "1rem" }}>
+                          <span>{s.name}</span>
+                          {s.category && <span style={{ color: "rgba(243,227,208,0.4)", fontSize: "0.75rem" }}>{s.category}</span>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "2rem" }}>
                 {allProducts.length === 0 ? (
-                  <p style={{ gridColumn: "1 / -1", textAlign: "center", color: "rgba(243,227,208,0.4)", padding: "4rem 0" }}>No products found.</p>
+                  <div style={{ gridColumn: "1 / -1", textAlign: "center", color: "rgba(243,227,208,0.5)", padding: "4rem 0" }}>
+                    {searchQuery.trim() ? (
+                      <>
+                        <p style={{ margin: "0 0 0.5rem 0", fontSize: "1.1rem", color: "var(--cream)" }}>{text.noResA} &ldquo;{searchQuery.trim()}&rdquo;</p>
+                        <p style={{ margin: "0 0 1.2rem 0", fontSize: "0.9rem" }}>{text.noResB}</p>
+                        <button onClick={() => setSearchQuery("")} style={{ background: "transparent", border: "1px solid var(--copper)", color: "var(--latte)", padding: "0.5rem 1.2rem", borderRadius: "6px", cursor: "pointer", fontSize: "0.85rem" }}>{text.clearSearch}</button>
+                      </>
+                    ) : (
+                      <p style={{ margin: 0 }}>No products found.</p>
+                    )}
+                  </div>
                 ) : (
                   allProducts.map((prod) => (
                     <div key={prod.id} onClick={() => router.push(`/product/${prod.id}`)} style={{ background: "#1a0f0a", borderRadius: "16px", border: "1px solid rgba(185,130,90,0.1)", padding: "1.2rem", cursor: "pointer", transition: "transform 0.2s, border 0.2s" }} onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.borderColor = "var(--copper)"; }} onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = "rgba(185,130,90,0.1)"; }}>

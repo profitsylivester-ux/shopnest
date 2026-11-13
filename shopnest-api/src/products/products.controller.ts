@@ -1,4 +1,5 @@
-import { Controller, Post, Get, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { ProductsService } from './products.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
@@ -14,6 +15,18 @@ export class ProductsController {
   @Get('public/:id')
   findPublic(@Param('id') id: string) {
     return this.productsService.findPublic(id);
+  }
+
+  @Get('search')
+  @UseGuards(ThrottlerGuard)
+  search(@Query('q') q: string) {
+    return this.productsService.search(typeof q === 'string' ? q : '');
+  }
+
+  @Get('suggest')
+  @UseGuards(ThrottlerGuard)
+  suggest(@Query('q') q: string) {
+    return this.productsService.suggest(typeof q === 'string' ? q : '');
   }
 
   // --- ADMIN ROUTES ---

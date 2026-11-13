@@ -48,6 +48,52 @@ export class ProductsService {
   }
 
   // --- ADMIN METHODS ---
+  async search(q: string) {
+    const term = (q || '').trim().slice(0, 60);
+    if (term.length < 1) return [];
+    return this.prisma.product.findMany({
+      where: {
+        status: 'ACTIVE',
+        store: { status: 'ACTIVE' },
+        OR: [
+          { name: { contains: term, mode: 'insensitive' } },
+          { description: { contains: term, mode: 'insensitive' } },
+          { category: { contains: term, mode: 'insensitive' } },
+          { store: { name: { contains: term, mode: 'insensitive' } } },
+        ],
+      },
+      include: { store: { select: { name: true, slug: true, whatsappNumber: true, location: true } } },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+  }
+
+  async suggest(q: string) {
+    const term = (q || '').trim().slice(0, 60);
+    if (term.length < 2) return [];
+    const rows = await this.prisma.product.findMany({
+      where: {
+        status: 'ACTIVE',
+        store: { status: 'ACTIVE' },
+        OR: [
+          { name: { contains: term, mode: 'insensitive' } },
+          { category: { contains: term, mode: 'insensitive' } },
+        ],
+      },
+      select: { name: true, category: true },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+    const seen = new Set<string>();
+    const out: { name: string; category: string | null }[] = [];
+    for (const r of rows) {
+      const key = r.name.toLowerCase();
+      if (!seen.has(key)) { seen.add(key); out.push({ name: r.name, category: r.category }); }
+      if (out.length >= 6) break;
+    }
+    return out;
+  }
+
   async getAllProductsAdmin() {
     return this.prisma.product.findMany({
       where: { status: { not: 'TRASHED' } },
