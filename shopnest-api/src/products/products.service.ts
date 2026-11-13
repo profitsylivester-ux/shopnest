@@ -94,6 +94,16 @@ export class ProductsService {
     return out;
   }
 
+  async findPublicImage(id: string) {
+    const product = await this.prisma.product.findFirst({
+      where: { id, status: 'ACTIVE', store: { status: 'ACTIVE' } },
+      select: { imageUrl: true },
+    });
+    const m = product?.imageUrl?.match(/^data:(image\/(?:png|jpeg|webp|gif|avif));base64,([A-Za-z0-9+/=]+)$/);
+    if (!m) throw new NotFoundException();
+    return { mime: m[1], buffer: Buffer.from(m[2], 'base64') };
+  }
+
   async getAllProductsAdmin() {
     return this.prisma.product.findMany({
       where: { status: { not: 'TRASHED' } },

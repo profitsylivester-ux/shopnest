@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Body, Param, UseGuards, Query, Header, StreamableFile } from '@nestjs/common';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { ProductsService } from './products.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
@@ -15,6 +15,14 @@ export class ProductsController {
   @Get('public/:id')
   findPublic(@Param('id') id: string) {
     return this.productsService.findPublic(id);
+  }
+
+  @Get('public/:id/image')
+  @UseGuards(ThrottlerGuard)
+  @Header('Cache-Control', 'public, max-age=86400')
+  async findPublicImage(@Param('id') id: string) {
+    const img = await this.productsService.findPublicImage(id);
+    return new StreamableFile(img.buffer, { type: img.mime });
   }
 
   @Get('search')
