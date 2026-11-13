@@ -52,6 +52,7 @@ model Store {
   ownerId        String      @unique
   owner          User        @relation(fields: [ownerId], references: [id])
   products       Product[]
+  events         StoreEvent[]
 }
 
 model Product {
@@ -68,6 +69,27 @@ model Product {
   updatedAt   DateTime      @updatedAt
   storeId     String
   store       Store         @relation(fields: [storeId], references: [id])
+  events      StoreEvent[]
+}
+
+enum EventType {
+  SHOP_VIEW
+  PRODUCT_VIEW
+  WHATSAPP_CLICK
+}
+
+model StoreEvent {
+  id        String    @id @default(uuid())
+  type      EventType
+  source    String?
+  createdAt DateTime  @default(now())
+  storeId   String
+  store     Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([storeId, createdAt])
+  @@index([productId])
 }
 
 model Setting {
