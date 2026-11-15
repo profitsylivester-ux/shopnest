@@ -167,7 +167,17 @@ export function Empty({ children }: { children: React.ReactNode }) {
 }
 
 export function Table({ children }: { children: React.ReactNode }) {
-  return <div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", minWidth: "720px" }}>{children}</table></div>;
+  const box = useRef<HTMLDivElement>(null);
+  // On phones each row becomes a card; this gives every cell its column name.
+  useEffect(() => {
+    const t = box.current ? box.current.querySelector("table") : null;
+    if (!t) return;
+    const heads = Array.from(t.querySelectorAll("thead th")).map((h) => (h.textContent || "").trim());
+    t.querySelectorAll("tbody tr").forEach((tr) => {
+      Array.from(tr.children).forEach((c, i) => { if (heads[i]) c.setAttribute("data-label", heads[i]); });
+    });
+  });
+  return <div ref={box} className="ad-tablebox" style={{ overflowX: "auto" }}><table className="ad-table" style={{ width: "100%", borderCollapse: "collapse", minWidth: "720px" }}>{children}</table></div>;
 }
 
 export function SearchBox({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {

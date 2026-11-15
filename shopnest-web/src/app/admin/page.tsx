@@ -56,6 +56,7 @@ export default function AdminPage() {
   const [tab, setTab] = useState("Overview");
   const [preset, setPreset] = useState<{ status?: string }>({});
   const [selfId, setSelfId] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     let token: string | null = null;
@@ -68,7 +69,7 @@ export default function AdminPage() {
     });
   }, [router]);
 
-  const go = (t: string, p?: { status?: string }) => { setPreset(p || {}); setTab(t); };
+  const go = (t: string, p?: { status?: string }) => { setPreset(p || {}); setTab(t); setMenuOpen(false); };
   const logout = () => { try { localStorage.removeItem("shopnest_token"); localStorage.removeItem("shopnest_user"); } catch { /* ignore */ } router.push("/"); };
 
   if (state === "checking") return <div style={{ minHeight: "100vh", background: "var(--espresso)", color: "var(--cream)", display: "grid", placeItems: "center", fontFamily: "Jost, sans-serif" }}>Loading...</div>;
@@ -84,8 +85,15 @@ export default function AdminPage() {
   }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#110a06", fontFamily: "Jost, sans-serif", color: "var(--cream)" }}>
-      <aside style={{ width: "250px", flexShrink: 0, borderRight: "1px solid rgba(185,130,90,0.1)", padding: "2rem 1rem", display: "flex", flexDirection: "column", position: "sticky", top: 0, height: "100vh", overflowY: "auto" }}>
+    <div className="ad-root" style={{ display: "flex", minHeight: "100vh", background: "#110a06", fontFamily: "Jost, sans-serif", color: "var(--cream)" }}>
+      <div className="ph-bar">
+        <button type="button" className="ph-burger" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
+        </button>
+        <span className="ph-bar-title">ShopNest Admin</span>
+      </div>
+      <div className={"ph-backdrop" + (menuOpen ? " open" : "")} onClick={() => setMenuOpen(false)} />
+      <aside className={"ph-drawer ad-aside" + (menuOpen ? " open" : "")} style={{ width: "250px", flexShrink: 0, borderRight: "1px solid rgba(185,130,90,0.1)", padding: "2rem 1rem", display: "flex", flexDirection: "column", position: "sticky", top: 0, height: "100vh", overflowY: "auto" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "0 1rem", marginBottom: "2rem" }}>
           <div style={{ width: "30px", height: "30px", background: "var(--latte)", color: "var(--espresso)", display: "grid", placeItems: "center", borderRadius: "8px", fontSize: "1.2rem", fontFamily: "Cormorant Garamond, serif", fontWeight: "bold" }}>S</div>
           <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.4rem", color: "var(--cream)", margin: 0 }}>ShopNest Admin</h2>
@@ -104,10 +112,10 @@ export default function AdminPage() {
             })}
           </div>
         ))}
-        <button onClick={logout} style={{ marginTop: "auto", background: "transparent", border: "1px solid rgba(185,130,90,0.3)", color: "var(--latte)", padding: "0.8rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.85rem", fontFamily: "Jost, sans-serif" }}>Sign Out</button>
+        <button onClick={logout} className="ph-logout" style={{ marginTop: "auto", background: "transparent", border: "1px solid rgba(185,130,90,0.3)", color: "var(--latte)", padding: "0.8rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.85rem", fontFamily: "Jost, sans-serif" }}>Sign Out</button>
       </aside>
 
-      <main style={{ flex: 1, minWidth: 0, padding: "2.5rem 3rem" }}>
+      <main className="ad-main" style={{ flex: 1, minWidth: 0, padding: "2.5rem 3rem" }}>
         {tab === "Overview" && <OverviewTab go={go} />}
         {tab === "Shops" && <ShopsTab key={preset.status || "all"} initialStatus={preset.status} />}
         {tab === "Users" && <UsersTab selfId={selfId} />}

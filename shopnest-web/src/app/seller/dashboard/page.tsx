@@ -24,7 +24,9 @@ export default function SellerDashboard() {
   const [userName, setUserName] = useState("Seller");
   
   // Navigation State
-  const [activeTab, setActiveTab] = useState("Home");
+  const [activeTab, setActiveTabRaw] = useState("Home");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const setActiveTab = (t: string) => { setActiveTabRaw(t); setMenuOpen(false); };
   const [msgView, setMsgView] = useState("inquiries");
 
   // Store Form State (Onboarding)
@@ -204,11 +206,11 @@ export default function SellerDashboard() {
       ) : null}
          <div style={{ width: "100%", maxWidth: "900px" }}>
           <div style={{ textAlign: "center", marginBottom: "4rem" }}>
-            <h1 style={{ fontFamily: "Playfair Display, serif", fontSize: "4rem", color: "var(--cream)", margin: "0 0 1rem 0", fontStyle: "italic" }}>Launch Your Store.</h1>
+            <h1 className="sd-onb-h" style={{ fontFamily: "Playfair Display, serif", fontSize: "4rem", color: "var(--cream)", margin: "0 0 1rem 0", fontStyle: "italic" }}>Launch Your Store.</h1>
             <p style={{ color: "rgba(243,227,208,0.6)", fontSize: "1.1rem" }}>Fill in the details below. Your store will be reviewed by the ShopNest team before going live.</p>
           </div>
           {error && <div style={{ textAlign: "center", color: "#ff5f56", marginBottom: "2rem" }}>{error}</div>}
-          <form onSubmit={handleCreateStore} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem" }}>
+          <form onSubmit={handleCreateStore} className="sd-onb" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label style={{ color: "var(--latte)", fontSize: "0.8rem", letterSpacing: "0.1em" }}>Store Name *</label>
@@ -259,7 +261,7 @@ export default function SellerDashboard() {
                 </label>
               </div>
             </div>
-            <div style={{ gridColumn: "span 2", marginTop: "2rem", textAlign: "center" }}>
+            <div className="sd-onb-last" style={{ gridColumn: "span 2", marginTop: "2rem", textAlign: "center" }}>
               <button type="submit" disabled={submitting} style={{ background: "var(--latte)", color: "var(--espresso)", border: "none", padding: "1.2rem 4rem", fontSize: "0.9rem", letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer", fontWeight: 600, borderRadius: "50px" }}>
                 {submitting ? "Initializing..." : "Submit for Review"}
               </button>
@@ -274,7 +276,14 @@ export default function SellerDashboard() {
 
   // --- MAIN DASHBOARD ---
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "var(--espresso)", fontFamily: "Jost, sans-serif" }}>
+    <div className="sd-root" style={{ display: "flex", minHeight: "100vh", background: "var(--espresso)", fontFamily: "Jost, sans-serif" }}>
+      <div className="ph-bar">
+        <button type="button" className="ph-burger" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
+        </button>
+        <span className="ph-bar-title">{store.name}</span>
+      </div>
+      <div className={"ph-backdrop" + (menuOpen ? " open" : "")} onClick={() => setMenuOpen(false)} />
       {notice ? (
         <div role="alert" style={{ position: "fixed", top: "1.2rem", left: "50%", transform: "translateX(-50%)", zIndex: 500, maxWidth: "min(92vw, 520px)", background: "#2a1810", color: "var(--cream)", border: "1px solid #ff5f56", borderRadius: "12px", padding: "0.9rem 1.2rem", display: "flex", gap: "1rem", alignItems: "center", boxShadow: "0 18px 40px rgba(0,0,0,0.5)", fontFamily: "Jost, sans-serif", fontSize: "0.92rem" }}>
           <span style={{ flex: 1 }}>{notice}</span>
@@ -283,7 +292,7 @@ export default function SellerDashboard() {
       ) : null}
       
       {/* FULL SIDEBAR */}
-      <aside style={{ width: "240px", background: "var(--roast)", display: "flex", flexDirection: "column", padding: "2rem 1rem", borderRight: "1px solid rgba(185,130,90,0.1)", position: "fixed", height: "100vh" }}>
+      <aside className={"ph-drawer sd-aside" + (menuOpen ? " open" : "")} style={{ width: "240px", background: "var(--roast)", display: "flex", flexDirection: "column", padding: "2rem 1rem", borderRight: "1px solid rgba(185,130,90,0.1)", position: "fixed", height: "100vh" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "3rem", padding: "0 1rem" }}>
           <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "10px" }}>
              <div style={{ width: "30px", height: "30px", background: "var(--latte)", color: "var(--espresso)", display: "grid", placeItems: "center", borderRadius: "8px", fontSize: "1.2rem", fontFamily: "Cormorant Garamond, serif", fontWeight: "bold" }}>S</div>
@@ -306,11 +315,11 @@ export default function SellerDashboard() {
           ))}
         </nav>
 
-        <button onClick={handleLogout} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(185,130,90,0.3)", color: "var(--latte)", padding: "0.8rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.85rem", marginTop: "1rem", width: "100%", marginBottom: "1.5rem" }}>Logout</button>
+        <button onClick={handleLogout} className="ph-logout" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(185,130,90,0.3)", color: "var(--latte)", padding: "0.8rem", borderRadius: "8px", cursor: "pointer", fontSize: "0.85rem", marginTop: "1rem", width: "100%", marginBottom: "1.5rem" }}>Logout</button>
       </aside>
 
       {/* MAIN CONTENT */}
-      <main style={{ flex: 1, marginLeft: "240px", padding: "2rem 3rem", overflowY: "auto" }}>
+      <main className="sd-main" style={{ flex: 1, marginLeft: "240px", padding: "2rem 3rem", overflowY: "auto" }}>
         
         {/* NEW HEADER */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
@@ -416,7 +425,7 @@ export default function SellerDashboard() {
       </main>
 
       {/* SLIDE-OUT PANEL FOR ADDING PRODUCTS */}
-      <div style={{ 
+      <div className="sd-panel" style={{ 
         position: "fixed", top: 0, right: isPanelOpen ? 0 : "-100%", overflowY: "auto", 
         width: "500px", height: "100vh", background: "var(--roast)", 
         borderLeft: "1px solid var(--copper)", zIndex: 100, 
@@ -424,7 +433,7 @@ export default function SellerDashboard() {
         padding: "4rem 3rem", boxShadow: "-20px 0 50px rgba(0,0,0,0.8)",
         display: "flex", flexDirection: "column"
       }}>
-        <button onClick={() => setIsPanelOpen(false)} style={{ position: "absolute", top: "2rem", right: "2rem", background: "none", border: "none", color: "var(--cream)", fontSize: "2rem", cursor: "pointer", fontFamily: "Cormorant Garamond, serif" }}>×</button>
+        <button onClick={() => setIsPanelOpen(false)} aria-label="Close" className="sd-panel-x" style={{ position: "absolute", top: "2rem", right: "2rem", background: "none", border: "none", color: "var(--cream)", fontSize: "2rem", cursor: "pointer", fontFamily: "Cormorant Garamond, serif" }}>×</button>
         
         <h2 style={{ fontFamily: "Playfair Display, serif", fontSize: "2.5rem", color: "var(--cream)", fontStyle: "italic", marginBottom: "1rem" }}>{editingId ? "Edit Product" : "New Masterpiece"}</h2>
         <p style={{ color: "var(--copper)", fontSize: "0.85rem", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "3rem" }}>{editingId ? "Update your product details" : "Add to your collection"}</p>

@@ -169,7 +169,7 @@ export default function Home() {
               <AccountMenu user={user} lang={lang} theme={theme} onSignedOut={() => setUser(null)} />
             ) : (
               <>
-                <button className="lang-toggle" onClick={() => openAuthModal("BUYER", true)}>{d.signIn}</button>
+                <button className="lang-toggle nav-signin" onClick={() => openAuthModal("BUYER", true)}>{d.signIn}</button>
                 <button className="btn-signup" onClick={() => openAuthModal("BUYER", false)}>{text.navSignup}</button>
               </>
             )}
