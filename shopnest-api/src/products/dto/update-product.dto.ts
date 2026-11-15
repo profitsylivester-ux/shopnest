@@ -17,7 +17,7 @@ export class UpdateProductDto {
 
   @IsOptional()
   @IsString()
-  @Matches(/^(?:|https?:\/\/[^\s"'()<>\\]+|data:image\/(?:png|jpeg|webp|gif|avif);base64,[A-Za-z0-9+\/=]+)$/, { message: 'imageUrl must be an http(s) link or a png/jpeg/webp/gif/avif data image' })
+  @Matches(/^(?:|https?:\/\/[^\s"'()<>\\]+|\/uploads\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(?:-sm)?\.webp|data:image\/(?:png|jpeg|webp|gif|avif);base64,[A-Za-z0-9+\/=]+)$/, { message: 'imageUrl must be an http(s) link, an uploaded picture, or a png/jpeg/webp/gif/avif data image' })
   imageUrl?: string;
 
   @IsOptional()

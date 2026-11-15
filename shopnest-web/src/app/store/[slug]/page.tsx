@@ -1,4 +1,5 @@
 "use client";
+import { imgSrc, thumbSrc } from "../../../lib/images";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
@@ -74,12 +75,12 @@ export default function PublicStorefront() {
       )}
 
       {/* HERO BANNER */}
-      <header style={{ height: "350px", background: store.bannerUrl ? `url(${store.bannerUrl}) center/cover` : "linear-gradient(135deg, var(--roast), var(--copper))", position: "relative", display: "flex", alignItems: "flex-end", padding: "3rem" }}>
+      <header style={{ height: "350px", background: store.bannerUrl ? `url(${imgSrc(store.bannerUrl)}) center/cover` : "linear-gradient(135deg, var(--roast), var(--copper))", position: "relative", display: "flex", alignItems: "flex-end", padding: "3rem" }}>
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, var(--espresso) 0%, rgba(26,15,10,0.4) 100%)" }} />
         <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: "2rem" }}>
           <div style={{ width: "120px", height: "120px", borderRadius: "50%", background: "var(--espresso)", border: "3px solid var(--copper)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
             {store.logoUrl ? (
-              <img src={store.logoUrl} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <img src={imgSrc(store.logoUrl)} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             ) : (
               <span style={{ fontSize: "3rem", fontFamily: "Cormorant Garamond, serif", color: "var(--latte)", fontWeight: "bold" }}>{store.name.substring(0, 2).toUpperCase()}</span>
             )}
@@ -107,7 +108,7 @@ export default function PublicStorefront() {
               <div key={prod.id} onClick={() => setSelectedProduct(prod)} style={{ background: "#23130c", borderRadius: "24px", overflow: "hidden", boxShadow: "0 15px 35px rgba(0,0,0,0.4)", cursor: "pointer", transition: "transform 0.3s" }} onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-8px)"} onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}>
                 
                 {/* Image with Floating Tag */}
-                <div style={{ height: "240px", position: "relative", background: prod.imageUrl ? `url(${prod.imageUrl}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${prod.imageUrl}) center/cover` : "var(--espresso)" }}>
+                <div style={{ height: "240px", position: "relative", background: prod.imageUrl ? `url(${thumbSrc(prod.imageUrl)}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${thumbSrc(prod.imageUrl)}) center/cover` : "var(--espresso)" }}>
                   <div style={{ position: "absolute", top: "1rem", left: "1rem", background: "rgba(255,255,255,0.9)", color: "var(--espresso)", padding: "0.3rem 0.8rem", borderRadius: "20px", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.05em" }}>
                     NEW ARRIVAL
                   </div>
@@ -175,7 +176,7 @@ export default function PublicStorefront() {
             
             <button onClick={() => setSelectedProduct(null)} style={{ position: "absolute", top: "1.5rem", right: "1.5rem", background: "#000", border: "none", color: "#fff", width: "36px", height: "36px", borderRadius: "50%", fontSize: "1.2rem", cursor: "pointer", zIndex: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
 
-            <div style={{ flex: 1, minHeight: "400px", background: selectedProduct.imageUrl ? `url(${selectedProduct.imageUrl}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${selectedProduct.imageUrl}) center/cover` : "var(--espresso)" }} />
+            <div style={{ flex: 1, minHeight: "400px", background: selectedProduct.imageUrl ? `url(${imgSrc(selectedProduct.imageUrl)}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${imgSrc(selectedProduct.imageUrl)}) center/cover` : "var(--espresso)" }} />
 
             <div style={{ flex: 1, padding: "3rem", display: "flex", flexDirection: "column", justifyContent: "center" }}>
               <p style={{ color: "var(--latte)", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1rem" }}>Product Details</p>

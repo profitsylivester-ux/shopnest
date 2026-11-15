@@ -1,4 +1,5 @@
 "use client";
+import { imgSrc, thumbSrc, uploadImage } from "../../../lib/images";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -84,35 +85,15 @@ export default function SellerDashboard() {
 
   useEffect(() => { fetchData(); }, [router]);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
+  const [upFor, setUpFor] = useState("");
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
     const file = e.target.files?.[0];
+    e.target.value = "";
     if (!file) return;
-    if (!file.type.startsWith("image/")) { alert("Please choose an image file."); return; }
-    if (file.size > 15 * 1024 * 1024) { alert("Image must be less than 15MB."); return; }
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
-      const maxSide = 1280;
-      const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
-      const w = Math.max(1, Math.round(img.width * scale));
-      const h = Math.max(1, Math.round(img.height * scale));
-      const canvas = document.createElement("canvas");
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) { URL.revokeObjectURL(url); alert("Could not process this image."); return; }
-      ctx.drawImage(img, 0, 0, w, h);
-      let out = canvas.toDataURL("image/webp", 0.82);
-      if (!out.startsWith("data:image/webp")) {
-        ctx.globalCompositeOperation = "destination-over";
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, w, h);
-        out = canvas.toDataURL("image/jpeg", 0.82);
-      }
-      URL.revokeObjectURL(url);
-      setter(out);
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); alert("Could not read this image. Try a JPG, PNG or WebP photo."); };
-    img.src = url;
+    setUpFor(setter === setLogo ? "logo" : setter === setBanner ? "banner" : "product");
+    const r = await uploadImage(file);
+    setUpFor("");
+    if (r.ok) setter(r.url); else alert(r.error);
   };
 
   const handleCreateStore = async (e: React.FormEvent) => {
@@ -248,7 +229,7 @@ export default function SellerDashboard() {
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--copper)" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
                   <div>
                     <p style={{ color: "var(--cream)", margin: 0, fontSize: "0.9rem" }}>Click to browse</p>
-                    {logo ? <p style={{ color: "#27c93f", margin: 0, fontSize: "0.75rem" }}>✓ Image Selected</p> : <p style={{ color: "rgba(243,227,208,0.4)", margin: 0, fontSize: "0.75rem" }}>Upload from device</p>}
+                    {upFor === "logo" ? <p style={{ color: "var(--latte)", margin: 0, fontSize: "0.75rem" }}>Uploading...</p> : logo ? <p style={{ color: "#27c93f", margin: 0, fontSize: "0.75rem" }}>✓ Image Selected</p> : <p style={{ color: "rgba(243,227,208,0.4)", margin: 0, fontSize: "0.75rem" }}>Upload from device</p>}
                   </div>
                   <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLogo)} style={{ display: "none" }} />
                 </label>
@@ -259,7 +240,7 @@ export default function SellerDashboard() {
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--copper)" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                   <div>
                     <p style={{ color: "var(--cream)", margin: 0, fontSize: "0.9rem" }}>Click to browse</p>
-                    {banner ? <p style={{ color: "#27c93f", margin: 0, fontSize: "0.75rem" }}>✓ Image Selected</p> : <p style={{ color: "rgba(243,227,208,0.4)", margin: 0, fontSize: "0.75rem" }}>Upload from device</p>}
+                    {upFor === "banner" ? <p style={{ color: "var(--latte)", margin: 0, fontSize: "0.75rem" }}>Uploading...</p> : banner ? <p style={{ color: "#27c93f", margin: 0, fontSize: "0.75rem" }}>✓ Image Selected</p> : <p style={{ color: "rgba(243,227,208,0.4)", margin: 0, fontSize: "0.75rem" }}>Upload from device</p>}
                   </div>
                   <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setBanner)} style={{ display: "none" }} />
                 </label>
@@ -318,7 +299,7 @@ export default function SellerDashboard() {
           <div style={{ display: "flex", alignItems: "center", gap: "1.2rem" }}>
             <div style={{ width: "50px", height: "50px", background: "var(--roast)", borderRadius: "12px", border: "1px solid rgba(185,130,90,0.3)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
               {store.logoUrl ? (
-                <img src={store.logoUrl} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <img src={imgSrc(store.logoUrl)} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               ) : (
                 <span style={{ fontSize: "1.5rem", fontFamily: "Cormorant Garamond, serif", color: "var(--latte)", fontWeight: "bold" }}>
                   {store.name.substring(0, 2).toUpperCase()}
@@ -389,7 +370,7 @@ export default function SellerDashboard() {
                ) : (
                   products.map((prod) => (
                     <div key={prod.id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(185,130,90,0.2)", borderRadius: "12px", overflow: "hidden" }}>
-                      <div style={{ height: "160px", background: prod.imageUrl ? `url(${prod.imageUrl}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${prod.imageUrl}) center/cover` : "var(--espresso)" }} />
+                      <div style={{ height: "160px", background: prod.imageUrl ? `url(${thumbSrc(prod.imageUrl)}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${thumbSrc(prod.imageUrl)}) center/cover` : "var(--espresso)" }} />
                       <div style={{ padding: "1rem" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
                           <p style={{ color: "var(--cream)", fontSize: "1rem", margin: 0, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{prod.name}</p>
@@ -468,7 +449,7 @@ export default function SellerDashboard() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--copper)" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
               <div>
                 <p style={{ color: "var(--cream)", margin: 0, fontSize: "0.9rem" }}>Click to browse</p>
-                {pImage ? <p style={{ color: "#27c93f", margin: 0, fontSize: "0.75rem" }}>✓ Image Selected</p> : <p style={{ color: "rgba(243,227,208,0.4)", margin: 0, fontSize: "0.75rem" }}>Upload from device</p>}
+                {upFor === "product" ? <p style={{ color: "var(--latte)", margin: 0, fontSize: "0.75rem" }}>Uploading...</p> : pImage ? <p style={{ color: "#27c93f", margin: 0, fontSize: "0.75rem" }}>✓ Image Selected</p> : <p style={{ color: "rgba(243,227,208,0.4)", margin: 0, fontSize: "0.75rem" }}>Upload from device</p>}
               </div>
               <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setPImage)} style={{ display: "none" }} />
             </label>

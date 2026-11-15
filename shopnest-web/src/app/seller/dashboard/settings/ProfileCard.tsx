@@ -1,18 +1,21 @@
 "use client";
 import { useState } from "react";
-import { Card, Field, Msg, api, input, lbl, primary, ghost, pickImage, MUTED, type Note } from "./shared";
+import { Card, Field, Msg, api, input, lbl, primary, ghost, MUTED, type Note } from "./shared";
+import { imgSrc, uploadImage } from "../../../../lib/images";
 
 const TYPES = [["Online", "Online Seller"], ["Physical", "Physical Shop"], ["Both", "Both (Online and Physical)"]];
 
-function ImageBox({ title, value, set, wide, bad }: { title: string; value: string; set: (v: string) => void; wide?: boolean; bad: () => void }) {
+function ImageBox({ title, value, set, wide, bad }: { title: string; value: string; set: (v: string) => void; wide?: boolean; bad: (text: string) => void }) {
+  const [up, setUp] = useState(false);
+  const pick = async (f: File) => { setUp(true); const r = await uploadImage(f); setUp(false); if (r.ok) set(r.url); else bad(r.error); };
   return (
     <div style={{ flex: wide ? "1 1 260px" : "0 0 auto" }}>
       <span style={lbl}>{title}</span>
       <div style={{ width: wide ? "100%" : "96px", height: wide ? "110px" : "96px", borderRadius: "10px", overflow: "hidden", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(185,130,90,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: MUTED, fontSize: "0.75rem" }}>
-        {value ? <img src={value} alt={title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : "No image yet"}
+        {value ? <img src={imgSrc(value)} alt={title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : "No image yet"}
       </div>
       <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
-        <label style={{ ...ghost, display: "inline-block" }}>Choose<input type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (f) pickImage(f, set, bad); }} /></label>
+        <label style={{ ...ghost, display: "inline-block" }}>{up ? "Uploading..." : "Choose"}<input type="file" accept="image/*" disabled={up} style={{ display: "none" }} onChange={(e) => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (f) pick(f); }} /></label>
         {value && <button type="button" onClick={() => set("")} style={ghost}>Remove</button>}
       </div>
     </div>
@@ -29,7 +32,7 @@ export default function ProfileCard({ store, onSaved }: { store: any; onSaved: (
   const [banner, setBanner] = useState<string>(store.bannerUrl || "");
   const [busy, setBusy] = useState(false);
   const [m, setM] = useState<Note>(null);
-  const bad = () => setM({ ok: false, text: "That file is not a usable image." });
+  const bad = (text: string) => setM({ ok: false, text });
   const save = async () => {
     if (!name.trim() || !wa.trim()) { setM({ ok: false, text: "Shop name and WhatsApp number are required." }); return; }
     setBusy(true); setM(null);

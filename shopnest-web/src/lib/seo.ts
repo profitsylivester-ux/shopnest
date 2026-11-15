@@ -20,6 +20,7 @@ export function productImageUrl(product: any): string | null {
   const u = product?.imageUrl;
   if (typeof u !== "string" || !u) return null;
   if (u.startsWith("data:")) return `${API_URL}/products/public/${product.id}/image`;
+  if (u.startsWith("/uploads/")) return API_URL + u;
   return /^https?:\/\//.test(u) ? u : null;
 }
 

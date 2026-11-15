@@ -1,4 +1,5 @@
 "use client";
+import { thumbSrc } from "../../lib/images";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -282,7 +283,7 @@ export default function AdminDashboard() {
                     <tr key={store.id} style={{ borderBottom: "1px solid rgba(185,130,90,0.1)" }}>
                       <td style={{ padding: "1.5rem" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                          <div style={{ width: "40px", height: "40px", borderRadius: "8px", background: store.logoUrl ? `url(${store.logoUrl}) center/cover` : "var(--roast)", border: "1px solid var(--copper)" }} />
+                          <div style={{ width: "40px", height: "40px", borderRadius: "8px", background: store.logoUrl ? `url(${thumbSrc(store.logoUrl)}) center/cover` : "var(--roast)", border: "1px solid var(--copper)" }} />
                           <p style={{ margin: 0, fontWeight: 600 }}>{store.name}</p>
                         </div>
                       </td>
@@ -338,7 +339,7 @@ export default function AdminDashboard() {
                       <tr key={prod.id} style={{ borderBottom: "1px solid rgba(185,130,90,0.1)" }}>
                         <td style={{ padding: "1.5rem" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                            <div style={{ width: "40px", height: "40px", borderRadius: "8px", background: prod.imageUrl ? `url(${prod.imageUrl}) center/cover` : "var(--roast)", border: "1px solid var(--copper)" }} />
+                            <div style={{ width: "40px", height: "40px", borderRadius: "8px", background: prod.imageUrl ? `url(${thumbSrc(prod.imageUrl)}) center/cover` : "var(--roast)", border: "1px solid var(--copper)" }} />
                             <p style={{ margin: 0, fontWeight: 600 }}>{prod.name}</p>
                           </div>
                         </td>
@@ -387,7 +388,7 @@ export default function AdminDashboard() {
                   {trashedProducts.length === 0 ? <tr><td colSpan={3} style={{ padding: "3rem", textAlign: "center", color: "rgba(243,227,208,0.4)" }}>Trash is empty.</td></tr> : (
                     trashedProducts.map((prod) => (
                       <tr key={prod.id} style={{ borderBottom: "1px solid rgba(185,130,90,0.1)" }}>
-                        <td style={{ padding: "1.5rem" }}><div style={{ display: "flex", alignItems: "center", gap: "1rem" }}><div style={{ width: "40px", height: "40px", borderRadius: "8px", background: prod.imageUrl ? `url(${prod.imageUrl}) center/cover` : "var(--roast)" }} /><p style={{ margin: 0, fontWeight: 600 }}>{prod.name}</p></div></td>
+                        <td style={{ padding: "1.5rem" }}><div style={{ display: "flex", alignItems: "center", gap: "1rem" }}><div style={{ width: "40px", height: "40px", borderRadius: "8px", background: prod.imageUrl ? `url(${thumbSrc(prod.imageUrl)}) center/cover` : "var(--roast)" }} /><p style={{ margin: 0, fontWeight: 600 }}>{prod.name}</p></div></td>
                         <td style={{ padding: "1.5rem", color: "rgba(243,227,208,0.6)" }}>{prod.store.name}</td>
                         <td style={{ padding: "1.5rem", textAlign: "right" }}><button onClick={() => handleRestore(prod.id)} style={{ background: "transparent", border: "1px solid #27c93f", color: "#27c93f", padding: "0.6rem 1rem", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "0.8rem" }}>Restore</button></td>
                       </tr>
