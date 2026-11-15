@@ -15,8 +15,10 @@ const card: React.CSSProperties = { background: "var(--roast)", borderRadius: "1
 const th: React.CSSProperties = { textAlign: "left", fontWeight: 500, padding: "0 0 0.8rem 0", color: MUTED, fontSize: "0.8rem", borderBottom: "1px solid rgba(185,130,90,0.2)" };
 const td: React.CSSProperties = { padding: "0.8rem 0", borderBottom: "1px solid rgba(185,130,90,0.06)", fontSize: "0.9rem", color: "var(--cream)" };
 
+// A rate from very few views would mislead, so it is only shown from 20 views on.
+const MIN_VIEWS = 20;
 function per100(clicks: number, views: number) {
-  return views > 0 ? String(Math.round((clicks / views) * 100)) : "-";
+  return views >= MIN_VIEWS ? String(Math.round((clicks / views) * 100)) : "-";
 }
 
 export default function AnalyticsTab() {
@@ -44,7 +46,7 @@ export default function AnalyticsTab() {
     { label: "WhatsApp clicks", value: t ? t.whatsappClicks.toLocaleString() : "-", hint: "Buyers who tapped WhatsApp" },
     { label: "Product views", value: t ? t.productViews.toLocaleString() : "-", hint: "Opens of a product page" },
     { label: "Shop views", value: t ? t.shopViews.toLocaleString() : "-", hint: "Visits to your shop page" },
-    { label: "Clicks per 100 views", value: t ? per100(t.whatsappClicks, t.productViews) : "-", hint: "WhatsApp clicks for every 100 product views" },
+    { label: "Clicks per 100 views", value: t ? per100(t.whatsappClicks, t.productViews) : "-", hint: "WhatsApp clicks for every 100 product views (shown from 20 views)" },
   ];
   const rows: any[] = summary ? summary.products : [];
 

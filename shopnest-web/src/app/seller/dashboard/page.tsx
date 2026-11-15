@@ -19,6 +19,8 @@ export default function SellerDashboard() {
   const [store, setStore] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  useEffect(() => { if (!notice) return undefined; const t = setTimeout(() => setNotice(""), 8000); return () => clearTimeout(t); }, [notice]);
   const [userName, setUserName] = useState("Seller");
   
   // Navigation State
@@ -97,7 +99,7 @@ export default function SellerDashboard() {
     setUpFor(setter === setLogo ? "logo" : setter === setBanner ? "banner" : "product");
     const r = await uploadImage(file);
     setUpFor("");
-    if (r.ok) setter(r.url); else alert(r.error);
+    if (r.ok) setter(r.url); else setNotice(r.error || "The picture could not be uploaded. Please try again.");
   };
 
   const handleCreateStore = async (e: React.FormEvent) => {
@@ -129,8 +131,8 @@ export default function SellerDashboard() {
       if (res.status === 201) {
         setIsPanelOpen(false); setPName(""); setPPrice(""); setPWas(""); setPDesc(""); setPImage(""); setPStock("1"); setPCategory(""); setPCondition(""); setPCatOther(false);
         fetchData();
-      } else { alert("Failed to add product."); }
-    } catch { alert("Network error."); } finally { setPSubmitting(false); }
+      } else { setNotice("The product could not be saved. Please check the details and try again."); }
+    } catch { setNotice("Network problem. Please check your connection and try again."); } finally { setPSubmitting(false); }
   };
 
   const openAddPanel = () => {
@@ -164,10 +166,10 @@ export default function SellerDashboard() {
       if (res.status === 200) {
         setIsPanelOpen(false); setEditingId(null); setPName(""); setPPrice(""); setPWas(""); setPDesc(""); setPImage(""); setPStock("1"); setPCategory(""); setPCondition(""); setPCatOther(false);
         fetchData();
-      } else if (res.status === 403) { alert("You can only edit your own products."); }
-      else if (res.status === 404) { alert("Product not found."); }
-      else { alert("Failed to update product."); }
-    } catch { alert("Network error."); } finally { setPSubmitting(false); }
+      } else if (res.status === 403) { setNotice("You can only edit your own products."); }
+      else if (res.status === 404) { setNotice("This product was not found. Please refresh the page."); }
+      else { setNotice("The product could not be updated. Please try again."); }
+    } catch { setNotice("Network problem. Please check your connection and try again."); } finally { setPSubmitting(false); }
   };
 
   const toggleProductStatus = async (id: string, currentStatus: string) => {
@@ -179,7 +181,7 @@ export default function SellerDashboard() {
         body: JSON.stringify({ status: newStatus }),
       });
       fetchData();
-    } catch { alert("Failed to update status."); }
+    } catch { setNotice("The product status could not be changed. Please try again."); }
   };
 
   const handleLogout = () => {
@@ -194,10 +196,16 @@ export default function SellerDashboard() {
   if (!store) {
     return (
       <div style={{ minHeight: "100vh", background: "var(--espresso)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem", fontFamily: "Jost, sans-serif" }}>
+        {notice ? (
+        <div role="alert" style={{ position: "fixed", top: "1.2rem", left: "50%", transform: "translateX(-50%)", zIndex: 500, maxWidth: "min(92vw, 520px)", background: "#2a1810", color: "var(--cream)", border: "1px solid #ff5f56", borderRadius: "12px", padding: "0.9rem 1.2rem", display: "flex", gap: "1rem", alignItems: "center", boxShadow: "0 18px 40px rgba(0,0,0,0.5)", fontFamily: "Jost, sans-serif", fontSize: "0.92rem" }}>
+          <span style={{ flex: 1 }}>{notice}</span>
+          <button type="button" onClick={() => setNotice("")} aria-label="Close message" style={{ background: "transparent", border: "none", color: "var(--latte)", fontSize: "1.2rem", cursor: "pointer", lineHeight: 1 }}>x</button>
+        </div>
+      ) : null}
          <div style={{ width: "100%", maxWidth: "900px" }}>
           <div style={{ textAlign: "center", marginBottom: "4rem" }}>
             <h1 style={{ fontFamily: "Playfair Display, serif", fontSize: "4rem", color: "var(--cream)", margin: "0 0 1rem 0", fontStyle: "italic" }}>Launch Your Store.</h1>
-            <p style={{ color: "rgba(243,227,208,0.6)", fontSize: "1.1rem" }}>Fill in the details below. Your store will be reviewed by Admin before going live.</p>
+            <p style={{ color: "rgba(243,227,208,0.6)", fontSize: "1.1rem" }}>Fill in the details below. Your store will be reviewed by the ShopNest team before going live.</p>
           </div>
           {error && <div style={{ textAlign: "center", color: "#ff5f56", marginBottom: "2rem" }}>{error}</div>}
           <form onSubmit={handleCreateStore} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem" }}>
@@ -267,6 +275,12 @@ export default function SellerDashboard() {
   // --- MAIN DASHBOARD ---
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "var(--espresso)", fontFamily: "Jost, sans-serif" }}>
+      {notice ? (
+        <div role="alert" style={{ position: "fixed", top: "1.2rem", left: "50%", transform: "translateX(-50%)", zIndex: 500, maxWidth: "min(92vw, 520px)", background: "#2a1810", color: "var(--cream)", border: "1px solid #ff5f56", borderRadius: "12px", padding: "0.9rem 1.2rem", display: "flex", gap: "1rem", alignItems: "center", boxShadow: "0 18px 40px rgba(0,0,0,0.5)", fontFamily: "Jost, sans-serif", fontSize: "0.92rem" }}>
+          <span style={{ flex: 1 }}>{notice}</span>
+          <button type="button" onClick={() => setNotice("")} aria-label="Close message" style={{ background: "transparent", border: "none", color: "var(--latte)", fontSize: "1.2rem", cursor: "pointer", lineHeight: 1 }}>x</button>
+        </div>
+      ) : null}
       
       {/* FULL SIDEBAR */}
       <aside style={{ width: "240px", background: "var(--roast)", display: "flex", flexDirection: "column", padding: "2rem 1rem", borderRight: "1px solid rgba(185,130,90,0.1)", position: "fixed", height: "100vh" }}>

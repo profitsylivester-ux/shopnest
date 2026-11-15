@@ -26,33 +26,42 @@ export default function MessagesTab() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  const load = async (skip: number) => {
+  const [updated, setUpdated] = useState("");
+  const load = async (skip: number, silent = false) => {
     const token = localStorage.getItem("shopnest_token");
     if (!token) return;
-    setBusy(true);
-    setError("");
+    if (!silent) { setBusy(true); setError(""); }
     try {
       const res = await fetch(`${API_URL}/events/me/recent?limit=${PAGE}&skip=${skip}`, { headers: { Authorization: `Bearer ${token}` } });
       if (!res.ok) throw new Error("bad status");
       const data = await res.json();
       setTotal(data.total);
-      setItems((prev) => (skip === 0 ? data.items : [...prev, ...data.items]));
+      setItems((prev) => {
+        if (skip > 0) return [...prev, ...data.items];
+        const ids = new Set(data.items.map((x: any) => x.id));
+        return [...data.items, ...prev.filter((x: any) => !ids.has(x.id))];
+      });
       setLoaded(true);
+      setUpdated(new Date().toLocaleTimeString("en-GB", { timeZone: "Africa/Dar_es_Salaam" }));
     } catch {
-      setError("Could not load your inquiries. Is the backend running?");
+      if (!silent) setError("Could not load your inquiries. Is the backend running?");
     } finally {
-      setBusy(false);
+      if (!silent) setBusy(false);
     }
   };
 
   useEffect(() => { load(0); }, []);
+  useEffect(() => {
+    const t = setInterval(() => { if (document.visibilityState === "visible") load(0, true); }, 15000);
+    return () => clearInterval(t);
+  }, []);
 
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem", marginBottom: "1.5rem" }}>
         <div>
           <h2 style={{ fontFamily: "Playfair Display, serif", fontStyle: "italic", fontSize: "1.8rem", color: "var(--cream)", margin: 0 }}>Messages</h2>
-          <p style={{ color: MUTED, fontSize: "0.85rem", margin: "0.3rem 0 0 0" }}>{loaded ? total.toLocaleString() + (total === 1 ? " inquiry" : " inquiries") + " in total" : "Every time a buyer taps WhatsApp on your shop"}</p>
+          <p style={{ color: MUTED, fontSize: "0.85rem", margin: "0.3rem 0 0 0" }}>{loaded ? total.toLocaleString() + (total === 1 ? " inquiry" : " inquiries") + " in total" : "Every time a buyer taps WhatsApp on your shop"}{updated ? " - updated " + updated : ""}</p>
         </div>
         <button onClick={() => load(0)} disabled={busy} style={{ background: "transparent", border: "1px solid var(--copper)", color: "var(--latte)", padding: "0.55rem 1.1rem", borderRadius: "8px", cursor: busy ? "default" : "pointer", fontSize: "0.85rem", fontFamily: "Jost, sans-serif", opacity: busy ? 0.6 : 1 }}>{busy ? "Loading..." : "Refresh"}</button>
       </div>
