@@ -185,7 +185,7 @@ export default function Home() {
 
       <main className="story" ref={storyRef}>
         {String(sysSettings.announcementActive) === "true" && (
-          <div style={{ position: "fixed", top: "80px", left: 0, right: 0, background: "var(--latte)", color: "var(--espresso)", textAlign: "center", padding: "0.8rem", fontSize: "0.9rem", fontWeight: 600, zIndex: 40, letterSpacing: "0.05em" }}>
+          <div className="sn-announce" style={{ position: "fixed", top: "80px", left: 0, right: 0, background: "var(--latte)", color: "var(--espresso)", textAlign: "center", padding: "0.8rem", fontSize: "0.9rem", fontWeight: 600, zIndex: 40, letterSpacing: "0.05em" }}>
             📢 {sysSettings.announcementText}
           </div>
         )}

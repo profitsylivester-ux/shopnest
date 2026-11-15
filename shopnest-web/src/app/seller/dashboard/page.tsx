@@ -354,7 +354,7 @@ export default function SellerDashboard() {
 
         {/* PREMIUM PENDING BANNER */}
         {store.status === "PENDING" && (
-          <div style={{ 
+          <div className="sd-pending" style={{ 
             background: "linear-gradient(90deg, rgba(185,130,90,0.1) 0%, rgba(26,15,10,0) 100%)", 
             borderLeft: "2px solid var(--latte)", 
             padding: "1.2rem 2rem", 
@@ -364,8 +364,8 @@ export default function SellerDashboard() {
             marginBottom: "2rem",
             backdropFilter: "blur(10px)"
           }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--latte)" strokeWidth="1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <div className="sd-pending-in" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--latte)" strokeWidth="1.5" style={{ flexShrink: 0 }}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
               <p style={{ margin: 0, color: "var(--cream)", fontSize: "0.95rem", letterSpacing: "0.02em" }}>Your store is currently under review. We will notify you once it is approved.</p>
             </div>
             <span style={{ color: "var(--latte)", fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase" }}>Reviewing</span>
