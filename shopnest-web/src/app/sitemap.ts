@@ -8,7 +8,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [
     { url: SITE_URL, changeFrequency: "daily", priority: 1 },
     { url: `${SITE_URL}/marketplace`, changeFrequency: "daily", priority: 0.8 },
+    { url: `${SITE_URL}/shops`, changeFrequency: "daily", priority: 0.7 },
   ];
+  // Info pages appear only once the admin has published them.
+  for (const slug of ["about", "faq", "support", "privacy", "terms"]) {
+    const p = await getJson(`/content/pages/${slug}`, 300);
+    if (p) entries.push({ url: `${SITE_URL}/${slug}`, changeFrequency: "monthly", priority: 0.4 });
+  }
   for (const s of Array.isArray(stores) ? stores : []) {
     if (s?.slug) entries.push({ url: `${SITE_URL}/store/${encodeURIComponent(s.slug)}`, changeFrequency: "weekly", priority: 0.7 });
     for (const p of Array.isArray(s?.products) ? s.products : []) {

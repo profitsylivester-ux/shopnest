@@ -1,8 +1,10 @@
-import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { randomBytes } from 'node:crypto';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, ServiceUnavailableException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { RegisterDto, LoginDto, ChangePasswordDto, ChangeEmailDto } from './dto/auth.dto.js';
+import { RegisterDto, LoginDto, GoogleDto, ChangePasswordDto, ChangeEmailDto } from './dto/auth.dto.js';
+import { GoogleTokenError, verifyGoogleIdToken } from './google-token.js';
 import { AuditService } from '../audit/audit.service.js';
 import type { ReqMeta } from '../audit/request-meta.js';
 
@@ -34,6 +36,41 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
     await this.audit.log({ userId: user.id, action: 'AUTH_LOGIN', summary: 'Signed in', ...meta });
+    return this.signToken(user);
+  }
+
+  // "Continue with Google". Google proves the email is real; we never see a Google password.
+  async googleSignIn(dto: GoogleDto, meta: ReqMeta) {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    if (!clientId) throw new ServiceUnavailableException('Google sign-in is not set up yet.');
+    let profile;
+    try {
+      profile = await verifyGoogleIdToken(dto.credential, clientId);
+    } catch (e) {
+      if (e instanceof GoogleTokenError) throw new UnauthorizedException('Google sign-in could not be verified. Please try again.');
+      throw new ServiceUnavailableException('Could not reach Google to check your sign-in. Please try again.');
+    }
+    const byGoogle = await this.prisma.user.findUnique({ where: { googleId: profile.sub } });
+    if (byGoogle) {
+      if (byGoogle.role === 'ADMIN') throw new ForbiddenException('Admin accounts must sign in with email and password.');
+      await this.audit.log({ userId: byGoogle.id, action: 'AUTH_LOGIN', summary: 'Signed in with Google', ...meta });
+      return this.signToken(byGoogle);
+    }
+    const sameEmail = await this.prisma.user.findUnique({ where: { email: profile.email } });
+    if (sameEmail) {
+      // We do not merge accounts automatically: someone could have registered this email by password before its real owner.
+      throw new ConflictException('An account with this email already exists. Please sign in with your email and password.');
+    }
+    const user = await this.prisma.user.create({
+      data: {
+        email: profile.email,
+        name: profile.name,
+        googleId: profile.sub,
+        password: await bcrypt.hash(randomBytes(32).toString('hex'), 10),
+        role: dto.role === 'SELLER' ? 'SELLER' : 'BUYER',
+      },
+    });
+    await this.audit.log({ userId: user.id, action: 'AUTH_REGISTER', summary: 'Account created with Google as ' + (user.role === 'SELLER' ? 'a seller' : 'a buyer'), ...meta });
     return this.signToken(user);
   }
 

@@ -1,19 +1,32 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
 import { AuditService } from '../audit/audit.service.js';
 import type { ReqMeta } from '../audit/request-meta.js';
 
-const LABEL: Record<string, string> = { name: 'name', description: 'description', price: 'price', imageUrl: 'image', stockQuantity: 'stock', category: 'category', condition: 'condition', status: 'status' };
+const LABEL: Record<string, string> = { name: 'name', description: 'description', price: 'price', wasPrice: 'old price', imageUrl: 'image', stockQuantity: 'stock', category: 'category', condition: 'condition', status: 'status' };
 const NOTE_ONLY = ['description', 'imageUrl'];
 const money = (n: unknown) => Number(n).toLocaleString('en-US');
 const show = (field: string, v: unknown) => {
   if (v === null || v === undefined || v === '') return 'empty';
-  if (field === 'price') return money(v);
+  if (field === 'price' || field === 'wasPrice') return money(v);
   if (typeof v === 'string') return '"' + v.slice(0, 40) + '"';
   return String(v);
 };
+
+const clampInt = (v: unknown, def: number, min: number, max: number) => {
+  const n = typeof v === 'string' ? parseInt(v, 10) : NaN;
+  return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : def;
+};
+const textOf = (v: unknown, max = 60) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+const numOf = (v: unknown) => {
+  if (typeof v !== 'string' || v.trim() === '') return null;
+  const n = Number(v);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+};
+const REAL_PICTURE: Prisma.ProductWhereInput = { OR: [{ imageUrl: { startsWith: '/uploads/' } }, { imageUrl: { startsWith: 'http' } }] };
 
 @Injectable()
 export class ProductsService {
@@ -22,6 +35,7 @@ export class ProductsService {
   async create(ownerId: string, dto: CreateProductDto, meta: ReqMeta) {
     const store = await this.prisma.store.findUnique({ where: { ownerId } });
     if (!store) throw new NotFoundException('You must create a store first.');
+    this.checkOldPrice(dto.price, dto.wasPrice);
     const product = await this.prisma.product.create({ data: { ...dto, storeId: store.id } });
     await this.audit.log({ userId: ownerId, action: 'PRODUCT_CREATED', summary: 'Added "' + product.name + '" (TZS ' + money(product.price) + ', stock ' + product.stockQuantity + ')', details: { product: { id: product.id, name: product.name, price: product.price, stock: product.stockQuantity } }, ...meta });
     return product;
@@ -41,6 +55,9 @@ export class ProductsService {
     if (!product) throw new NotFoundException('Product not found.');
     if (product.store.ownerId !== ownerId) throw new ForbiddenException('You can only edit your own products.');
     if (product.status === 'TRASHED') throw new NotFoundException('Product not found.');
+    const nextPrice = dto.price !== undefined ? dto.price : product.price;
+    const nextWas = dto.wasPrice !== undefined ? dto.wasPrice : product.wasPrice;
+    if (dto.price !== undefined || dto.wasPrice !== undefined) this.checkOldPrice(nextPrice, nextWas);
     const changes: { field: string; from?: unknown; to?: unknown; note?: string }[] = [];
     for (const [k, v] of Object.entries(dto as Record<string, any>)) {
       if (v === undefined || !(k in LABEL)) continue;
@@ -62,6 +79,12 @@ export class ProductsService {
       await this.audit.log({ userId: ownerId, action: 'PRODUCT_UPDATED', summary: 'Edited "' + product.name + '": ' + parts.join('; '), details: { product: { id: product.id, name: product.name }, changes }, ...meta });
     }
     return updated;
+  }
+
+  // An "old price" is only allowed when it is really higher than the price, so a discount shown to buyers is always real.
+  private checkOldPrice(price: number, was: number | null | undefined) {
+    if (was === null || was === undefined) return;
+    if (!(was > price)) throw new BadRequestException('The old price must be higher than the price. Leave it empty if there is no discount.');
   }
 
   async findPublic(id: string) {
@@ -94,6 +117,78 @@ export class ProductsService {
       orderBy: { createdAt: 'desc' },
       take: 50,
     });
+  }
+
+  // The marketplace page: filtering, sorting and paging all happen here, so the website never downloads every product.
+  async browse(raw: Record<string, unknown>) {
+    const page = clampInt(raw.page, 1, 1, 1000);
+    const limit = clampInt(raw.limit, 24, 1, 48);
+    const q = textOf(raw.q);
+    const category = textOf(raw.category, 40);
+    const condition = textOf(raw.condition, 20);
+    const location = textOf(raw.location);
+    const shop = textOf(raw.shop);
+    const min = numOf(raw.min);
+    const max = numOf(raw.max);
+    const inStock = raw.inStock === '1';
+    const onSale = raw.sale === '1';
+    const sort = textOf(raw.sort, 20);
+
+    const base: Prisma.ProductWhereInput[] = [{ status: 'ACTIVE', store: { status: 'ACTIVE', isPaused: false } }];
+    if (q) {
+      base.push({ OR: [
+        { name: { contains: q, mode: 'insensitive' } },
+        { description: { contains: q, mode: 'insensitive' } },
+        { category: { contains: q, mode: 'insensitive' } },
+        { store: { name: { contains: q, mode: 'insensitive' } } },
+      ] });
+    }
+    if (['New', 'Used', 'Refurbished'].includes(condition)) base.push({ condition });
+    if (min !== null) base.push({ price: { gte: min } });
+    if (max !== null) base.push({ price: { lte: max } });
+    if (location) base.push({ store: { location: { contains: location, mode: 'insensitive' } } });
+    if (shop) base.push({ store: { slug: shop } });
+    if (inStock) base.push({ stockQuantity: { gt: 0 } });
+    if (onSale) base.push({ wasPrice: { not: null } });
+    const where: Prisma.ProductWhereInput = { AND: category ? [...base, { category }] : base };
+    const orderBy: Prisma.ProductOrderByWithRelationInput[] =
+      sort === 'price_asc' ? [{ price: 'asc' }, { createdAt: 'desc' }] : sort === 'price_desc' ? [{ price: 'desc' }, { createdAt: 'desc' }] : [{ createdAt: 'desc' }];
+
+    const [items, total, cats, thumbs, locs] = await Promise.all([
+      this.prisma.product.findMany({
+        where,
+        orderBy,
+        skip: (page - 1) * limit,
+        take: limit,
+        include: { store: { select: { name: true, slug: true, location: true, whatsappNumber: true } } },
+      }),
+      this.prisma.product.count({ where }),
+      this.prisma.product.groupBy({ by: ['category'], where: { AND: base }, _count: { _all: true } }),
+      this.prisma.product.findMany({
+        where: { AND: [{ status: 'ACTIVE', store: { status: 'ACTIVE', isPaused: false }, category: { not: null } }, REAL_PICTURE] },
+        select: { category: true, imageUrl: true },
+        orderBy: { createdAt: 'desc' },
+        distinct: ['category'],
+      }),
+      this.prisma.store.findMany({
+        where: { status: 'ACTIVE', isPaused: false, location: { not: null }, products: { some: { status: 'ACTIVE' } } },
+        select: { location: true },
+        distinct: ['location'],
+        orderBy: { location: 'asc' },
+      }),
+    ]);
+    const thumbOf = new Map(thumbs.map((t) => [t.category as string, t.imageUrl as string]));
+    return {
+      items,
+      total,
+      page,
+      limit,
+      pages: Math.max(1, Math.ceil(total / limit)),
+      facets: {
+        categories: cats.filter((c) => c.category).map((c) => ({ name: c.category as string, count: c._count._all, thumb: thumbOf.get(c.category as string) ?? null })).sort((a, b) => b.count - a.count || a.name.localeCompare(b.name)),
+        locations: locs.map((l) => l.location as string),
+      },
+    };
   }
 
   async suggest(q: string) {

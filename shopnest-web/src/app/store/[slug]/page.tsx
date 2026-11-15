@@ -1,14 +1,16 @@
 "use client";
-import { imgSrc, thumbSrc } from "../../../lib/images";
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import Link from "next/link";
-import { trackEvent, trackViewOnce } from "../../../lib/track";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import ProductCard from "../../../components/ProductCard";
+import SiteShell from "../../../components/SiteShell";
+import { imgSrc } from "../../../lib/images";
+import { T, useLang } from "../../../lib/i18n";
+import { API_URL, SITE_URL } from "../../../lib/seo";
+import { trackViewOnce } from "../../../lib/track";
 
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-const TYPE_LABEL: Record<string, string> = { Online: "Online shop", Physical: "Physical shop", Both: "Online and physical shop" };
-const infoH: React.CSSProperties = { fontFamily: "Cormorant Garamond, serif", fontSize: "1.4rem", color: "var(--cream)", margin: "0 0 1rem 0" };
-const infoP: React.CSSProperties = { margin: 0, color: "rgba(243,227,208,0.75)", fontSize: "0.95rem", lineHeight: 1.6 };
+const DAYS_EN = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const DAYS_SW = ["Jumatatu", "Jumanne", "Jumatano", "Alhamisi", "Ijumaa", "Jumamosi", "Jumapili"];
 type Day = { closed: boolean; open: string; close: string };
 
 function parseHours(raw: string | null): Day[] | null {
@@ -21,181 +23,112 @@ function parseHours(raw: string | null): Day[] | null {
 export default function PublicStorefront() {
   const params = useParams();
   const slug = params.slug as string;
-
+  const [lang] = useLang();
+  const d = T[lang];
   const [store, setStore] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [state, setState] = useState<"loading" | "ok" | "missing" | "network">("loading");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
-
-    fetch(`http://localhost:3001/stores/${slug}`)
+    let dead = false;
+    fetch(API_URL + "/stores/" + encodeURIComponent(slug))
       .then(async (res) => {
-        if (res.status === 200) { setStore(await res.json()); trackViewOnce({ type: "SHOP_VIEW", storeSlug: slug, source: "store" }); }
-        else {
-          const mv = await fetch(`http://localhost:3001/stores/${encodeURIComponent(slug)}/moved`).then((m) => (m.status === 200 ? m.json() : null)).catch(() => null);
-          if (mv && typeof mv.slug === "string" && mv.slug !== slug) { window.location.replace(`/store/${encodeURIComponent(mv.slug)}`); return; }
-          setError("Store not found.");
+        if (dead) return;
+        if (res.status === 200) {
+          setStore(await res.json());
+          setState("ok");
+          trackViewOnce({ type: "SHOP_VIEW", storeSlug: slug, source: "store" });
+        } else {
+          const mv = await fetch(API_URL + "/stores/" + encodeURIComponent(slug) + "/moved").then((m) => (m.status === 200 ? m.json() : null)).catch(() => null);
+          if (mv && typeof mv.slug === "string" && mv.slug !== slug) { window.location.replace("/store/" + encodeURIComponent(mv.slug)); return; }
+          if (!dead) setState("missing");
         }
       })
-      .catch(() => setError("Network error."))
-      .finally(() => setLoading(false));
+      .catch(() => { if (!dead) setState("network"); });
+    return () => { dead = true; };
   }, [slug]);
 
-  if (loading) return <div style={{ minHeight: "100vh", background: "var(--espresso)", color: "var(--cream)", display: "grid", placeItems: "center", fontFamily: "Jost, sans-serif" }}>Loading Storefront...</div>;
-  if (error || !store) return <div style={{ minHeight: "100vh", background: "var(--espresso)", color: "#ff5f56", display: "grid", placeItems: "center", fontFamily: "Jost, sans-serif" }}>{error}</div>;
+  if (state !== "ok" || !store) {
+    return (
+      <SiteShell>
+        <div className="sn-wrap sn-pad"><div className="sn-empty"><p>{state === "loading" ? d.loading : state === "network" ? d.networkError : d.storeMissing}</p><Link href="/shops" className="sn-btn sn-btn-dark">{d.allShops}</Link></div></div>
+      </SiteShell>
+    );
+  }
 
   const hours = parseHours(store.openingHours);
+  const days = lang === "SW" ? DAYS_SW : DAYS_EN;
   const socials = [["Instagram", store.instagramUrl], ["Facebook", store.facebookUrl], ["TikTok", store.tiktokUrl]].filter((s) => typeof s[1] === "string" && s[1].startsWith("https://"));
-
-  const handleWhatsApp = (product: any) => {
-    const phone = store.whatsappNumber?.replace(/[^0-9]/g, "");
-    const text = encodeURIComponent(`Hi ${store.name}, I am interested in buying "${product.name}" (TZS ${product.price.toLocaleString()}) from your ShopNest storefront.`);
-    trackEvent({ type: "WHATSAPP_CLICK", productId: product.id, source: "store" });
-    window.open(`https://wa.me/${phone}?text=${text}`, "_blank");
-  };
+  const typeLabel = store.shopType === "Physical" ? d.physical : store.shopType === "Online" ? d.online : store.shopType === "Both" ? d.both : "";
+  const products: any[] = Array.isArray(store.products) ? store.products : [];
+  const pageUrl = SITE_URL + "/store/" + store.slug;
+  const share = () => window.open("https://wa.me/?text=" + encodeURIComponent(store.name + "\n" + pageUrl), "_blank", "noopener");
+  const copy = async () => { try { await navigator.clipboard.writeText(pageUrl); setCopied(true); setTimeout(() => setCopied(false), 1800); } catch { /* clipboard blocked */ } };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--espresso)", fontFamily: "Jost, sans-serif", color: "var(--cream)" }}>
-      
-      {/* TOP NAV */}
-      <nav style={{ padding: "1.5rem 3rem", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(185,130,90,0.1)", background: "var(--roast)" }}>
-        <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "10px" }}>
-           <div style={{ width: "30px", height: "30px", background: "var(--latte)", color: "var(--espresso)", display: "grid", placeItems: "center", borderRadius: "8px", fontSize: "1.2rem", fontFamily: "Cormorant Garamond, serif", fontWeight: "bold" }}>S</div>
-           <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.5rem", color: "var(--cream)", margin: 0 }}>ShopNest</h2>
-        </Link>
-        <Link href="/marketplace" style={{ color: "var(--latte)", textDecoration: "none", fontSize: "0.9rem", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-          Marketplace
-        </Link>
-      </nav>
-
-      {store.announcement && (
-        <div role="note" style={{ background: "var(--latte)", color: "var(--espresso)", textAlign: "center", padding: "0.7rem 1rem", fontSize: "0.9rem", fontWeight: 600, letterSpacing: "0.02em" }}>{store.announcement}</div>
-      )}
-
-      {/* HERO BANNER */}
-      <header style={{ height: "350px", background: store.bannerUrl ? `url(${imgSrc(store.bannerUrl)}) center/cover` : "linear-gradient(135deg, var(--roast), var(--copper))", position: "relative", display: "flex", alignItems: "flex-end", padding: "3rem" }}>
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, var(--espresso) 0%, rgba(26,15,10,0.4) 100%)" }} />
-        <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: "2rem" }}>
-          <div style={{ width: "120px", height: "120px", borderRadius: "50%", background: "var(--espresso)", border: "3px solid var(--copper)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
-            {store.logoUrl ? (
-              <img src={imgSrc(store.logoUrl)} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            ) : (
-              <span style={{ fontSize: "3rem", fontFamily: "Cormorant Garamond, serif", color: "var(--latte)", fontWeight: "bold" }}>{store.name.substring(0, 2).toUpperCase()}</span>
-            )}
-          </div>
-          <div>
-            <h1 style={{ fontFamily: "Playfair Display, serif", fontSize: "3.5rem", margin: "0 0 0.5rem 0", fontStyle: "italic", color: "#fff" }}>{store.name}</h1>
-            <p style={{ color: "rgba(243,227,208,0.8)", fontSize: "1.1rem", margin: 0, maxWidth: "600px" }}>{store.description || "Welcome to our boutique."}</p>
-          </div>
-        </div>
-      </header>
-
-      {/* PRODUCTS GRID */}
-      <main style={{ padding: "4rem 3rem", maxWidth: "1400px", margin: "0 auto" }}>
-        <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "2rem", marginBottom: "2rem", borderBottom: "1px solid rgba(185,130,90,0.2)", paddingBottom: "1rem" }}>
-          Our Collection
-        </h2>
-
-        {store.products.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "5rem 0", opacity: 0.5 }}>
-            <p>{store.isPaused ? "This shop is on a break right now. Please check back later." : "This store hasn't added any products yet."}</p>
-          </div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "2.5rem" }}>
-            {store.products.map((prod: any) => (
-              <div key={prod.id} onClick={() => setSelectedProduct(prod)} style={{ background: "#23130c", borderRadius: "24px", overflow: "hidden", boxShadow: "0 15px 35px rgba(0,0,0,0.4)", cursor: "pointer", transition: "transform 0.3s" }} onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-8px)"} onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}>
-                
-                {/* Image with Floating Tag */}
-                <div style={{ height: "240px", position: "relative", background: prod.imageUrl ? `url(${thumbSrc(prod.imageUrl)}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${thumbSrc(prod.imageUrl)}) center/cover` : "var(--espresso)" }}>
-                  <div style={{ position: "absolute", top: "1rem", left: "1rem", background: "rgba(255,255,255,0.9)", color: "var(--espresso)", padding: "0.3rem 0.8rem", borderRadius: "20px", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.05em" }}>
-                    NEW ARRIVAL
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div style={{ padding: "1.5rem" }}>
-                  <h3 style={{ margin: "0 0 0.5rem 0", fontSize: "1.3rem", fontWeight: 500, color: "var(--cream)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{prod.name}</h3>
-                  <p style={{ margin: "0 0 1.2rem 0", color: "rgba(243,227,208,0.6)", fontSize: "0.9rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    {prod.description || "Click to view details"}
-                  </p>
-                  
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <p style={{ margin: 0, color: "var(--latte)", fontSize: "1.2rem", fontWeight: 600 }}>TZS {prod.price.toLocaleString()}{(prod.stockQuantity ?? 1) <= 0 ? " - Sold Out" : (prod.stockQuantity ?? 1) <= 3 ? " - Low Stock" : ""}</p>
-                    <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--latte)", color: "var(--espresso)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.5rem", fontWeight: "bold" }}>
-                      +
-                    </div>
-                  </div>
-                </div>
+    <SiteShell>
+      {store.announcement ? <div role="note" className="sn-announce">{store.announcement}</div> : null}
+      <div className="sn-wrap">
+        <header className="sn-store-head">
+          <div className="sn-store-banner">{store.bannerUrl ? <img src={imgSrc(store.bannerUrl)} alt="" /> : null}</div>
+          <div className="sn-store-id">
+            <div className="sn-store-logo">{store.logoUrl ? <img src={imgSrc(store.logoUrl)} alt="" /> : <span>{String(store.name).slice(0, 2).toUpperCase()}</span>}</div>
+            <div className="sn-store-text">
+              <h1>{store.name}</h1>
+              <div className="sn-shop-meta">
+                {store.location ? <span>{store.location}</span> : null}
+                {typeLabel ? <span>{typeLabel}</span> : null}
               </div>
-            ))}
+              {store.description ? <p>{store.description}</p> : null}
+            </div>
+            <div className="sn-store-actions">
+              <button type="button" className="sn-btn sn-btn-line sn-btn-sm" onClick={share}>{d.share}</button>
+              <button type="button" className="sn-btn sn-btn-line sn-btn-sm" onClick={copy}>{copied ? d.copied : d.copy}</button>
+            </div>
           </div>
-        )}
-      </main>
+        </header>
 
-      {(hours || store.deliveryReturns || store.location || socials.length > 0) && (
-        <section style={{ borderTop: "1px solid rgba(185,130,90,0.15)", background: "var(--roast)", padding: "3rem" }}>
-          <div style={{ maxWidth: "1400px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "2.5rem" }}>
-            {store.location && (
-              <div>
-                <h3 style={infoH}>Find us</h3>
-                <p style={infoP}>{store.location}{store.shopType && TYPE_LABEL[store.shopType] ? " - " + TYPE_LABEL[store.shopType] : ""}</p>
-              </div>
-            )}
+        <section>
+          <h2 className="sn-h2">{d.storeProducts}</h2>
+          {products.length === 0 ? (
+            <div className="sn-empty"><p>{store.isPaused ? d.storePaused : d.storeEmpty}</p></div>
+          ) : (
+            <div className="sn-grid">
+              {products.map((p) => (
+                <ProductCard key={p.id} p={p} lang={lang} source="store" store={{ name: store.name, slug: store.slug, location: store.location, whatsapp: store.whatsappNumber }} />
+              ))}
+            </div>
+          )}
+        </section>
+
+        {(hours || store.deliveryReturns || socials.length > 0) && (
+          <section className="sn-store-info">
             {hours && (
               <div>
-                <h3 style={infoH}>Opening hours</h3>
-                {hours.map((d, i) => (
-                  <div key={DAYS[i]} style={{ ...infoP, display: "flex", justifyContent: "space-between", gap: "1rem", padding: "0.25rem 0" }}><span>{DAYS[i]}</span><span>{d.closed ? "Closed" : d.open + " - " + d.close}</span></div>
+                <h3>{d.hours}</h3>
+                {hours.map((h, i) => (
+                  <div key={DAYS_EN[i]} className="sn-hours-row"><span>{days[i]}</span><span>{h.closed ? d.closed : h.open + " - " + h.close}</span></div>
                 ))}
               </div>
             )}
             {store.deliveryReturns && (
               <div>
-                <h3 style={infoH}>Delivery and returns</h3>
-                <p style={{ ...infoP, whiteSpace: "pre-line" }}>{store.deliveryReturns}</p>
+                <h3>{d.delivery}</h3>
+                <p style={{ whiteSpace: "pre-line" }}>{store.deliveryReturns}</p>
               </div>
             )}
             {socials.length > 0 && (
               <div>
-                <h3 style={infoH}>Follow us</h3>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                  {socials.map((s) => (<a key={s[0]} href={s[1]} target="_blank" rel="noopener noreferrer" style={{ color: "var(--latte)", textDecoration: "none", fontSize: "0.95rem" }}>{s[0]}</a>))}
+                <h3>{d.follow}</h3>
+                <div className="sn-social">
+                  {socials.map((s) => (<a key={s[0]} href={s[1]} target="_blank" rel="noopener noreferrer">{s[0]}</a>))}
                 </div>
               </div>
             )}
-          </div>
-        </section>
-      )}
-
-      {/* PRODUCT DETAIL MODAL (Glassmorphism) */}
-      {selectedProduct && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: "2rem" }}>
-          <div style={{ background: "rgba(35, 19, 12, 0.85)", backdropFilter: "blur(20px)", border: "1px solid rgba(185,130,90,0.2)", borderRadius: "24px", maxWidth: "800px", width: "100%", display: "flex", overflow: "hidden", position: "relative", boxShadow: "0 25px 50px rgba(0,0,0,0.6)" }}>
-            
-            <button onClick={() => setSelectedProduct(null)} style={{ position: "absolute", top: "1.5rem", right: "1.5rem", background: "#000", border: "none", color: "#fff", width: "36px", height: "36px", borderRadius: "50%", fontSize: "1.2rem", cursor: "pointer", zIndex: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
-
-            <div style={{ flex: 1, minHeight: "400px", background: selectedProduct.imageUrl ? `url(${imgSrc(selectedProduct.imageUrl)}) center/contain no-repeat, linear-gradient(rgba(17,10,6,0.72), rgba(17,10,6,0.72)), url(${imgSrc(selectedProduct.imageUrl)}) center/cover` : "var(--espresso)" }} />
-
-            <div style={{ flex: 1, padding: "3rem", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-              <p style={{ color: "var(--latte)", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1rem" }}>Product Details</p>
-              <h2 style={{ fontFamily: "Playfair Display, serif", fontSize: "2.5rem", margin: "0 0 1rem 0", fontStyle: "italic", lineHeight: 1.1 }}>{selectedProduct.name}</h2>
-              <h3 style={{ fontSize: "1.5rem", color: "var(--copper)", margin: "0 0 1.5rem 0" }}>TZS {selectedProduct.price.toLocaleString()}</h3>
-              
-              <p style={{ color: "rgba(243,227,208,0.7)", lineHeight: 1.6, marginBottom: "2rem" }}>
-                {selectedProduct.description || "Contact the seller on WhatsApp for more details."}
-              </p>
-
-              <button onClick={() => handleWhatsApp(selectedProduct)} disabled={(selectedProduct.stockQuantity ?? 1) <= 0} style={{ opacity: (selectedProduct.stockQuantity ?? 1) <= 0 ? 0.5 : 1, width: "100%", background: "#25D366", color: "white", border: "none", padding: "1.2rem", borderRadius: "50px", fontSize: "1rem", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginTop: "auto", transition: "0.3s" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                {(selectedProduct.stockQuantity ?? 1) <= 0 ? "Sold Out" : "Contact on WhatsApp"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-    </div>
+          </section>
+        )}
+      </div>
+    </SiteShell>
   );
 }

@@ -35,6 +35,7 @@ model User {
   updatedAt    DateTime   @updatedAt
   store        Store?
   tokenVersion Int        @default(0)
+  googleId     String?    @unique
   auditLogs    AuditLog[]
 }
 
@@ -70,6 +71,7 @@ model Product {
   name          String
   description   String?
   price         Float
+  wasPrice      Float?
   imageUrl      String?
   status        ProductStatus @default(ACTIVE)
   stockQuantity Int           @default(1)

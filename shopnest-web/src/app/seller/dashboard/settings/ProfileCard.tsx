@@ -1,4 +1,5 @@
 "use client";
+import { TZ_REGIONS, joinLocation, splitLocation } from "../../../../lib/regions";
 import { useState } from "react";
 import { Card, Field, Msg, api, input, lbl, primary, ghost, MUTED, type Note } from "./shared";
 import { imgSrc, uploadImage } from "../../../../lib/images";
@@ -26,7 +27,8 @@ export default function ProfileCard({ store, onSaved }: { store: any; onSaved: (
   const [name, setName] = useState<string>(store.name || "");
   const [desc, setDesc] = useState<string>(store.description || "");
   const [wa, setWa] = useState<string>(store.whatsappNumber || "");
-  const [place, setPlace] = useState<string>(store.location || "");
+  const [region, setRegion] = useState<string>(splitLocation(store.location || "").region);
+  const [area, setArea] = useState<string>(splitLocation(store.location || "").area);
   const [type, setType] = useState<string>(store.shopType || "");
   const [logo, setLogo] = useState<string>(store.logoUrl || "");
   const [banner, setBanner] = useState<string>(store.bannerUrl || "");
@@ -36,7 +38,7 @@ export default function ProfileCard({ store, onSaved }: { store: any; onSaved: (
   const save = async () => {
     if (!name.trim() || !wa.trim()) { setM({ ok: false, text: "Shop name and WhatsApp number are required." }); return; }
     setBusy(true); setM(null);
-    const r = await api("PATCH", "/stores/me", { name, description: desc, whatsappNumber: wa, location: place, logoUrl: logo, bannerUrl: banner, ...(type ? { shopType: type } : {}) });
+    const r = await api("PATCH", "/stores/me", { name, description: desc, whatsappNumber: wa, location: joinLocation(region, area), logoUrl: logo, bannerUrl: banner, ...(type ? { shopType: type } : {}) });
     setBusy(false);
     if (r.ok) { onSaved(r.data); setM({ ok: true, text: "Saved. Your shop profile is up to date." }); } else setM({ ok: false, text: r.error });
   };
@@ -45,7 +47,13 @@ export default function ProfileCard({ store, onSaved }: { store: any; onSaved: (
       <Field name="Shop name"><input style={input} value={name} maxLength={100} onChange={(e) => setName(e.target.value)} /></Field>
       <Field name="Description"><textarea style={{ ...input, minHeight: "90px", resize: "vertical" }} value={desc} maxLength={1000} onChange={(e) => setDesc(e.target.value)} /></Field>
       <Field name="WhatsApp number (buyers contact you here)"><input style={input} value={wa} maxLength={20} onChange={(e) => setWa(e.target.value)} /></Field>
-      <Field name="Location (town or area)"><input style={input} value={place} maxLength={100} onChange={(e) => setPlace(e.target.value)} /></Field>
+      <Field name="Region (buyers can filter the marketplace by region)">
+        <select style={input} value={region} onChange={(e) => setRegion(e.target.value)}>
+          <option value="">Not set</option>
+          {TZ_REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+        </select>
+      </Field>
+      <Field name="Town or area (optional)"><input style={input} value={area} maxLength={70} onChange={(e) => setArea(e.target.value)} /></Field>
       <Field name="Shop type">
         <select style={input} value={type} onChange={(e) => setType(e.target.value)}>
           <option value="">Not set</option>

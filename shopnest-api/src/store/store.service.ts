@@ -5,6 +5,8 @@ import { UpdateStoreDto } from './dto/update-store.dto.js';
 import { AuditService } from '../audit/audit.service.js';
 import type { ReqMeta } from '../audit/request-meta.js';
 
+// Names that already mean something in /stores/..., so a shop can never take them as its link.
+const RESERVED_SLUGS = ['marketplace', 'list', 'me', 'admin'];
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
 const STATUSES = ['PENDING', 'ACTIVE', 'SUSPENDED'];
@@ -91,7 +93,11 @@ export class StoreService {
   }
 
   private normSlug(raw: unknown) { return String(raw ?? '').trim().toLowerCase(); }
-  private slugFormatError(s: string) { return s.length < 3 || s.length > 40 || !SLUG_RE.test(s) ? 'Use 3 to 40 letters, numbers and single hyphens.' : null; }
+  private slugFormatError(s: string) {
+    if (s.length < 3 || s.length > 40 || !SLUG_RE.test(s)) return 'Use 3 to 40 letters, numbers and single hyphens.';
+    if (RESERVED_SLUGS.includes(s)) return 'That link is reserved. Please choose another.';
+    return null;
+  }
 
   async slugAvailable(ownerId: string, raw: string) {
     const s = this.normSlug(raw);
@@ -154,6 +160,20 @@ export class StoreService {
       include: { products: { where: { status: 'ACTIVE' } } },
     });
     return stores.map(({ ownerId, ...publicStore }) => publicStore);
+  }
+
+  // The public list of shops for the /shops page.
+  async listPublic() {
+    const rows = await this.prisma.store.findMany({
+      where: { status: 'ACTIVE', isPaused: false },
+      select: {
+        id: true, name: true, slug: true, description: true, logoUrl: true, bannerUrl: true, location: true, shopType: true, createdAt: true,
+        _count: { select: { products: { where: { status: 'ACTIVE' } } } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 200,
+    });
+    return rows.map(({ _count, description, ...s }) => ({ ...s, description: description ? description.slice(0, 140) : null, productCount: _count.products }));
   }
 
   async getAllStoresForAdmin() {

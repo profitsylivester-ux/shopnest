@@ -37,6 +37,7 @@ export default function ShopLinkCard({ store, onSaved }: { store: any; onSaved: 
       {!editing ? (
         <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
           <button onClick={copy} style={ghost}>Copy link</button>
+          <button onClick={() => window.open("https://wa.me/?text=" + encodeURIComponent(store.name + "\n" + base + store.slug), "_blank", "noopener")} style={ghost}>Share on WhatsApp</button>
           <a href={base + store.slug} target="_blank" rel="noopener noreferrer" style={{ ...ghost, textDecoration: "none", display: "inline-block" }}>Open my shop</a>
           <button onClick={() => { setDraft(store.slug); setEditing(true); setM(null); }} style={ghost}>Change link</button>
         </div>

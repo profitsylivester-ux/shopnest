@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get, Patch, UseGuards, HttpCode, HttpStatus, Req } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { RegisterDto, LoginDto, UpdateProfileDto, ChangePasswordDto, ChangeEmailDto } from './dto/auth.dto.js';
+import { RegisterDto, LoginDto, GoogleDto, UpdateProfileDto, ChangePasswordDto, ChangeEmailDto } from './dto/auth.dto.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { CurrentUser } from './decorators/current-user.decorator.js';
 import { reqMeta } from '../audit/request-meta.js';
@@ -15,6 +15,9 @@ export class AuthController {
 
   @Post('login') @HttpCode(HttpStatus.OK) @UseGuards(ThrottlerGuard)
   login(@Body() dto: LoginDto, @Req() req: any) { return this.authService.login(dto, reqMeta(req)); }
+
+  @Post('google') @HttpCode(HttpStatus.OK) @UseGuards(ThrottlerGuard)
+  google(@Body() dto: GoogleDto, @Req() req: any) { return this.authService.googleSignIn(dto, reqMeta(req)); }
 
   @Get('me') @UseGuards(JwtAuthGuard)
   me(@CurrentUser() user: any) { return { user }; }

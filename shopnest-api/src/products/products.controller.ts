@@ -32,6 +32,12 @@ export class ProductsController {
     return this.productsService.search(typeof q === 'string' ? q : '');
   }
 
+  @Get('browse')
+  @UseGuards(ThrottlerGuard)
+  browse(@Query() query: Record<string, unknown>) {
+    return this.productsService.browse(query);
+  }
+
   @Get('suggest')
   @UseGuards(ThrottlerGuard)
   suggest(@Query('q') q: string) {

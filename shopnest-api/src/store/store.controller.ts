@@ -15,6 +15,9 @@ export class StoreController {
   @Get('marketplace')
   getMarketplace() { return this.storeService.getMarketplace(); }
 
+  @Get('list')
+  list() { return this.storeService.listPublic(); }
+
   @Get('admin/all') @UseGuards(JwtAuthGuard, RolesGuard) @Roles('ADMIN')
   getAllForAdmin() { return this.storeService.getAllStoresForAdmin(); }
 

@@ -18,6 +18,18 @@ export class RegisterDto {
   role?: string;
 }
 
+export class GoogleDto {
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(4096)
+  credential: string;
+
+  @IsString()
+  @IsOptional()
+  @IsIn(['BUYER', 'SELLER'])
+  role?: string;
+}
+
 export class LoginDto {
   @IsEmail()
   email: string;
