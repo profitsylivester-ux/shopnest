@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { SITE_URL } from "../lib/seo";
+import PwaRegister from "../components/PwaRegister";
 
 const SITE_TITLE = "ShopNest | Multi-Vendor Marketplace";
 const SITE_DESC = "Tanzania's trusted multi-vendor marketplace. Connecting local creators with buyers everywhere.";
@@ -11,7 +12,12 @@ export const metadata: Metadata = {
   description: SITE_DESC,
   openGraph: { title: SITE_TITLE, description: SITE_DESC, url: SITE_URL, siteName: "ShopNest", type: "website", locale: "en_TZ" },
   twitter: { card: "summary", title: SITE_TITLE, description: SITE_DESC },
+  applicationName: "ShopNest",
+  appleWebApp: { capable: true, title: "ShopNest", statusBarStyle: "black-translucent" },
+  icons: { apple: "/icons/apple-touch-icon.png" },
 };
+
+export const viewport: Viewport = { themeColor: "#1a0f0a", width: "device-width", initialScale: 1 };
 
 export default function RootLayout({
   children,
@@ -20,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>{children}<PwaRegister /></body>
     </html>
   );
 }

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import AccountMenu from "../components/AccountMenu";
 import Assistant from "../components/Assistant";
+import InstallApp from "../components/InstallApp";
 import AuthModal from "../components/AuthModal";
 import NavMenu from "../components/NavMenu";
 import ProductCard, { toCardStore } from "../components/ProductCard";
@@ -154,6 +155,7 @@ export default function Home() {
           <li><Link href="/faq">{d.faqs}</Link></li>
           <li><Link href="/about">{d.about}</Link></li>
         </ul>
+        <InstallApp lang={lang} variant="side" />
       </div>
 
       {/* NAVBAR */}

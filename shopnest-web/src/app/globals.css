@@ -1038,3 +1038,13 @@ h1,h2,.logo{font-family:'Cormorant Garamond',serif;font-weight:500;letter-spacin
   .sd-pending{flex-direction:column;align-items:flex-start!important;gap:.6rem;padding:1rem!important}
   .sd-pending-in p{font-size:.9rem!important;line-height:1.4}
 }
+
+/* ===== INSTALL APP BUTTON (PWA) ===== */
+.sn-install-btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit;font-size:.9rem;font-weight:600;cursor:pointer}
+.sn-install-btn:hover{opacity:.85}
+.sn-install-hint{margin-top:8px;font-size:.82rem;line-height:1.45;max-width:300px;opacity:.85}
+.sn-install-footer{margin-top:14px;color:#f3e3d0}
+.sn-install-row{padding:4px 8px 8px;color:var(--sn-ink,#1a0f0a)}
+.sn-install-row .sn-install-btn{width:100%;justify-content:center}
+.sn-acct[data-theme="dark"] .sn-install-row{color:#f3e3d0}
+.sn-install-side{margin-top:1.4rem;color:#f6ebdd;list-style:none}

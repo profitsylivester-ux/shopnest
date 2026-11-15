@@ -8,6 +8,7 @@ import AuthModal from "./AuthModal";
 import AccountMenu from "./AccountMenu";
 import Assistant from "./Assistant";
 import NavMenu from "./NavMenu";
+import InstallApp from "./InstallApp";
 
 type AuthState = { open: boolean; mode: "login" | "signup"; role: "BUYER" | "SELLER" };
 
@@ -83,6 +84,7 @@ function Footer({ lang, openAuth }: { lang: Lang; openAuth: (mode: "login" | "si
         <div className="sn-footer-brand">
           <Link href="/" className="sn-logo sn-logo-dark"><span className="sn-logo-mark">S</span><span className="sn-logo-text">ShopNest</span></Link>
           <p>{d.footTag}</p>
+          <InstallApp lang={lang} variant="footer" />
         </div>
         {cols.map((c) => (
           <div key={c.title} className="sn-footer-col">
