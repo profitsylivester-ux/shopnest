@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import AccountMenu from "../components/AccountMenu";
+import Assistant from "../components/Assistant";
 import AuthModal from "../components/AuthModal";
 import NavMenu from "../components/NavMenu";
 import ProductCard from "../components/ProductCard";
@@ -34,7 +35,6 @@ const t = {
     authTitle: "Join ShopNest", authDesc: "Choose your account type to get started.", authBtn: "Create Account",
     authLoginTitle: "Welcome Back", authLoginDesc: "Enter your details to access your account.", authLoginBtn: "Sign In",
     roleBuyer: "Buyer", roleSeller: "Seller",
-    chatTitle: "ShopNest Assistant", chatPlaceholder: "Ask about ShopNest...", chatHello: "Hi! I am the ShopNest assistant. Ask me anything about buying or selling on our platform.",
     miniDesc: "Shop from the best local vendors and creators.", miniBtn: "Explore Marketplace",
     filterTitle: "Filters", sortBy: "Sort By", newest: "Newest", priceLowHigh: "Price: Low to High", priceHighLow: "Price: High to Low", catTitle: "Category", catAll: "All", noResA: "No results for", noResB: "Try fewer words, check the spelling, or pick another category.", clearSearch: "Clear search", catElec: "Electronics", catFash: "Fashion", catShoes: "Shoes", catVeh: "Vehicles", catFood: "Food", catServ: "Services", priceTitle: "Price (TSH)", locTitle: "Location", locAny: "Anywhere", locDar: "Dar es Salaam", locMbeya: "Mbeya", locArusha: "Arusha", condTitle: "Condition", condAny: "Any", condNew: "New", condUsed: "Used", condRef: "Refurbished", reset: "Reset Filters", explore: "Explore Products", exploreDesc: "Discover items from all our trusted sellers.", searchPlace: "Search products..."
   },
@@ -59,7 +59,6 @@ const t = {
     authTitle: "Jiunge na ShopNest", authDesc: "Chagua aina ya akaunti yako kuanza.", authBtn: "Unda Akaunti",
     authLoginTitle: "Karibu Tena", authLoginDesc: "Weka maelezo yako kufikia akaunti yako.", authLoginBtn: "Ingia",
     roleBuyer: "Mnunuzi", roleSeller: "Mwuza",
-    chatTitle: "Msaidizi wa ShopNest", chatPlaceholder: "Uliza kuhusu ShopNest...", chatHello: "Habari! Mimi ni msaidizi wa ShopNest. Niulize chochote kuhusu kununua au kuuza kwenye jukwaa letu.",
     miniDesc: "Nunua kutoka kwa wauzaji bora wa ndani.", miniBtn: "Gundua Soko",
     filterTitle: "Vichujio", sortBy: "Panga Kwa", newest: "Mpya Zaidi", priceLowHigh: "Bei: Chini hadi Juu", priceHighLow: "Bei: Juu hadi Chini", catTitle: "Kundi", catAll: "Zote", noResA: "Hakuna matokeo ya", noResB: "Jaribu maneno machache, angalia tahajia, au chagua kundi lingine.", clearSearch: "Futa utafutaji", catElec: "Elektroniki", catFash: "Mavazi", catShoes: "Viatu", catVeh: "Magari", catFood: "Chakula", catServ: "Huduma", priceTitle: "Bei (TSH)", locTitle: "Mahali", locAny: "Mahali Popote", locDar: "Dar es Salaam", locMbeya: "Mbeya", locArusha: "Arusha", condTitle: "Hali", condAny: "Yoyote", condNew: "Mpya", condUsed: "Iliyotumika", condRef: "Iliyorekebishwa", reset: "Weka Upya", explore: "Gundua Bidhaa", exploreDesc: "Gundua bidhaa kutoka kwa wauzaji wetu wote.", searchPlace: "Tafuta bidhaa..."
   }
@@ -83,11 +82,6 @@ export default function Home() {
     return () => { window.removeEventListener("shopnest-auth", sync); window.removeEventListener("storage", sync); };
   }, []);
 
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState<{role: 'user' | 'bot', text: string}[]>([]);
-  const [chatInput, setChatInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-
   // Settings and the newest products shown on slide 3
   const [sysSettings, setSysSettings] = useState<any>({});
   const [featured, setFeatured] = useState<any[] | null>(null);
@@ -101,7 +95,6 @@ export default function Home() {
   // Texts saved in Admin are English only, so Swahili visitors keep the built-in Swahili.
   const ov = lang === "EN";
   const storyRef = useRef<HTMLDivElement>(null);
-  const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch(API_URL + "/settings")
@@ -136,10 +129,6 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [currentSlide]);
 
-  useEffect(() => {
-    if (chatEndRef.current) chatEndRef.current.scrollIntoView({ behavior: "smooth" });
-  }, [chatMessages, isTyping]);
-
   const scrollTo = (index: number) => {
     if (!storyRef.current) return;
     window.scrollTo({ top: storyRef.current.offsetTop + index * window.innerHeight, behavior: 'smooth' });
@@ -147,19 +136,6 @@ export default function Home() {
 
   const handleLinkClick = (e: React.MouseEvent, slideIndex: number) => { e.preventDefault(); scrollTo(slideIndex); };
   const openAuthModal = (role: "BUYER" | "SELLER", login: boolean = false) => setAuth({ open: true, mode: login ? "login" : "signup", role });
-
-
-  const handleChatSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); if (!chatInput.trim()) return;
-    const userMsg = chatInput.trim();
-    setChatMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-    setChatInput(""); setIsTyping(true);
-    setTimeout(() => {
-      let botResponse = "I'm here to help you with anything related to ShopNest.";
-      setChatMessages(prev => [...prev, { role: 'bot', text: botResponse }]);
-      setIsTyping(false);
-    }, 1500);
-  };
 
 
   return (
@@ -418,23 +394,7 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* CHATBOT UI */}
-      <div className={`chat-window ${isChatOpen ? 'open' : ''}`}>
-        <div className="chat-header"><h3>{text.chatTitle}</h3><button className="chat-close" onClick={() => setIsChatOpen(false)}>×</button></div>
-        <div className="chat-messages">
-          <div className="message bot">{text.chatHello}</div>
-          {chatMessages.map((msg, idx) => <div key={idx} className={`message ${msg.role}`}>{msg.text}</div>)}
-          {isTyping && <div className="message bot"><span className="typing-dots">...</span></div>}
-          <div ref={chatEndRef} />
-        </div>
-        <form onSubmit={handleChatSubmit} className="chat-input-area">
-          <input type="text" value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder={text.chatPlaceholder} />
-          <button type="submit" className="chat-send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
-        </form>
-      </div>
-      <button className="chat" aria-label="Chat" onClick={() => setIsChatOpen(!isChatOpen)}>
-        <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-      </button>
+      <Assistant defaultTheme="dark" />
     </div>
   );
 }

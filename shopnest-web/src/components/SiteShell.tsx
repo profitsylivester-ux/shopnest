@@ -6,6 +6,7 @@ import { useTheme, type Theme } from "../lib/theme";
 import { readUser, useMenu, type SessionUser } from "../lib/site";
 import AuthModal from "./AuthModal";
 import AccountMenu from "./AccountMenu";
+import Assistant from "./Assistant";
 import NavMenu from "./NavMenu";
 
 type AuthState = { open: boolean; mode: "login" | "signup"; role: "BUYER" | "SELLER" };
@@ -115,6 +116,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
       <Header lang={lang} setLang={setLang} theme={theme} toggleTheme={toggleTheme} openAuth={openAuth} />
       <div className="sn-main">{children}</div>
       <Footer lang={lang} openAuth={openAuth} />
+      <Assistant defaultTheme="light" />
       <AuthModal open={auth.open} onClose={closeAuth} lang={lang} theme={theme} initialMode={auth.mode} initialRole={auth.role} />
     </div>
   );
