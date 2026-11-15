@@ -1,6 +1,7 @@
-﻿node_modules/
+node_modules/
 .next/
 dist/
 .env
 .DS_Store
 *.mp4
+shopnest-api/uploads/

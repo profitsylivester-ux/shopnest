@@ -3,7 +3,8 @@ import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { ValidationPipe } from '@nestjs/common';
-import { json, urlencoded } from 'express';
+import { json, urlencoded, static as serveStatic } from 'express';
+import { uploadDir } from './uploads/storage.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,6 +23,8 @@ async function bootstrap() {
   // INCREASE PAYLOAD LIMIT FOR BASE64 IMAGES
   app.use(json({ limit: '10mb' }));
   app.use(urlencoded({ extended: true, limit: '10mb' }));
+  // uploaded pictures: names are random, so browsers can keep them for a long time
+  app.use('/uploads', serveStatic(uploadDir(), { maxAge: '30d', immutable: true, index: false, dotfiles: 'ignore' }));
 
   app.enableCors({
     origin: 'http://localhost:3000',
