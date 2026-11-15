@@ -25,13 +25,27 @@ function isStaffViewer(): boolean {
   return false;
 }
 
+function visitorId(): string | undefined {
+  try {
+    const key = "shopnest_visitor";
+    let v = localStorage.getItem(key);
+    if (!v || !/^[0-9a-f-]{36}$/i.test(v)) {
+      v = crypto.randomUUID();
+      localStorage.setItem(key, v);
+    }
+    return v;
+  } catch {
+    return undefined;
+  }
+}
+
 export function trackEvent(payload: TrackPayload): void {
   try {
     if (typeof window === "undefined" || isStaffViewer()) return;
     fetch(`${API_URL}/events`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ ...payload, visitorId: visitorId() }),
       keepalive: true,
     }).catch(() => {});
   } catch {

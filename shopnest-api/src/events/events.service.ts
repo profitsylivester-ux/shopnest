@@ -42,7 +42,7 @@ export class EventsService {
       productId = product.id;
     }
     await this.prisma.storeEvent.create({
-      data: { type: dto.type, source: dto.source ?? null, storeId, productId },
+      data: { type: dto.type, source: dto.source ?? null, storeId, productId, visitorId: dto.visitorId ?? null },
     });
     return { ok: true };
   }
