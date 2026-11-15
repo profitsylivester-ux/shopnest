@@ -2,7 +2,9 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import ProductCard from "../../../components/ProductCard";
+import ProductCard, { toCardStore } from "../../../components/ProductCard";
+import Reviews from "../../../components/Reviews";
+import { RatingLine, VerifiedBadge } from "../../../components/Trust";
 import SiteShell from "../../../components/SiteShell";
 import { imgSrc } from "../../../lib/images";
 import { T, useLang } from "../../../lib/i18n";
@@ -28,6 +30,9 @@ export default function PublicStorefront() {
   const [store, setStore] = useState<any>(null);
   const [state, setState] = useState<"loading" | "ok" | "missing" | "network">("loading");
   const [copied, setCopied] = useState(false);
+
+  // Reloads the shop (rating and badge) after a review is written, edited or deleted.
+  const refreshStore = () => { fetch(API_URL + "/stores/" + encodeURIComponent(slug)).then((r) => (r.ok ? r.json() : null)).then((j) => { if (j) setStore(j); }).catch(() => {}); };
 
   useEffect(() => {
     if (!slug) return;
@@ -76,6 +81,10 @@ export default function PublicStorefront() {
             <div className="sn-store-logo">{store.logoUrl ? <img src={imgSrc(store.logoUrl)} alt="" /> : <span>{String(store.name).slice(0, 2).toUpperCase()}</span>}</div>
             <div className="sn-store-text">
               <h1>{store.name}</h1>
+              <div className="sn-store-trust">
+                <VerifiedBadge t={store} lang={lang} showReason />
+                <a href="#reviews" className="sn-store-rate"><RatingLine t={store} lang={lang} /></a>
+              </div>
               <div className="sn-shop-meta">
                 {store.location ? <span>{store.location}</span> : null}
                 {typeLabel ? <span>{typeLabel}</span> : null}
@@ -96,11 +105,13 @@ export default function PublicStorefront() {
           ) : (
             <div className="sn-grid">
               {products.map((p) => (
-                <ProductCard key={p.id} p={p} lang={lang} source="store" store={{ name: store.name, slug: store.slug, location: store.location, whatsapp: store.whatsappNumber }} />
+                <ProductCard key={p.id} p={p} lang={lang} source="store" store={toCardStore(store)} />
               ))}
             </div>
           )}
         </section>
+
+        <Reviews slug={store.slug} lang={lang} onChanged={refreshStore} />
 
         {(hours || store.deliveryReturns || socials.length > 0) && (
           <section className="sn-store-info">

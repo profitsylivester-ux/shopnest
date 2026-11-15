@@ -16,7 +16,7 @@ export class StoreController {
   getMarketplace() { return this.storeService.getMarketplace(); }
 
   @Get('list')
-  list() { return this.storeService.listPublic(); }
+  list(@Query('verified') verified?: string, @Query('top') top?: string, @Query('sort') sort?: string) { return this.storeService.listPublic({ verified: verified === '1', top: top === '1', sort }); }
 
   @Get('admin/all') @UseGuards(JwtAuthGuard, RolesGuard) @Roles('ADMIN')
   getAllForAdmin() { return this.storeService.getAllStoresForAdmin(); }

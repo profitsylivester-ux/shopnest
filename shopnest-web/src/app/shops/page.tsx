@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import SiteShell from "../../components/SiteShell";
 import ShopsClient from "./ShopsClient";
 
@@ -10,7 +11,9 @@ export const metadata: Metadata = {
 export default function ShopsPage() {
   return (
     <SiteShell>
-      <ShopsClient />
+      <Suspense fallback={<div className="sn-wrap sn-pad">Loading...</div>}>
+        <ShopsClient />
+      </Suspense>
     </SiteShell>
   );
 }

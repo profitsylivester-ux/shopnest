@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import ProductCard from "../../../components/ProductCard";
+import ProductCard, { toCardStore } from "../../../components/ProductCard";
+import { RatingLine, VerifiedTick } from "../../../components/Trust";
 import SiteShell from "../../../components/SiteShell";
 import { imgSrc, thumbSrc } from "../../../lib/images";
 import { T, fill, useLang } from "../../../lib/i18n";
@@ -122,7 +123,7 @@ export default function ProductDetail() {
             {product.store ? (
               <Link href={"/store/" + product.store.slug} className="sn-seller">
                 <span className="sn-seller-logo">{product.store.logoUrl ? <img src={thumbSrc(product.store.logoUrl)} alt="" /> : String(product.store.name).slice(0, 1).toUpperCase()}</span>
-                <span className="sn-seller-text"><small>{d.soldBy}</small><strong>{product.store.name}</strong></span>
+                <span className="sn-seller-text"><small>{d.soldBy}</small><strong>{product.store.name}{product.store.verified ? <VerifiedTick t={product.store} lang={lang} /> : null}</strong><RatingLine t={product.store} lang={lang} /></span>
                 <span className="sn-seller-go">{d.visit} &rarr;</span>
               </Link>
             ) : null}
@@ -134,7 +135,7 @@ export default function ProductDetail() {
             <h2 className="sn-h2">{d.moreFrom}</h2>
             <div className="sn-grid sn-grid-4">
               {more.map((p) => (
-                <ProductCard key={p.id} p={p} lang={lang} source="product" store={{ name: p.store?.name || product.store?.name || "", slug: product.store?.slug || "", location: p.store?.location, whatsapp: p.store?.whatsappNumber }} />
+                <ProductCard key={p.id} p={p} lang={lang} source="product" store={toCardStore(product.store, { name: p.store?.name, slug: product.store?.slug })} />
               ))}
             </div>
           </section>

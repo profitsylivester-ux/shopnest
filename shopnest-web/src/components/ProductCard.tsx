@@ -3,8 +3,14 @@ import Link from "next/link";
 import { thumbSrc } from "../lib/images";
 import { T, fill, type Lang } from "../lib/i18n";
 import { trackEvent } from "../lib/track";
+import { RatingLine, VerifiedTick, type TrustInfo } from "./Trust";
 
-export type CardStore = { name: string; slug: string; location?: string | null; whatsapp?: string | null };
+export type CardStore = { name: string; slug: string; location?: string | null; whatsapp?: string | null } & TrustInfo;
+
+// Builds the shop part of a card from any API shop object (keeps the real rating and Verified facts).
+export function toCardStore(s: any, fallback?: { name?: string; slug?: string }): CardStore {
+  return { name: s?.name || fallback?.name || "", slug: s?.slug || fallback?.slug || "", location: s?.location, whatsapp: s?.whatsappNumber ?? s?.whatsapp, ratingAvg: s?.ratingAvg ?? null, ratingCount: s?.ratingCount ?? 0, topRated: !!s?.topRated, verified: !!s?.verified, vProducts: s?.vProducts ?? 0, vVisitors: s?.vVisitors ?? 0 };
+}
 export type CardProduct = { id: string; name: string; price: number; wasPrice?: number | null; description?: string | null; imageUrl?: string | null; stockQuantity?: number | null; createdAt?: string | null };
 
 const WEEK = 7 * 24 * 60 * 60 * 1000;
@@ -47,7 +53,8 @@ export default function ProductCard({ p, store, source, lang }: { p: CardProduct
         </div>
         <div className="sn-card-foot">
           <div className="sn-card-shop">
-            <span className="sn-card-shopname">{store.name}</span>
+            <span className="sn-card-shopname"><span className="sn-card-shopname-t">{store.name}</span><VerifiedTick t={store} lang={lang} /></span>
+            <RatingLine t={store} lang={lang} />
             {store.location ? <span className="sn-card-loc"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.4" /></svg><span>{store.location}</span></span> : null}
           </div>
           <button type="button" className="sn-card-wa" onClick={chat} disabled={soldOut || !phone} aria-label={d.chatAria} title={d.chatAria}>

@@ -5,6 +5,7 @@ import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
 import { AuditService } from '../audit/audit.service.js';
 import type { ReqMeta } from '../audit/request-meta.js';
+import { TrustService } from '../trust/trust.service.js';
 
 const LABEL: Record<string, string> = { name: 'name', description: 'description', price: 'price', wasPrice: 'old price', imageUrl: 'image', stockQuantity: 'stock', category: 'category', condition: 'condition', status: 'status' };
 const NOTE_ONLY = ['description', 'imageUrl'];
@@ -30,7 +31,7 @@ const REAL_PICTURE: Prisma.ProductWhereInput = { OR: [{ imageUrl: { startsWith: 
 
 @Injectable()
 export class ProductsService {
-  constructor(private prisma: PrismaService, private audit: AuditService) {}
+  constructor(private prisma: PrismaService, private audit: AuditService, private trust: TrustService) {}
 
   async create(ownerId: string, dto: CreateProductDto, meta: ReqMeta) {
     const store = await this.prisma.store.findUnique({ where: { ownerId } });
@@ -95,8 +96,9 @@ export class ProductsService {
     if (!product || product.status !== 'ACTIVE' || product.store.status !== 'ACTIVE' || product.store.isPaused) {
       throw new NotFoundException('Product not found');
     }
-    const { ownerId, ...publicStore } = product.store;
-    return { ...product, store: publicStore };
+    const { ownerId, verificationRevoked, verificationRevokedReason, verificationRevokedAt, ...publicStore } = product.store;
+    const facts = (await this.trust.facts([product.store.id])).get(product.store.id);
+    return { ...product, store: { ...publicStore, ...this.trust.publicOf(facts) } };
   }
 
   async search(q: string) {
@@ -133,6 +135,7 @@ export class ProductsService {
     const inStock = raw.inStock === '1';
     const onSale = raw.sale === '1';
     const sort = textOf(raw.sort, 20);
+    const verifiedOnly = raw.verified === '1';
 
     const base: Prisma.ProductWhereInput[] = [{ status: 'ACTIVE', store: { status: 'ACTIVE', isPaused: false } }];
     if (q) {
@@ -150,19 +153,30 @@ export class ProductsService {
     if (shop) base.push({ store: { slug: shop } });
     if (inStock) base.push({ stockQuantity: { gt: 0 } });
     if (onSale) base.push({ wasPrice: { not: null } });
+    if (verifiedOnly) base.push({ store: { id: { in: await this.trust.verifiedStoreIds() } } });
     const where: Prisma.ProductWhereInput = { AND: category ? [...base, { category }] : base };
     const orderBy: Prisma.ProductOrderByWithRelationInput[] =
       sort === 'price_asc' ? [{ price: 'asc' }, { createdAt: 'desc' }] : sort === 'price_desc' ? [{ price: 'desc' }, { createdAt: 'desc' }] : [{ createdAt: 'desc' }];
 
-    const [items, total, cats, thumbs, locs] = await Promise.all([
+    // Sorting by shop rating cannot be done by the database alone, so the matching products are ranked here and the page is cut afterwards.
+    let ranked: string[] | null = null;
+    if (sort === 'rating') {
+      const all = await this.prisma.product.findMany({ where, select: { id: true, storeId: true, createdAt: true }, orderBy: { createdAt: 'desc' } });
+      const facts = await this.trust.facts(all.map((a) => a.storeId));
+      ranked = all
+        .map((a, i) => ({ id: a.id, score: this.trust.rankScore(facts.get(a.storeId)), i }))
+        .sort((x, y) => y.score - x.score || x.i - y.i)
+        .map((x) => x.id);
+    }
+    const pageIds = ranked ? ranked.slice((page - 1) * limit, page * limit) : null;
+
+    const [itemsRaw, total, cats, thumbs, locs] = await Promise.all([
       this.prisma.product.findMany({
-        where,
-        orderBy,
-        skip: (page - 1) * limit,
-        take: limit,
-        include: { store: { select: { name: true, slug: true, location: true, whatsappNumber: true } } },
+        where: pageIds ? { id: { in: pageIds } } : where,
+        ...(pageIds ? {} : { orderBy, skip: (page - 1) * limit, take: limit }),
+        include: { store: { select: { id: true, name: true, slug: true, location: true, whatsappNumber: true } } },
       }),
-      this.prisma.product.count({ where }),
+      ranked ? Promise.resolve(ranked.length) : this.prisma.product.count({ where }),
       this.prisma.product.groupBy({ by: ['category'], where: { AND: base }, _count: { _all: true } }),
       this.prisma.product.findMany({
         where: { AND: [{ status: 'ACTIVE', store: { status: 'ACTIVE', isPaused: false }, category: { not: null } }, REAL_PICTURE] },
@@ -177,6 +191,10 @@ export class ProductsService {
         orderBy: { location: 'asc' },
       }),
     ]);
+    const orderIdx = new Map((pageIds || []).map((id, i) => [id, i]));
+    const ordered = pageIds ? [...itemsRaw].sort((a, b) => (orderIdx.get(a.id) ?? 0) - (orderIdx.get(b.id) ?? 0)) : itemsRaw;
+    const tf = await this.trust.facts(ordered.map((it) => it.store.id));
+    const items = ordered.map((it) => ({ ...it, store: { ...it.store, ...this.trust.publicOf(tf.get(it.store.id)) } }));
     const thumbOf = new Map(thumbs.map((t) => [t.category as string, t.imageUrl as string]));
     return {
       items,

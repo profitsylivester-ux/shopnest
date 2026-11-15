@@ -4,6 +4,7 @@ import { CreateStoreDto } from './dto/create-store.dto.js';
 import { UpdateStoreDto } from './dto/update-store.dto.js';
 import { AuditService } from '../audit/audit.service.js';
 import type { ReqMeta } from '../audit/request-meta.js';
+import { TrustService } from '../trust/trust.service.js';
 
 // Names that already mean something in /stores/..., so a shop can never take them as its link.
 const RESERVED_SLUGS = ['marketplace', 'list', 'me', 'admin'];
@@ -27,7 +28,7 @@ function validHours(raw: string): boolean {
 
 @Injectable()
 export class StoreService {
-  constructor(private prisma: PrismaService, private audit: AuditService) {}
+  constructor(private prisma: PrismaService, private audit: AuditService, private trust: TrustService) {}
 
   async create(ownerId: string, dto: CreateStoreDto, meta: ReqMeta) {
     const existing = await this.prisma.store.findUnique({ where: { ownerId } });
@@ -143,8 +144,10 @@ export class StoreService {
       include: { products: { where: { status: 'ACTIVE' }, orderBy: { createdAt: 'desc' } } },
     });
     if (!store || store.status !== 'ACTIVE') throw new NotFoundException('Store not found');
-    const { ownerId, ...publicStore } = store;
-    return store.isPaused ? { ...publicStore, products: [] } : publicStore;
+    const { ownerId, verificationRevoked, verificationRevokedReason, verificationRevokedAt, ...publicStore } = store;
+    const facts = (await this.trust.facts([store.id])).get(store.id);
+    const withTrust = { ...publicStore, ...this.trust.publicOf(facts) };
+    return store.isPaused ? { ...withTrust, products: [] } : withTrust;
   }
 
   async findMoved(raw: string) {
@@ -163,7 +166,7 @@ export class StoreService {
   }
 
   // The public list of shops for the /shops page.
-  async listPublic() {
+  async listPublic(opts: { verified?: boolean; top?: boolean; sort?: string } = {}) {
     const rows = await this.prisma.store.findMany({
       where: { status: 'ACTIVE', isPaused: false },
       select: {
@@ -173,7 +176,12 @@ export class StoreService {
       orderBy: { createdAt: 'desc' },
       take: 200,
     });
-    return rows.map(({ _count, description, ...s }) => ({ ...s, description: description ? description.slice(0, 140) : null, productCount: _count.products }));
+    const facts = await this.trust.facts(rows.map((r) => r.id));
+    let out = rows.map(({ _count, description, ...s }) => ({ ...s, description: description ? description.slice(0, 140) : null, productCount: _count.products, ...this.trust.publicOf(facts.get(s.id)) }));
+    if (opts.verified) out = out.filter((s) => s.verified);
+    if (opts.top) out = out.filter((s) => s.topRated);
+    if (opts.top || opts.sort === 'rating') out = out.sort((a, b) => this.trust.rankScore(facts.get(b.id)) - this.trust.rankScore(facts.get(a.id)));
+    return out;
   }
 
   async getAllStoresForAdmin() {

@@ -5,6 +5,7 @@ import { AuditService } from '../audit/audit.service.js';
 import { ReqMeta } from '../audit/request-meta.js';
 import { PERIODS, SQL_FORMAT, bucketKey, bucketKeys } from '../common/buckets.js';
 import { paging } from '../common/validate.js';
+import { TrustService } from '../trust/trust.service.js';
 
 const STORE_STATUSES = ['PENDING', 'ACTIVE', 'SUSPENDED'];
 const PRODUCT_STATUSES = ['ACTIVE', 'HIDDEN', 'TRASHED'];
@@ -20,7 +21,7 @@ function cleanQ(q?: string) {
 
 @Injectable()
 export class AdminService {
-  constructor(private prisma: PrismaService, private audit: AuditService) {}
+  constructor(private prisma: PrismaService, private audit: AuditService, private trust: TrustService) {}
 
   // ---------- Overview ----------
   async overview(period?: string) {
@@ -149,17 +150,18 @@ export class AdminService {
       this.prisma.store.findMany({
         where, orderBy, ...p,
         select: {
-          id: true, name: true, slug: true, status: true, isPaused: true, location: true, whatsappNumber: true, logoUrl: true, createdAt: true, ownerId: true,
+          id: true, name: true, slug: true, status: true, isPaused: true, location: true, whatsappNumber: true, logoUrl: true, createdAt: true, ownerId: true, shopType: true, verificationRevoked: true, verificationRevokedReason: true,
           owner: { select: { name: true, email: true } },
           _count: { select: { products: { where: { status: { not: 'TRASHED' } } }, events: { where: { type: 'WHATSAPP_CLICK' } } } },
         },
       }),
       this.prisma.store.groupBy({ by: ['status'], _count: { _all: true } }),
     ]);
+    const facts = await this.trust.facts(rows.map((r) => r.id));
     return {
       total,
       counts: { all: counts.reduce((a, r) => a + r._count._all, 0), PENDING: counts.find((c) => c.status === 'PENDING')?._count._all ?? 0, ACTIVE: counts.find((c) => c.status === 'ACTIVE')?._count._all ?? 0, SUSPENDED: counts.find((c) => c.status === 'SUSPENDED')?._count._all ?? 0 },
-      items: rows.map((s) => ({ id: s.id, name: s.name, slug: s.slug, status: s.status, isPaused: s.isPaused, location: s.location, whatsappNumber: s.whatsappNumber, logoUrl: s.logoUrl && !s.logoUrl.startsWith('data:') ? s.logoUrl : null, createdAt: s.createdAt, ownerId: s.ownerId, ownerName: s.owner.name, ownerEmail: s.owner.email, products: s._count.products, enquiries: s._count.events })),
+      items: rows.map((s) => ({ id: s.id, name: s.name, slug: s.slug, status: s.status, isPaused: s.isPaused, location: s.location, whatsappNumber: s.whatsappNumber, logoUrl: s.logoUrl && !s.logoUrl.startsWith('data:') ? s.logoUrl : null, createdAt: s.createdAt, ownerId: s.ownerId, ownerName: s.owner.name, ownerEmail: s.owner.email, products: s._count.products, enquiries: s._count.events, shopType: s.shopType, trust: { verified: !!facts.get(s.id)?.verified, revoked: s.verificationRevoked, revokedReason: s.verificationRevokedReason, activeProducts: facts.get(s.id)?.products ?? 0, visitors: facts.get(s.id)?.visitors ?? 0, needProducts: facts.get(s.id)?.needProducts ?? 10, needVisitors: facts.get(s.id)?.needVisitors ?? 20, ratingAvg: facts.get(s.id)?.ratingAvg ?? null, ratingCount: facts.get(s.id)?.ratingCount ?? 0 } })),
     };
   }
 

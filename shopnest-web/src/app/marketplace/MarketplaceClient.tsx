@@ -3,7 +3,7 @@ import { TZ_REGIONS } from "../../lib/regions";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import ProductCard from "../../components/ProductCard";
+import ProductCard, { toCardStore } from "../../components/ProductCard";
 import { imgSrc, thumbSrc } from "../../lib/images";
 import { T, fill, useLang } from "../../lib/i18n";
 import { API_URL } from "../../lib/seo";
@@ -60,6 +60,7 @@ export default function MarketplaceClient() {
   const sort = get("sort") || "newest";
   const inStock = get("inStock") === "1";
   const onSale = get("sale") === "1";
+  const verifiedOnly = get("verified") === "1";
   const page = Math.max(1, parseInt(get("page") || "1", 10) || 1);
 
   const [data, setData] = useState<Browse | null>(null);
@@ -112,7 +113,7 @@ export default function MarketplaceClient() {
     });
   }, [data, cats, lang]);
 
-  const anyFilter = !!(get("q") || category || condition || location || get("min") || get("max") || inStock || onSale);
+  const anyFilter = !!(get("q") || category || condition || location || get("min") || get("max") || inStock || onSale || verifiedOnly);
   const total = data ? data.total : 0;
   const applyPrice = () => setParams({ min: minIn.trim() || null, max: maxIn.trim() || null });
   const sel = (label: string, active: boolean, on: () => void, count?: number, k?: string) => (
@@ -163,6 +164,7 @@ export default function MarketplaceClient() {
       <div className="sn-fgroup">
         <label className="sn-check"><input type="checkbox" checked={inStock} onChange={(e) => setParams({ inStock: e.target.checked ? "1" : null })} /><span>{d.inStock}</span></label>
         <label className="sn-check"><input type="checkbox" checked={onSale} onChange={(e) => setParams({ sale: e.target.checked ? "1" : null })} /><span>{d.onSale}</span></label>
+        <label className="sn-check"><input type="checkbox" checked={verifiedOnly} onChange={(e) => setParams({ verified: e.target.checked ? "1" : null })} /><span>{d.verifiedShopsOnly}</span></label>
       </div>
     </aside>
   );
@@ -208,6 +210,7 @@ export default function MarketplaceClient() {
                 <option value="newest">{d.newest}</option>
                 <option value="price_asc">{d.priceAsc}</option>
                 <option value="price_desc">{d.priceDesc}</option>
+                <option value="rating">{d.sortRating}</option>
               </select>
             </label>
           </div>
@@ -224,7 +227,7 @@ export default function MarketplaceClient() {
           {!error && data && data.items.length > 0 && (
             <div className={"sn-grid" + (loading ? " is-loading" : "")}>
               {data.items.map((p) => (
-                <ProductCard key={p.id} p={p} lang={lang} source="marketplace" store={{ name: p.store?.name || "", slug: p.store?.slug || "", location: p.store?.location, whatsapp: p.store?.whatsappNumber }} />
+                <ProductCard key={p.id} p={p} lang={lang} source="marketplace" store={toCardStore(p.store)} />
               ))}
             </div>
           )}

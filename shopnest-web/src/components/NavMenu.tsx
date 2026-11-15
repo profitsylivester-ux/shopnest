@@ -28,7 +28,7 @@ export default function NavMenu({ tone, lang, onSell, onHome }: { tone: "light" 
     : [
         { key: "home", label: d.home, href: "/" },
         { key: "market", label: d.marketplace, href: "/marketplace", cats: true, children: [{ label: d.allProducts, href: "/marketplace" }, { label: d.newArrivals, href: "/marketplace?sort=newest" }] },
-        { key: "shops", label: d.shops, href: "/shops", children: [{ label: d.allShops, href: "/shops" }, { label: d.openShop, href: "#sell", action: "sell" }] },
+        { key: "shops", label: d.shops, href: "/shops", children: [{ label: d.allShops, href: "/shops" }, { label: d.topRated, href: "/shops?top=1" }, { label: d.verified, href: "/shops?verified=1" }, { label: d.openShop, href: "#sell", action: "sell" }] },
         { key: "help", label: d.help, children: [{ label: d.support, href: "/support" }, { label: d.faqs, href: "/faq" }, { label: d.about, href: "/about" }] },
       ];
 

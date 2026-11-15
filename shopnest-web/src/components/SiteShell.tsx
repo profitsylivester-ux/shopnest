@@ -111,6 +111,12 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   const [auth, setAuth] = useState<AuthState>({ open: false, mode: "login", role: "BUYER" });
   const openAuth = useCallback((mode: "login" | "signup", role: "BUYER" | "SELLER") => setAuth({ open: true, mode, role }), []);
   const closeAuth = useCallback(() => setAuth((a) => ({ ...a, open: false })), []);
+  // Other parts of the site (for example the reviews form) ask for the sign-in card with this event.
+  useEffect(() => {
+    const on = (e: Event) => { const m = (e as CustomEvent).detail?.mode === "signup" ? "signup" : "login"; setAuth({ open: true, mode: m, role: "BUYER" }); };
+    window.addEventListener("shopnest-open-auth", on);
+    return () => window.removeEventListener("shopnest-open-auth", on);
+  }, []);
   return (
     <div className="sn-page" data-theme={theme}>
       <Header lang={lang} setLang={setLang} theme={theme} toggleTheme={toggleTheme} openAuth={openAuth} />

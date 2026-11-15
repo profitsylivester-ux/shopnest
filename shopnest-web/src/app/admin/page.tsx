@@ -8,6 +8,7 @@ import CategoriesTab from "./CategoriesTab";
 import MenuTab from "./MenuTab";
 import OverviewTab from "./OverviewTab";
 import PagesTab from "./PagesTab";
+import ReviewsTab from "./ReviewsTab";
 import ProductsTab from "./ProductsTab";
 import SettingsTab from "./SettingsTab";
 import ShopsTab from "./ShopsTab";
@@ -21,6 +22,7 @@ const GROUPS: { title: string; items: { id: string; label: string; icon: string 
     items: [
       { id: "Shops", label: "Shops", icon: "M3 9l1-5h16l1 5M5 9v11h14V9M9 20v-6h6v6" },
       { id: "Users", label: "Users", icon: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" },
+      { id: "Reviews", label: "Reviews", icon: "M12 2l3 6.3 6.9.9-5 4.8 1.3 6.9L12 17.6 5.8 20.9l1.3-6.9-5-4.8 6.9-.9z" },
       { id: "Products", label: "Products", icon: "M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" },
     ],
   },
@@ -109,6 +111,7 @@ export default function AdminPage() {
         {tab === "Overview" && <OverviewTab go={go} />}
         {tab === "Shops" && <ShopsTab key={preset.status || "all"} initialStatus={preset.status} />}
         {tab === "Users" && <UsersTab selfId={selfId} />}
+        {tab === "Reviews" && <ReviewsTab />}
         {tab === "Products" && <ProductsTab />}
         {tab === "Homepage" && <SettingsTab />}
         {tab === "Categories" && <CategoriesTab />}

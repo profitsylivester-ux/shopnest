@@ -11,9 +11,10 @@ import { AuditModule } from './audit/audit.module.js';
 import { UploadsModule } from './uploads/uploads.module.js';
 import { AdminModule } from './admin/admin.module.js';
 import { ContentModule } from './content/content.module.js';
+import { TrustModule } from './trust/trust.module.js';
 
 @Module({
-  imports: [PrismaModule, AuthModule, StoreModule, ProductsModule, SettingsModule, EventsModule, AuditModule, UploadsModule, AdminModule, ContentModule],
+  imports: [PrismaModule, AuthModule, StoreModule, ProductsModule, SettingsModule, EventsModule, AuditModule, UploadsModule, AdminModule, ContentModule, TrustModule],
   controllers: [AppController],
   providers: [AppService],
 })

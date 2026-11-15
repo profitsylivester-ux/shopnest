@@ -5,7 +5,7 @@ import AccountMenu from "../components/AccountMenu";
 import Assistant from "../components/Assistant";
 import AuthModal from "../components/AuthModal";
 import NavMenu from "../components/NavMenu";
-import ProductCard from "../components/ProductCard";
+import ProductCard, { toCardStore } from "../components/ProductCard";
 import ThemeToggle from "../components/ThemeToggle";
 import { T, useLang } from "../lib/i18n";
 import { TZ_REGIONS } from "../lib/regions";
@@ -330,7 +330,7 @@ export default function Home() {
                   {featured && featured.length > 0 && (
                     <div className="sn-grid">
                       {featured.map((p) => (
-                        <ProductCard key={p.id} p={p} lang={lang} source="home" store={{ name: p.store?.name || "", slug: p.store?.slug || "", location: p.store?.location, whatsapp: p.store?.whatsappNumber }} />
+                        <ProductCard key={p.id} p={p} lang={lang} source="home" store={toCardStore(p.store)} />
                       ))}
                     </div>
                   )}

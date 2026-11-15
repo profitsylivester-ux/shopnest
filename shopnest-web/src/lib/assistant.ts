@@ -90,8 +90,8 @@ export const ENTRIES: Entry[] = [
     q: { EN: "What do New, -% and Low stock mean?", SW: "New, -% na Zimebaki zinamaanisha nini?" },
     keys: ["price is real", "real price", "fake discount", "is the discount real", "bei ni ya kweli", "new tag", "new label", "what does new mean", "discount", "discount tag", "percent off", "tag", "tags", "badge", "badges", "label", "labels", "low stock", "only left", "only 3 left", "what does low stock mean", "mpya inamaanisha", "punguzo", "zimebaki", "alama", "lebo"],
     a: {
-      EN: "Every label on a product card is real:\n\n- **New**: the product was added in the last 7 days.\n- **-20%** (or another number): the seller entered a real old price that is higher than the current price.\n- **Only 3 left**: shown only when 3 or fewer are in stock.\n- **Sold out**: nothing in stock. The WhatsApp button is switched off.\n\nThere are no fake discounts or fake stars on ShopNest.",
-      SW: "Kila alama kwenye kadi ya bidhaa ni ya kweli:\n\n- **Mpya**: bidhaa iliwekwa ndani ya siku 7 zilizopita.\n- **-20%** (au namba nyingine): muuzaji ameweka bei ya zamani halisi iliyo juu kuliko bei ya sasa.\n- **Zimebaki 3**: huonekana tu pale zilizopo ni 3 au chini.\n- **Imeisha**: hakuna iliyobaki. Kitufe cha WhatsApp huzimwa.\n\nShopNest haina punguzo bandia wala nyota bandia.",
+      EN: "Every label on a product card is real:\n\n- **New**: the product was added in the last 7 days.\n- **-20%** (or another number): the seller entered a real old price that is higher than the current price.\n- **Only 3 left**: shown only when 3 or fewer are in stock.\n- **Sold out**: nothing in stock. The WhatsApp button is switched off.\n\nStars appear only when a shop has real buyer reviews. There are no fake discounts on ShopNest.",
+      SW: "Kila alama kwenye kadi ya bidhaa ni ya kweli:\n\n- **Mpya**: bidhaa iliwekwa ndani ya siku 7 zilizopita.\n- **-20%** (au namba nyingine): muuzaji ameweka bei ya zamani halisi iliyo juu kuliko bei ya sasa.\n- **Zimebaki 3**: huonekana tu pale zilizopo ni 3 au chini.\n- **Imeisha**: hakuna iliyobaki. Kitufe cha WhatsApp huzimwa.\n\nNyota huonekana tu pale duka lina maoni halisi ya wanunuzi. ShopNest haina punguzo bandia.",
     },
     rel: ["sold_out", "old_price", "search_filters"],
   },
@@ -383,12 +383,23 @@ export const ENTRIES: Entry[] = [
   {
     id: "reviews",
     q: { EN: "Are there reviews, ratings or verified shops?", SW: "Kuna maoni, nyota au maduka yaliyothibitishwa?" },
-    keys: ["review", "reviews", "rating", "ratings", "stars", "verified", "verified shop", "verified badge", "trusted", "top rated", "favorites", "favourites", "wishlist", "heart", "maoni", "nyota", "imethibitishwa", "duka lililothibitishwa", "vipendwa"],
+    keys: ["review", "reviews", "rating", "ratings", "stars", "star", "verified", "verified shop", "verified badge", "trusted", "top rated", "write a review", "leave a review", "favorites", "favourites", "wishlist", "heart", "maoni", "nyota", "imethibitishwa", "duka lililothibitishwa", "vipendwa", "andika maoni"],
     a: {
-      EN: "Not yet. Shop reviews, ratings, a verified badge and favorites are not available on ShopNest at the moment, so you will not see stars or badges. When they arrive they will show up on the shop pages.",
-      SW: "Bado. Maoni ya maduka, nyota, alama ya uthibitisho na vipendwa havipatikani ShopNest kwa sasa, kwa hiyo hutaona nyota wala alama. Vikiwasili vitaonekana kwenye kurasa za maduka.",
+      EN: "Yes. Signed-in buyers can rate a shop from 1 to 5 stars and add a short comment on the shop page (one review per account, and shop owners cannot review their own shop). Stars appear on cards and shop pages only when a shop has real reviews.\n\n- **Verified**: a badge a shop earns automatically from real activity. Point at it to see the exact reason.\n- **Top Rated**: at least 3 reviews with an average of 4.0 or more.\n\nUse the Verified shops only filter on the marketplace, or open Shops > Top Rated. Only the ShopNest team can hide a review that breaks the rules. A badge is a sign of activity, not a guarantee, so still check the product and agree details on WhatsApp. Favorites (hearts) are not available.",
+      SW: "Ndiyo. Wanunuzi walioingia wanaweza kupe duka nyota 1 hadi 5 na kuandika maoni mafupi kwenye ukurasa wa duka (maoni moja kwa akaunti, na mmiliki hawezi kujipa maoni). Nyota huonekana kwenye kadi na kurasa za maduka tu pale duka lina maoni halisi.\n\n- **Verified**: alama ambayo duka hupata yenyewe kutokana na shughuli halisi. Elekeza kwenye alama kuona sababu kamili.\n- **Top Rated**: maoni angalau 3 na wastani wa 4.0 au zaidi.\n\nTumia kichujio cha Verified shops only kwenye soko, au fungua Shops > Top Rated. Ni timu ya ShopNest pekee inaweza kuficha maoni yanayovunja sheria. Alama ni ishara ya shughuli, si dhamana, kwa hiyo bado kagua bidhaa na kubaliana maelezo kwenye WhatsApp. Vipendwa (mioyo) havipatikani.",
     },
-    rel: ["labels", "support"],
+    rel: ["get-verified", "labels", "support"],
+  },
+  {
+    id: "get-verified",
+    q: { EN: "How does my shop get the Verified badge?", SW: "Duka langu linapataje alama ya Verified?" },
+    keys: ["get verified", "how to get verified", "how many buyers", "buyers do i need", "how many products do i need", "verified requirements", "requirements for verified", "verified badge", "get the badge", "lose badge", "badge removed", "why not verified", "become verified", "kuthibitishwa", "pata alama", "alama ya verified", "alama imeondolewa"],
+    a: {
+      EN: "The badge is earned automatically, nobody sells it. Your shop needs:\n\n- **10 active products**.\n- **10 different buyers** who tapped WhatsApp (physical shops or Both), or **20** for online-only shops. Each buyer counts once, so repeat taps from one phone do not help.\n\nYour dashboard Overview shows your progress. The check repeats automatically, so the badge can disappear if the numbers drop. The ShopNest team can also remove it, for example if clicks look fake, and then your dashboard shows the reason. Contact Support if you think that is a mistake.",
+      SW: "Alama hupatikana yenyewe, hakuna anayeiuza. Duka lako linahitaji:\n\n- **Bidhaa 10 zinazoonekana**.\n- **Wanunuzi 10 tofauti** waliobonyeza WhatsApp (maduka ya kawaida au Both), au **20** kwa maduka ya mtandaoni tu. Kila mnunuzi huhesabiwa mara moja, kwa hiyo kubonyeza tena kutoka simu moja hakusaidii.\n\nOverview ya dashibodi yako inaonyesha maendeleo yako. Ukaguzi hurudiwa yenyewe, kwa hiyo alama inaweza kutoweka namba zikishuka. Timu ya ShopNest pia inaweza kuiondoa, kwa mfano kama mibonyezo inaonekana ya uongo, na dashibodi yako itaonyesha sababu. Wasiliana na Support ukiona ni kosa.",
+    },
+    links: [L_SUPPORT],
+    rel: ["reviews", "support"],
   },
   {
     id: "language",

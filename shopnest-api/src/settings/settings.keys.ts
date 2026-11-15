@@ -11,6 +11,7 @@ export const SETTING_RULES: Record<string, Rule> = {
   slide1Title: { label: 'Home headline', max: 120, kind: 'text' },
   slide1Desc: { label: 'Home description', max: 300, kind: 'text' },
   slide1Video: { label: 'Home background video', max: 300, kind: 'media' },
+  reviewsRequireApproval: { label: 'Review approval switch', max: 5, kind: 'bool' },
   // kept so an old saved value is not rejected; the home page does not use it
   slide3Bg: { label: 'Slide 3 background', max: 500, kind: 'media' },
 };

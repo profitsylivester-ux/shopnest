@@ -38,6 +38,14 @@ export default function HomeTab({ store, products, onAddProduct, onOpenTab }: Pr
   const [summary, setSummary] = useState<any>(null);
   const [recent, setRecent] = useState<any>(null);
   const [error, setError] = useState("");
+  const [rv, setRv] = useState<any>(null);
+
+  // Real rating and Verified progress (reviews are not part of the time period switch).
+  useEffect(() => {
+    const token = localStorage.getItem("shopnest_token");
+    if (!token) return;
+    fetch(`${API_URL}/reviews/me?limit=1`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => (r.ok ? r.json() : null)).then((j) => { if (j) setRv(j); }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -65,11 +73,12 @@ export default function HomeTab({ store, products, onAddProduct, onOpenTab }: Pr
   const hidden = products.filter((p) => p.status === "HIDDEN");
 
   const t = summary ? summary.totals : null;
-  const tiles: { label: string; value: number | null; hint: string }[] = [
+  const tiles: { label: string; value: number | string | null; hint: string }[] = [
     { label: "WhatsApp clicks", value: t ? t.whatsappClicks : null, hint: "Buyers who tapped WhatsApp" },
     { label: "Product views", value: t ? t.productViews : null, hint: "Opens of a product page" },
     { label: "Shop views", value: t ? t.shopViews : null, hint: "Visits to your shop page" },
     { label: "Products", value: live.length, hint: soldOut.length + " sold out | " + hidden.length + " hidden" },
+    { label: "Rating", value: rv ? (rv.summary.avg !== null ? rv.summary.avg.toFixed(1) : "-") : null, hint: rv ? (rv.summary.count === 0 ? "No reviews yet" : rv.summary.count + (rv.summary.count === 1 ? " review" : " reviews") + (rv.awaiting > 0 ? " | " + rv.awaiting + " waiting for approval" : "")) : "Loading" },
   ];
 
   const attention: { color: string; text: string }[] = [];
@@ -104,12 +113,36 @@ export default function HomeTab({ store, products, onAddProduct, onOpenTab }: Pr
         {tiles.map((tile) => (
           <div key={tile.label} style={{ ...card, padding: "1.3rem" }}>
             <p style={{ margin: 0, fontSize: "0.7rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--latte)" }}>{tile.label}</p>
-            <p style={{ margin: "0.6rem 0 0.3rem 0", fontFamily: "Playfair Display, serif", fontSize: "2.4rem", color: "var(--cream)", lineHeight: 1 }}>{tile.value === null ? "-" : tile.value.toLocaleString()}</p>
+            <p style={{ margin: "0.6rem 0 0.3rem 0", fontFamily: "Playfair Display, serif", fontSize: "2.4rem", color: "var(--cream)", lineHeight: 1 }}>{tile.value === null ? "-" : typeof tile.value === "number" ? tile.value.toLocaleString() : tile.value}</p>
             <p style={{ margin: 0, fontSize: "0.78rem", color: MUTED }}>{tile.hint}</p>
           </div>
         ))}
       </div>
       <p style={{ color: MUTED, fontSize: "0.8rem", margin: "0 0 1.5rem 0", lineHeight: 1.5 }}>A WhatsApp click means a buyer opened a chat with you from your shop or listings. It is not a completed sale - deals are agreed on WhatsApp. Your own visits are not counted.</p>
+
+      {rv && rv.trust && (
+        <div style={{ ...card, marginBottom: "1.5rem" }}>
+          <h3 style={{ ...heading, marginBottom: "0.8rem" }}>Verified badge</h3>
+          {rv.trust.verified ? (
+            <p style={{ color: "#7fd6b0", fontSize: "0.92rem", margin: 0 }}>Your shop is Verified. Buyers see the badge on your shop page and cards. It is re-checked automatically.</p>
+          ) : rv.trust.revoked ? (
+            <p style={{ color: "#ff5f56", fontSize: "0.92rem", margin: 0 }}>The ShopNest team removed the Verified badge{rv.trust.revokedReason ? ": " + rv.trust.revokedReason : "."} Contact Support if you think this is a mistake.</p>
+          ) : (
+            <div>
+              <p style={{ color: MUTED, fontSize: "0.85rem", margin: "0 0 0.9rem 0", lineHeight: 1.5 }}>The badge is earned automatically from real activity. Each buyer counts once, so tapping WhatsApp many times from one phone does not help.</p>
+              {[
+                { label: "Active products", have: rv.trust.products, need: rv.trust.needProducts },
+                { label: "Different buyers who tapped WhatsApp", have: rv.trust.visitors, need: rv.trust.needVisitors },
+              ].map((b) => (
+                <div key={b.label} style={{ marginBottom: "0.8rem" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", color: "var(--cream)", marginBottom: "0.3rem" }}><span>{b.label}</span><span>{Math.min(b.have, b.need)} / {b.need}</span></div>
+                  <div style={{ height: "8px", background: "rgba(255,255,255,0.06)", borderRadius: "6px", overflow: "hidden" }}><div style={{ width: Math.min(100, Math.round((b.have / b.need) * 100)) + "%", height: "100%", background: "var(--latte)" }} /></div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div style={{ marginBottom: "1.5rem" }}>
         <TrendChart buckets={summary ? summary.buckets : []} granularity={summary ? summary.granularity : "day"} />

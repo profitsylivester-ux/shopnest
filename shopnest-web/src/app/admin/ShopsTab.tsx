@@ -16,6 +16,7 @@ export default function ShopsTab({ initialStatus }: { initialStatus?: string }) 
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState("");
+  const [revoke, setRevoke] = useState<{ id: string; name: string; reason: string } | null>(null);
   const [activity, setActivity] = useState<{ id: string; name: string } | null>(null);
   const [notice, show, clear, clearError] = useNotice();
   const dq = useDebounced(q);
@@ -37,6 +38,13 @@ export default function ShopsTab({ initialStatus }: { initialStatus?: string }) 
     if (r.ok) { show("ok", name + " " + verb + "."); load(); } else show("error", r.error);
   }
 
+  async function setBadge(id: string, name: string, revoked: boolean, reason?: string) {
+    setBusy(id);
+    const r = await api("/admin/shops/" + id + "/verification", { method: "PATCH", data: { revoked, reason } });
+    setBusy("");
+    if (r.ok) { setRevoke(null); show("ok", revoked ? "Verified badge removed from " + name + "." : "Badge rule restored for " + name + "."); load(); } else show("error", r.error);
+  }
+
   const counts = data?.counts;
 
   return (
@@ -44,6 +52,17 @@ export default function ShopsTab({ initialStatus }: { initialStatus?: string }) 
       <PageTitle title="Shops" sub="Approve new shops, suspend shops that break the rules, and see how each shop is doing." />
       <Notice n={notice} onClose={clear} />
       {activity && <ActivityPanel userId={activity.id} title={"Activity of " + activity.name} onClose={() => setActivity(null)} />}
+      {revoke && (
+        <Panel style={{ marginBottom: "1.2rem" }}>
+          <p style={{ margin: "0 0 0.6rem 0", fontWeight: 500 }}>Remove the Verified badge from {revoke.name}</p>
+          <p style={{ color: C.muted, fontSize: "0.8rem", margin: "0 0 0.8rem 0", lineHeight: 1.5 }}>Write a short reason. The shop owner sees it in their dashboard and activity log. The badge stays off until you restore it, even if the numbers are still met.</p>
+          <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
+            <input value={revoke.reason} onChange={(e) => setRevoke({ ...revoke, reason: e.target.value.slice(0, 200) })} placeholder="Reason, for example: fake WhatsApp clicks suspected" aria-label="Reason" style={{ flex: 1, minWidth: "260px", padding: "0.7rem 0.9rem", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(185,130,90,0.3)", borderRadius: "8px", color: "var(--cream)", fontFamily: "Jost, sans-serif" }} />
+            <Btn kind="danger" disabled={busy === revoke.id || revoke.reason.trim().length < 3} onClick={() => setBadge(revoke.id, revoke.name, true, revoke.reason.trim())}>Remove badge</Btn>
+            <Btn onClick={() => setRevoke(null)}>Cancel</Btn>
+          </div>
+        </Panel>
+      )}
       <Panel>
         <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", alignItems: "center", marginBottom: "1.2rem" }}>
           {FILTERS.map((f) => {
@@ -62,7 +81,7 @@ export default function ShopsTab({ initialStatus }: { initialStatus?: string }) 
         </div>
         {loading && !data ? <Empty>Loading...</Empty> : data && data.items.length === 0 ? <Empty>No shops match.</Empty> : data && (
           <Table>
-            <thead><tr><th style={th}>Shop</th><th style={th}>Owner</th><th style={th}>Status</th><th style={th}>Products</th><th style={th}>Enquiries</th><th style={th}>Joined</th><th style={th}>Actions</th></tr></thead>
+            <thead><tr><th style={th}>Shop</th><th style={th}>Owner</th><th style={th}>Status</th><th style={th}>Products</th><th style={th}>Enquiries</th><th style={th}>Trust</th><th style={th}>Joined</th><th style={th}>Actions</th></tr></thead>
             <tbody>
               {data.items.map((s: any) => (
                 <tr key={s.id}>
@@ -76,6 +95,11 @@ export default function ShopsTab({ initialStatus }: { initialStatus?: string }) 
                   <td style={td}><Pill tone={s.status === "ACTIVE" ? "ok" : s.status === "PENDING" ? "warn" : "bad"}>{s.status === "ACTIVE" ? "Active" : s.status === "PENDING" ? "Pending" : "Suspended"}</Pill>{s.isPaused && <div style={{ marginTop: "0.3rem" }}><Pill tone="muted">Paused by owner</Pill></div>}</td>
                   <td style={td}>{s.products}</td>
                   <td style={td}>{s.enquiries}</td>
+                  <td style={td}>
+                    {s.trust.verified ? <Pill tone="ok">Verified</Pill> : s.trust.revoked ? <span title={s.trust.revokedReason || ""}><Pill tone="bad">Badge removed</Pill></span> : <span style={{ color: C.muted, fontSize: "0.75rem" }}>{Math.min(s.trust.activeProducts, s.trust.needProducts)}/{s.trust.needProducts} products, {Math.min(s.trust.visitors, s.trust.needVisitors)}/{s.trust.needVisitors} buyers</span>}
+                    {s.trust.ratingCount > 0 && <div style={{ color: "#e0a526", fontSize: "0.78rem", marginTop: "0.25rem" }}>{"\u2605"} {s.trust.ratingAvg} ({s.trust.ratingCount})</div>}
+                    {s.trust.revoked && s.trust.revokedReason && <div style={{ color: C.muted, fontSize: "0.72rem", marginTop: "0.25rem", maxWidth: "180px" }}>{s.trust.revokedReason}</div>}
+                  </td>
                   <td style={td}>{fmtDate(s.createdAt)}</td>
                   <td style={td}>
                     <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
@@ -84,6 +108,8 @@ export default function ShopsTab({ initialStatus }: { initialStatus?: string }) 
                       {s.status === "SUSPENDED" && <Btn small kind="primary" disabled={busy === s.id} onClick={() => setShopStatus(s.id, s.name, "ACTIVE", "reactivated")}>Reactivate</Btn>}
                       {s.status === "PENDING" && <ConfirmBtn label="Suspend" confirmLabel="Confirm suspend" kind="danger" disabled={busy === s.id} onConfirm={() => setShopStatus(s.id, s.name, "SUSPENDED", "suspended")} />}
                       {s.status === "ACTIVE" && <Link href={"/store/" + s.slug} target="_blank" style={{ color: "var(--latte)", border: "1px solid rgba(185,130,90,0.4)", borderRadius: "8px", padding: "0.4rem 0.8rem", fontSize: "0.78rem", textDecoration: "none" }}>Open shop</Link>}
+                      {s.trust.verified && <Btn small kind="danger" disabled={busy === s.id} onClick={() => setRevoke({ id: s.id, name: s.name, reason: "" })}>Remove badge</Btn>}
+                      {s.trust.revoked && <Btn small kind="primary" disabled={busy === s.id} onClick={() => setBadge(s.id, s.name, false)}>Restore badge rule</Btn>}
                       <Btn small onClick={() => { setActivity({ id: s.ownerId, name: s.name }); window.scrollTo({ top: 0, behavior: "smooth" }); }}>Activity</Btn>
                     </div>
                   </td>

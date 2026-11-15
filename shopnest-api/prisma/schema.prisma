@@ -37,33 +37,38 @@ model User {
   tokenVersion Int        @default(0)
   googleId     String?    @unique
   auditLogs    AuditLog[]
+  reviews      Review[]
 }
 
 model Store {
-  id              String             @id @default(uuid())
-  name            String
-  slug            String             @unique @default(uuid())
-  description     String?
-  whatsappNumber  String?
-  logoUrl         String?
-  bannerUrl       String?
-  location        String?
-  shopType        String?
-  instagramUrl    String?
-  facebookUrl     String?
-  tiktokUrl       String?
-  openingHours    String?
-  deliveryReturns String?
-  announcement    String?
-  isPaused        Boolean            @default(false)
-  status          StoreStatus        @default(PENDING)
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  ownerId         String             @unique
-  owner           User               @relation(fields: [ownerId], references: [id])
-  products        Product[]
-  events          StoreEvent[]
-  slugHistory     StoreSlugHistory[]
+  id                        String             @id @default(uuid())
+  name                      String
+  slug                      String             @unique @default(uuid())
+  description               String?
+  whatsappNumber            String?
+  logoUrl                   String?
+  bannerUrl                 String?
+  location                  String?
+  shopType                  String?
+  instagramUrl              String?
+  facebookUrl               String?
+  tiktokUrl                 String?
+  openingHours              String?
+  deliveryReturns           String?
+  announcement              String?
+  isPaused                  Boolean            @default(false)
+  status                    StoreStatus        @default(PENDING)
+  createdAt                 DateTime           @default(now())
+  updatedAt                 DateTime           @updatedAt
+  ownerId                   String             @unique
+  owner                     User               @relation(fields: [ownerId], references: [id])
+  products                  Product[]
+  events                    StoreEvent[]
+  slugHistory               StoreSlugHistory[]
+  reviews                   Review[]
+  verificationRevoked       Boolean            @default(false)
+  verificationRevokedReason String?
+  verificationRevokedAt     DateTime?
 }
 
 model Product {
@@ -196,4 +201,27 @@ model SitePage {
   isPublished Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+enum ReviewStatus {
+  VISIBLE
+  PENDING
+  HIDDEN
+}
+
+model Review {
+  id        String       @id @default(uuid())
+  rating    Int
+  comment   String?
+  status    ReviewStatus @default(VISIBLE)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  storeId   String
+  store     Store        @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, userId])
+  @@index([storeId, status])
+  @@index([status, createdAt])
 }

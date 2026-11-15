@@ -1,9 +1,11 @@
 "use client";
 import MessagesTab from "./MessagesTab";
 import ActivityLog from "./ActivityLog";
+import ReviewsView from "./ReviewsView";
 
 const TABS = [
   { key: "inquiries", label: "Inquiries" },
+  { key: "reviews", label: "Reviews" },
   { key: "activity", label: "Account activity" },
 ];
 
@@ -15,7 +17,7 @@ export default function MessagesAndAudit({ view, onView }: { view: string; onVie
           <button key={t.key} onClick={() => onView(t.key)} aria-pressed={view === t.key} style={{ background: view === t.key ? "var(--latte)" : "transparent", color: view === t.key ? "var(--espresso)" : "var(--latte)", border: "none", borderRadius: "7px", padding: "0.5rem 1.1rem", fontSize: "0.85rem", cursor: "pointer", fontFamily: "Jost, sans-serif", fontWeight: view === t.key ? 600 : 400 }}>{t.label}</button>
         ))}
       </div>
-      {view === "activity" ? <ActivityLog /> : <MessagesTab />}
+      {view === "activity" ? <ActivityLog /> : view === "reviews" ? <ReviewsView /> : <MessagesTab />}
     </div>
   );
 }
