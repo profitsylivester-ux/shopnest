@@ -36,6 +36,9 @@ export class StoreController {
   @Patch('me/slug') @UseGuards(JwtAuthGuard, RolesGuard) @Roles('SELLER')
   changeSlug(@CurrentUser('sub') ownerId: string, @Body() dto: SlugDto, @Req() req: any) { return this.storeService.changeSlug(ownerId, dto.slug, reqMeta(req)); }
 
+  @Get(':slug/moved')
+  findMoved(@Param('slug') slug: string) { return this.storeService.findMoved(slug); }
+
   @Get(':slug')
   findPublic(@Param('slug') slug: string) { return this.storeService.findPublic(slug); }
 }

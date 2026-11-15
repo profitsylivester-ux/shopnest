@@ -32,7 +32,11 @@ export default function PublicStorefront() {
     fetch(`http://localhost:3001/stores/${slug}`)
       .then(async (res) => {
         if (res.status === 200) { setStore(await res.json()); trackViewOnce({ type: "SHOP_VIEW", storeSlug: slug, source: "store" }); }
-        else setError("Store not found.");
+        else {
+          const mv = await fetch(`http://localhost:3001/stores/${encodeURIComponent(slug)}/moved`).then((m) => (m.status === 200 ? m.json() : null)).catch(() => null);
+          if (mv && typeof mv.slug === "string" && mv.slug !== slug) { window.location.replace(`/store/${encodeURIComponent(mv.slug)}`); return; }
+          setError("Store not found.");
+        }
       })
       .catch(() => setError("Network error."))
       .finally(() => setLoading(false));

@@ -30,7 +30,13 @@ export class StoreService {
   async create(ownerId: string, dto: CreateStoreDto, meta: ReqMeta) {
     const existing = await this.prisma.store.findUnique({ where: { ownerId } });
     if (existing) throw new ConflictException('Seller already has a store');
-    const slug = dto.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(Math.random() * 1000);
+    const base = dto.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    let slug = base + '-' + Math.floor(Math.random() * 1000);
+    for (let i = 0; i < 5; i++) {
+      const taken = (await this.prisma.store.findUnique({ where: { slug }, select: { id: true } })) || (await this.prisma.storeSlugHistory.findUnique({ where: { slug }, select: { id: true } }));
+      if (!taken) break;
+      slug = base + '-' + Math.floor(Math.random() * 100000);
+    }
     const store = await this.prisma.store.create({
       data: {
         name: dto.name,
@@ -91,11 +97,14 @@ export class StoreService {
     const s = this.normSlug(raw);
     const bad = this.slugFormatError(s);
     if (bad) return { slug: s, available: false, message: bad };
-    const store = await this.prisma.store.findUnique({ where: { ownerId }, select: { slug: true } });
+    const store = await this.prisma.store.findUnique({ where: { ownerId }, select: { id: true, slug: true } });
     if (!store) throw new NotFoundException('Store not found');
     if (store.slug === s) return { slug: s, available: true, message: 'This is your current link.' };
     const other = await this.prisma.store.findUnique({ where: { slug: s }, select: { id: true } });
-    return other ? { slug: s, available: false, message: 'That link is already taken.' } : { slug: s, available: true, message: 'This link is free.' };
+    if (other) return { slug: s, available: false, message: 'That link is already taken.' };
+    const old = await this.prisma.storeSlugHistory.findUnique({ where: { slug: s }, select: { storeId: true } });
+    if (old && old.storeId !== store.id) return { slug: s, available: false, message: 'That link is already taken.' };
+    return { slug: s, available: true, message: old ? 'This was your old link. You can take it back.' : 'This link is free.' };
   }
 
   async changeSlug(ownerId: string, raw: string, meta: ReqMeta) {
@@ -106,7 +115,14 @@ export class StoreService {
     if (!store) throw new NotFoundException('Store not found');
     if (store.slug === s) return store;
     try {
-      const updated = await this.prisma.store.update({ where: { ownerId }, data: { slug: s } });
+      const updated = await this.prisma.$transaction(async (tx) => {
+        const old = await tx.storeSlugHistory.findUnique({ where: { slug: s }, select: { storeId: true } });
+        if (old && old.storeId !== store.id) throw new ConflictException('That link is already taken.');
+        if (old) await tx.storeSlugHistory.delete({ where: { slug: s } });
+        const u = await tx.store.update({ where: { ownerId }, data: { slug: s } });
+        await tx.storeSlugHistory.upsert({ where: { slug: store.slug }, update: { storeId: store.id }, create: { slug: store.slug, storeId: store.id } });
+        return u;
+      });
       await this.audit.log({ userId: ownerId, action: 'STORE_SLUG_CHANGED', summary: 'Shop link changed from /store/' + store.slug + ' to /store/' + s, details: { changes: [{ field: 'slug', from: store.slug, to: s }] }, ...meta });
       return updated;
     } catch (e: any) {
@@ -123,6 +139,13 @@ export class StoreService {
     if (!store || store.status !== 'ACTIVE') throw new NotFoundException('Store not found');
     const { ownerId, ...publicStore } = store;
     return store.isPaused ? { ...publicStore, products: [] } : publicStore;
+  }
+
+  async findMoved(raw: string) {
+    const s = this.normSlug(raw);
+    const row = await this.prisma.storeSlugHistory.findUnique({ where: { slug: s }, select: { store: { select: { slug: true, status: true } } } });
+    if (!row || row.store.status !== 'ACTIVE' || row.store.slug === s) throw new NotFoundException('Store not found');
+    return { slug: row.store.slug };
   }
 
   async getMarketplace() {

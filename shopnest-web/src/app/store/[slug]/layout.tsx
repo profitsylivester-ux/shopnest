@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { SITE_URL, getJson, clip, productImageUrl, jsonLd } from "../../../lib/seo";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -22,6 +23,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function StoreLayout({ params, children }: { params: Promise<{ slug: string }>; children: React.ReactNode }) {
   const { slug } = await params;
   const s = await getJson(`/stores/${encodeURIComponent(slug)}`);
+  if (!s) {
+    const moved = await getJson(`/stores/${encodeURIComponent(slug)}/moved`, 0);
+    if (moved && typeof moved.slug === "string" && moved.slug !== slug) redirect(`/store/${encodeURIComponent(moved.slug)}`);
+  }
   const data = s
     ? {
         "@context": "https://schema.org",

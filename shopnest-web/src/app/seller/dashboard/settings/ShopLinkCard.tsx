@@ -27,7 +27,7 @@ export default function ShopLinkCard({ store, onSaved }: { store: any; onSaved: 
     setBusy(true); setM(null);
     const r = await api("PATCH", "/stores/me/slug", { slug: clean });
     setBusy(false);
-    if (r.ok) { onSaved(r.data); setEditing(false); setCheck(null); setM({ ok: true, text: "Link changed. Your old link no longer works." }); } else setM({ ok: false, text: r.error });
+    if (r.ok) { onSaved(r.data); setEditing(false); setCheck(null); setM({ ok: true, text: "Link changed. Your old link still works and sends visitors to the new one." }); } else setM({ ok: false, text: r.error });
   };
   const canSave = !busy && clean !== store.slug && !!check && check.available;
   return (
@@ -45,7 +45,7 @@ export default function ShopLinkCard({ store, onSaved }: { store: any; onSaved: 
           <p style={{ color: MUTED, fontSize: "0.8rem", margin: "0 0 0.4rem 0", wordBreak: "break-all" }}>{base}</p>
           <input style={input} value={draft} maxLength={40} onChange={(e) => setDraft(e.target.value)} aria-label="New shop link" />
           {check && <p style={{ color: check.available ? "#27c93f" : "#ff5f56", fontSize: "0.8rem", margin: "0.5rem 0 0 0" }}>{check.message}</p>}
-          <p style={{ color: "#e8a33d", fontSize: "0.78rem", margin: "0.8rem 0", lineHeight: 1.5 }}>Warning: once you change it, the old link stops working. Anyone who saved or shared the old link will not find your shop.</p>
+          <p style={{ color: "#e8a33d", fontSize: "0.78rem", margin: "0.8rem 0", lineHeight: 1.5 }}>Good to know: your old link keeps working and sends visitors to your new link, and no other shop can take it. Still, avoid changing your link often, so people keep recognising it.</p>
           <div style={{ display: "flex", gap: "0.6rem" }}>
             <button onClick={save} disabled={!canSave} style={{ ...primary, opacity: canSave ? 1 : 0.5 }}>{busy ? "Saving..." : "Save new link"}</button>
             <button onClick={() => { setEditing(false); setCheck(null); }} style={ghost}>Cancel</button>
