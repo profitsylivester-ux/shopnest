@@ -26,60 +26,60 @@ enum ProductStatus {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      Role     @default(BUYER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  store     Store?
-  tokenVersion Int    @default(0)
-  auditLogs AuditLog[]
+  id           String     @id @default(uuid())
+  email        String     @unique
+  password     String
+  name         String
+  role         Role       @default(BUYER)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  store        Store?
+  tokenVersion Int        @default(0)
+  auditLogs    AuditLog[]
 }
 
 model Store {
-  id             String      @id @default(uuid())
-  name           String
-  slug           String      @unique @default(uuid())
-  description    String?
-  whatsappNumber String?
-  logoUrl        String?
-  bannerUrl      String?
-  location       String?
-  shopType       String?
-  instagramUrl   String?
-  facebookUrl    String?
-  tiktokUrl      String?
-  openingHours   String?
+  id              String             @id @default(uuid())
+  name            String
+  slug            String             @unique @default(uuid())
+  description     String?
+  whatsappNumber  String?
+  logoUrl         String?
+  bannerUrl       String?
+  location        String?
+  shopType        String?
+  instagramUrl    String?
+  facebookUrl     String?
+  tiktokUrl       String?
+  openingHours    String?
   deliveryReturns String?
-  announcement   String?
-  isPaused       Boolean     @default(false)
-  status         StoreStatus @default(PENDING)
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  ownerId        String      @unique
-  owner          User        @relation(fields: [ownerId], references: [id])
-  products       Product[]
-  events         StoreEvent[]
-  slugHistory    StoreSlugHistory[]
+  announcement    String?
+  isPaused        Boolean            @default(false)
+  status          StoreStatus        @default(PENDING)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  ownerId         String             @unique
+  owner           User               @relation(fields: [ownerId], references: [id])
+  products        Product[]
+  events          StoreEvent[]
+  slugHistory     StoreSlugHistory[]
 }
 
 model Product {
-  id          String        @id @default(uuid())
-  name        String
-  description String?
-  price       Float
-  imageUrl    String?
-  status      ProductStatus @default(ACTIVE)
-  stockQuantity Int         @default(1)
+  id            String        @id @default(uuid())
+  name          String
+  description   String?
+  price         Float
+  imageUrl      String?
+  status        ProductStatus @default(ACTIVE)
+  stockQuantity Int           @default(1)
   category      String?
   condition     String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  storeId     String
-  store       Store         @relation(fields: [storeId], references: [id])
-  events      StoreEvent[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  storeId       String
+  store         Store         @relation(fields: [storeId], references: [id])
+  events        StoreEvent[]
 }
 
 enum EventType {
@@ -135,4 +135,63 @@ model AuditLog {
   userAgent String?
 
   @@index([userId, createdAt])
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  nameEn    String   @unique
+  nameSw    String?
+  imageUrl  String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Banner {
+  id        String    @id @default(uuid())
+  title     String?
+  subtitle  String?
+  imageUrl  String
+  linkUrl   String?
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+enum MenuLocation {
+  NAVBAR
+  FOOTER
+}
+
+model MenuItem {
+  id        String       @id @default(uuid())
+  labelEn   String
+  labelSw   String?
+  href      String
+  location  MenuLocation @default(NAVBAR)
+  sortOrder Int          @default(0)
+  isActive  Boolean      @default(true)
+  parentId  String?
+  parent    MenuItem?    @relation("MenuTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  MenuItem[]   @relation("MenuTree")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([location, sortOrder])
+}
+
+model SitePage {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  titleEn     String
+  titleSw     String?
+  bodyEn      String
+  bodySw      String?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

@@ -9,9 +9,11 @@ import { SettingsModule } from './settings/settings.module.js';
 import { EventsModule } from './events/events.module.js';
 import { AuditModule } from './audit/audit.module.js';
 import { UploadsModule } from './uploads/uploads.module.js';
+import { AdminModule } from './admin/admin.module.js';
+import { ContentModule } from './content/content.module.js';
 
 @Module({
-  imports: [PrismaModule, AuthModule, StoreModule, ProductsModule, SettingsModule, EventsModule, AuditModule, UploadsModule],
+  imports: [PrismaModule, AuthModule, StoreModule, ProductsModule, SettingsModule, EventsModule, AuditModule, UploadsModule, AdminModule, ContentModule],
   controllers: [AppController],
   providers: [AppService],
 })
