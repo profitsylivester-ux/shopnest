@@ -23,7 +23,8 @@ export class EventsService {
   async track(dto: TrackEventDto) {
     let storeId: string;
     let productId: string | null = null;
-    if (dto.type === 'SHOP_VIEW') {
+    // a shop view, or a chat click on the shop page itself (no product involved), is counted against the shop
+    if (dto.type === 'SHOP_VIEW' || (dto.type === 'WHATSAPP_CLICK' && !dto.productId && dto.storeSlug)) {
       if (!dto.storeSlug) throw new BadRequestException('storeSlug is required');
       const store = await this.prisma.store.findFirst({
         where: { slug: dto.storeSlug, status: 'ACTIVE', isPaused: false },
