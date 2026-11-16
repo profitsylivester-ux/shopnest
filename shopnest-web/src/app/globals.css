@@ -1048,3 +1048,6 @@ h1,h2,.logo{font-family:'Cormorant Garamond',serif;font-weight:500;letter-spacin
 .sn-install-row .sn-install-btn{width:100%;justify-content:center}
 .sn-acct[data-theme="dark"] .sn-install-row{color:#f3e3d0}
 .sn-install-side{margin-top:1.4rem;color:#f6ebdd;list-style:none}
+/* landing slide 2 headline fits both languages: centered over the slide, two lines, never wider than the screen */
+.big-title{left:0 !important;right:0 !important;transform:none !important;width:auto !important;max-width:none !important;box-sizing:border-box;padding:0 4vw;white-space:normal !important}
+@media(min-width:801px){.big-title{font-size:clamp(2.25rem,3.6vw,3.75rem) !important}}

@@ -171,7 +171,6 @@ export default function Home() {
               <AccountMenu user={user} lang={lang} theme={theme} onSignedOut={() => setUser(null)} />
             ) : (
               <>
-                <button className="lang-toggle nav-signin" onClick={() => openAuthModal("BUYER", true)}>{d.signIn}</button>
                 <button className="btn-signup" onClick={() => openAuthModal("BUYER", false)}>{text.navSignup}</button>
               </>
             )}
@@ -284,7 +283,7 @@ export default function Home() {
                 <a className="btn-ghost" href="#" onClick={(e) => { e.preventDefault(); openAuthModal("SELLER", false); }}>{text.slide2RBtn}</a>
               </div>
             </div>
-            <h1 className="big-title">{text.slide2Title}</h1>
+            <h1 className="big-title">{text.slide2Title.split("\n").map((line, i) => (<span key={i} style={{ display: "block" }}>{line}</span>))}</h1>
           </section>
 
           {/* SLIDE 3: LATEST PRODUCTS */}

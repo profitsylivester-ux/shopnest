@@ -44,7 +44,6 @@ function Header({ lang, setLang, theme, toggleTheme, openAuth }: { lang: Lang; s
               <AccountMenu user={user} lang={lang} theme={theme} onSignedOut={() => setUser(null)} />
             ) : (
               <>
-                <button type="button" className="sn-btn sn-btn-line sn-signin" onClick={() => openAuth("login", "BUYER")}>{d.signIn}</button>
                 <button type="button" className="sn-btn sn-btn-dark" onClick={() => openAuth("signup", "BUYER")}>{d.signUp}</button>
               </>
             )}
