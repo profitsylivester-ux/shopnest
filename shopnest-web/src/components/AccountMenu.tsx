@@ -40,7 +40,6 @@ export default function AccountMenu({ user, lang, theme, onSignedOut }: { user: 
             </div>
           </div>
           {user.role === "SELLER" && <Link href="/seller/dashboard" role="menuitem" className="sn-acct-row" onClick={() => setOpen(false)}>{d.dashboard}</Link>}
-          <Link href="/account/password" role="menuitem" className="sn-acct-row" onClick={() => setOpen(false)}>{lang === "SW" ? "Badilisha nenosiri" : "Change password"}</Link>
           <InstallApp lang={lang} variant="row" />
           <button type="button" role="menuitem" className="sn-acct-row sn-acct-out" onClick={out}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>

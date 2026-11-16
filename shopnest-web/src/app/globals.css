@@ -1070,3 +1070,8 @@ h1,h2,.logo{font-family:'Cormorant Garamond',serif;font-weight:500;letter-spacin
 .sn-page[data-theme="dark"] .sn-pw-msg.err{color:#ff9d92}
 /* phone menu: the account card opens inside the menu (it was clipped behind the page, so Sign out and Change password could not be tapped) */
 @media(max-width:900px){.sn-header-panel .sn-acct{flex-basis:100%;min-width:0;max-width:100%}.sn-header-panel .sn-acct-card{position:static;width:100%;box-sizing:border-box;margin-top:10px;box-shadow:none}.sn-header-panel .sn-acct-top,.sn-header-panel .sn-acct-who{min-width:0}.sn-header-panel .sn-acct-who span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+/* dark dropdown lists: the seller dashboard and the admin (the open list used to be white with pale, unreadable text) */
+.sd-root select,.sd-panel select,.sd-onb select,.ad-root select{color-scheme:dark}
+.sd-root option,.sd-panel option,.sd-onb option,.ad-root option,.sd-root optgroup,.sd-panel optgroup,.sd-onb optgroup,.ad-root optgroup{background-color:#2c1a12;color:#f3e3d0}
+.sd-root option:checked,.sd-panel option:checked,.sd-onb option:checked,.ad-root option:checked{background-color:#6b4328;color:#fff}
+.sd-root option:disabled,.sd-panel option:disabled,.sd-onb option:disabled,.ad-root option:disabled{color:#8f7a6a}
