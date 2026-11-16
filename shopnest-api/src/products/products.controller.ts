@@ -45,25 +45,11 @@ export class ProductsController {
   }
 
   // --- ADMIN ROUTES ---
-  @Get('admin/all')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
-  getAllAdmin() {
-    return this.productsService.getAllProductsAdmin();
-  }
-
   @Patch('admin/:id/status')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   updateStatusAdmin(@Param('id') id: string, @Body('status') status: any, @CurrentUser('sub') adminId: string) {
     return this.productsService.updateProductStatusAdmin(id, status, adminId);
-  }
-
-  @Get('admin/trash')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
-  getTrashed() {
-    return this.productsService.getTrashed();
   }
 
   @Patch('admin/restore/:id')

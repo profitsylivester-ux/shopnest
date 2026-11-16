@@ -12,10 +12,11 @@ import { UploadsModule } from './uploads/uploads.module.js';
 import { AdminModule } from './admin/admin.module.js';
 import { ContentModule } from './content/content.module.js';
 import { TrustModule } from './trust/trust.module.js';
+import { HealthController } from './health.controller.js';
 
 @Module({
   imports: [PrismaModule, AuthModule, StoreModule, ProductsModule, SettingsModule, EventsModule, AuditModule, UploadsModule, AdminModule, ContentModule, TrustModule],
-  controllers: [AppController],
+  controllers: [AppController, HealthController],
   providers: [AppService],
 })
 export class AppModule {}

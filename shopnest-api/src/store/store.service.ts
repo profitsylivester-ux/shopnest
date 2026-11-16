@@ -184,13 +184,6 @@ export class StoreService {
     return out;
   }
 
-  async getAllStoresForAdmin() {
-    return this.prisma.store.findMany({
-      include: { owner: { select: { name: true, email: true } } },
-      orderBy: { createdAt: 'desc' },
-    });
-  }
-
   async updateStoreStatus(id: string, status: any, adminId: string) {
     if (!STATUSES.includes(status)) throw new BadRequestException('Invalid status');
     const store = await this.prisma.store.findUnique({ where: { id }, select: { ownerId: true, status: true } });

@@ -8,6 +8,7 @@ import AnalyticsTab from "./AnalyticsTab";
 import MessagesAndAudit from "./MessagesAndAudit";
 import SettingsTab from "./settings/SettingsTab";
 import { useCategories } from "../../../lib/site";
+import { API_URL } from "../../../lib/seo";
 
 const CATS = ["Electronics", "Phones & Tablets", "Computers", "Fashion", "Shoes", "Bags & Accessories", "Beauty & Health", "Home & Furniture", "Appliances", "Vehicles", "Auto Parts", "Property", "Food & Drinks", "Books & Stationery", "Sports & Fitness", "Baby & Kids", "Agriculture", "Services"];
 
@@ -65,7 +66,7 @@ export default function SellerDashboard() {
     }
 
     try {
-      const resStore = await fetch("http://localhost:3001/stores/me", {
+      const resStore = await fetch(API_URL + "/stores/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -73,7 +74,7 @@ export default function SellerDashboard() {
         const storeData = await resStore.json();
         setStore(storeData);
         
-        const resProd = await fetch("http://localhost:3001/products/me", {
+        const resProd = await fetch(API_URL + "/products/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (resProd.status === 200) {
@@ -108,7 +109,7 @@ export default function SellerDashboard() {
     e.preventDefault();
     setSubmitting(true); setError("");
     try {
-      const res = await fetch("http://localhost:3001/stores", {
+      const res = await fetch(API_URL + "/stores", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({ name, description: desc, whatsappNumber: whatsapp, logoUrl: logo, bannerUrl: banner, location, shopType }),
@@ -125,7 +126,7 @@ export default function SellerDashboard() {
     e.preventDefault();
     setPSubmitting(true);
     try {
-      const res = await fetch("http://localhost:3001/products", {
+      const res = await fetch(API_URL + "/products", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({ name: pName, price: parseFloat(pPrice), wasPrice: pWas.trim() ? parseFloat(pWas) : undefined, description: pDesc, imageUrl: pImage, stockQuantity: parseInt(pStock || "0", 10), category: pCategory || undefined, condition: pCondition || undefined }),
@@ -160,7 +161,7 @@ export default function SellerDashboard() {
     if (!editingId) return;
     setPSubmitting(true);
     try {
-      const res = await fetch(`http://localhost:3001/products/${editingId}`, {
+      const res = await fetch(`${API_URL}/products/${editingId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({ name: pName, price: parseFloat(pPrice), wasPrice: pWas.trim() ? parseFloat(pWas) : null, description: pDesc, imageUrl: pImage, stockQuantity: parseInt(pStock || "0", 10), category: pCategory || undefined, condition: pCondition || undefined }),
@@ -177,7 +178,7 @@ export default function SellerDashboard() {
   const toggleProductStatus = async (id: string, currentStatus: string) => {
     const newStatus = currentStatus === "ACTIVE" ? "HIDDEN" : "ACTIVE";
     try {
-      await fetch(`http://localhost:3001/products/${id}`, {
+      await fetch(`${API_URL}/products/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({ status: newStatus }),
@@ -188,7 +189,7 @@ export default function SellerDashboard() {
 
   const handleLogout = () => {
     const token = getToken();
-    if (token) { fetch("http://localhost:3001/auth/logout", { method: "POST", headers: { Authorization: `Bearer ${token}` }, keepalive: true }).catch(() => {}); }
+    if (token) { fetch(API_URL + "/auth/logout", { method: "POST", headers: { Authorization: `Bearer ${token}` }, keepalive: true }).catch(() => {}); }
     localStorage.removeItem("shopnest_token"); localStorage.removeItem("shopnest_user"); router.push("/");
   };
 

@@ -18,9 +18,6 @@ export class StoreController {
   @Get('list')
   list(@Query('verified') verified?: string, @Query('top') top?: string, @Query('sort') sort?: string) { return this.storeService.listPublic({ verified: verified === '1', top: top === '1', sort }); }
 
-  @Get('admin/all') @UseGuards(JwtAuthGuard, RolesGuard) @Roles('ADMIN')
-  getAllForAdmin() { return this.storeService.getAllStoresForAdmin(); }
-
   @Patch('admin/:id/status') @UseGuards(JwtAuthGuard, RolesGuard) @Roles('ADMIN')
   updateStatus(@Param('id') id: string, @Body('status') status: any, @CurrentUser('sub') adminId: string) { return this.storeService.updateStoreStatus(id, status, adminId); }
 

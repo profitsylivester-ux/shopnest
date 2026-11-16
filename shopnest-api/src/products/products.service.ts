@@ -246,14 +246,6 @@ export class ProductsService {
   }
 
   // --- ADMIN METHODS ---
-  async getAllProductsAdmin() {
-    return this.prisma.product.findMany({
-      where: { status: { not: 'TRASHED' } },
-      include: { store: { select: { name: true } } },
-      orderBy: { createdAt: 'desc' },
-    });
-  }
-
   async updateProductStatusAdmin(id: string, status: any, adminId: string) {
     if (!['ACTIVE', 'HIDDEN', 'TRASHED'].includes(status)) throw new BadRequestException('Invalid status');
     const p = await this.prisma.product.findUnique({ where: { id }, select: { name: true, status: true, store: { select: { ownerId: true } } } });
@@ -263,13 +255,6 @@ export class ProductsService {
       await this.audit.log({ userId: p.store.ownerId, actorId: adminId, actorRole: 'ADMIN', action: 'ADMIN_PRODUCT_STATUS', summary: 'Admin changed "' + p.name + '" from ' + p.status + ' to ' + status, details: { changes: [{ field: 'status', from: p.status, to: status }] } });
     }
     return updated;
-  }
-
-  async getTrashed() {
-    return this.prisma.product.findMany({
-      where: { status: 'TRASHED' },
-      include: { store: { select: { name: true } } },
-    });
   }
 
   async restoreProduct(id: string, adminId: string) {
