@@ -13,6 +13,7 @@ import ProductsTab from "./ProductsTab";
 import SettingsTab from "./SettingsTab";
 import ShopsTab from "./ShopsTab";
 import UsersTab from "./UsersTab";
+import SecurityTab from "./SecurityTab";
 import { api, C, PageTitle } from "./ui";
 
 const GROUPS: { title: string; items: { id: string; label: string; icon: string }[] }[] = [
@@ -36,7 +37,7 @@ const GROUPS: { title: string; items: { id: string; label: string; icon: string 
       { id: "Pages", label: "Pages", icon: "M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8M8 17h8" },
     ],
   },
-  { title: "System", items: [{ id: "MyActivity", label: "My admin activity", icon: "M12 8v4l3 3M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" }] },
+  { title: "System", items: [{ id: "MyActivity", label: "My admin activity", icon: "M12 8v4l3 3M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" }, { id: "Security", label: "Change password", icon: "M6 11V8a6 6 0 0 1 12 0v3M5 11h14v10H5z" }] },
 ];
 
 function tokenUserId(): string {
@@ -126,6 +127,7 @@ export default function AdminPage() {
         {tab === "Banners" && <BannersTab />}
         {tab === "Menu" && <MenuTab />}
         {tab === "Pages" && <PagesTab />}
+        {tab === "Security" && <SecurityTab />}
         {tab === "MyActivity" && (
           <>
             <PageTitle title="My admin activity" sub="Every change you make to settings and website content is recorded here." />

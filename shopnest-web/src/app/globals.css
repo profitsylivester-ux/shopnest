@@ -1051,3 +1051,22 @@ h1,h2,.logo{font-family:'Cormorant Garamond',serif;font-weight:500;letter-spacin
 /* landing slide 2 headline fits both languages: centered over the slide, two lines, never wider than the screen */
 .big-title{left:0 !important;right:0 !important;transform:none !important;width:auto !important;max-width:none !important;box-sizing:border-box;padding:0 4vw;white-space:normal !important}
 @media(min-width:801px){.big-title{font-size:clamp(2.25rem,3.6vw,3.75rem) !important}}
+/* change password page (signed-in buyers, sellers and the site owner) */
+.sn-pw{max-width:460px;margin:0 auto;padding:48px 20px 72px}
+.sn-pw h1{font-family:'Playfair Display',serif;font-style:italic;font-weight:600;font-size:clamp(1.7rem,5vw,2.2rem);color:var(--sn-ink);margin:0 0 .5rem}
+.sn-pw .sn-pw-sub{color:var(--sn-mute);margin:0 0 1.4rem;line-height:1.55}
+.sn-pw-card{background:var(--sn-card);border:1px solid var(--sn-line);border-radius:18px;padding:22px;box-shadow:0 2px 10px var(--sn-shadow)}
+.sn-pw-f{display:block;margin-bottom:14px}
+.sn-pw-f span{display:block;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--sn-mute);margin-bottom:6px}
+.sn-pw-f input{width:100%;min-height:46px;padding:0 14px;border-radius:12px;border:1px solid var(--sn-line);background:var(--sn-bg);color:var(--sn-ink);font:inherit;font-size:16px}
+.sn-pw-f input:focus{outline:2px solid var(--sn-accent);outline-offset:1px}
+.sn-pw-show{display:flex;align-items:center;gap:8px;min-height:44px;margin-bottom:6px;color:var(--sn-mute);font-size:.88rem}
+.sn-pw-show input{width:20px;height:20px}
+.sn-pw .sn-btn{width:100%;min-height:46px}
+.sn-pw-msg{margin-top:14px;padding:12px 14px;border-radius:12px;font-size:.92rem;line-height:1.45}
+.sn-pw-msg.ok{background:rgba(31,170,89,.12);color:#1b7f43;border:1px solid rgba(31,170,89,.35)}
+.sn-pw-msg.err{background:rgba(192,57,43,.1);color:var(--sn-red);border:1px solid rgba(192,57,43,.35)}
+.sn-page[data-theme="dark"] .sn-pw-msg.ok{color:#7fd6b0}
+.sn-page[data-theme="dark"] .sn-pw-msg.err{color:#ff9d92}
+/* phone menu: the account card opens inside the menu (it was clipped behind the page, so Sign out and Change password could not be tapped) */
+@media(max-width:900px){.sn-header-panel .sn-acct{flex-basis:100%;min-width:0;max-width:100%}.sn-header-panel .sn-acct-card{position:static;width:100%;box-sizing:border-box;margin-top:10px;box-shadow:none}.sn-header-panel .sn-acct-top,.sn-header-panel .sn-acct-who{min-width:0}.sn-header-panel .sn-acct-who span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}

@@ -99,6 +99,7 @@ export class AuthService {
   async changePassword(userId: string, dto: ChangePasswordDto, meta: ReqMeta) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new UnauthorizedException('Account not found');
+    if (user.googleId) throw new BadRequestException('This account signs in with Google, so it has no password to change.');
     if (!(await bcrypt.compare(dto.currentPassword, user.password))) {
       await this.audit.log({ userId, action: 'AUTH_PASSWORD_CHANGE_FAILED', summary: 'Password change refused (wrong current password)', ...meta });
       throw new BadRequestException('Current password is incorrect');
