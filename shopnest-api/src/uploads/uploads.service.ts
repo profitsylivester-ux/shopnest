@@ -1,13 +1,19 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import sharp from 'sharp';
-import { saveFile } from './storage.js';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { createPictureDb } from './picture-db.js';
+import { saveFile, setPictureDb } from './storage.js';
 
 const ALLOWED = ['jpeg', 'png', 'webp'];
 const LIMITS = { limitInputPixels: 50_000_000 };
 
 @Injectable()
 export class UploadsService {
+  constructor(prisma?: PrismaService) {
+    if (prisma) setPictureDb(createPictureDb(prisma.picture as any));
+  }
+
   // Reads the real file type from the content (not the file name), re-saves the picture as WebP
   // (this removes hidden data such as phone location) and makes a small thumbnail for cards.
   async saveImage(data: Buffer) {

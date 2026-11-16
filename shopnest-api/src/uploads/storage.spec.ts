@@ -3,7 +3,7 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { putObject, s3ConfigFromEnv } from './s3.js';
-import { cloudUrlFor, resetCloudConfigForTests, saveFile } from './storage.js';
+import { cloudUrlFor, databaseMode, resetCloudConfigForTests, saveFile, setPictureDb } from './storage.js';
 
 const CLOUD = {
   S3_ENDPOINT: 'https://abc123.r2.cloudflarestorage.com/',
@@ -12,7 +12,7 @@ const CLOUD = {
   S3_SECRET_ACCESS_KEY: 'SECRET',
   S3_PUBLIC_URL: 'https://pub-xyz.r2.dev/',
 };
-const KEYS = [...Object.keys(CLOUD), 'S3_REGION', 'UPLOAD_DIR'];
+const KEYS = [...Object.keys(CLOUD), 'S3_REGION', 'UPLOAD_DIR', 'PICTURE_STORAGE'];
 const NAME = '4cc5b1e6-3502-4193-ab71-5e49bf9692d3.webp';
 
 describe('picture storage settings', () => {
@@ -82,5 +82,25 @@ describe('saveFile', () => {
     await expect(readFile(join(dir, NAME))).rejects.toThrow();
     expect(cloudUrlFor(NAME)).toBe('https://pub-xyz.r2.dev/' + NAME);
     expect(cloudUrlFor('../../etc/passwd')).toBeNull();
+  });
+
+  it('keeps pictures in the database (and not on disk) when PICTURE_STORAGE=database', async () => {
+    Object.assign(process.env, { PICTURE_STORAGE: 'database', UPLOAD_DIR: dir });
+    resetCloudConfigForTests();
+    const put: any[] = [];
+    setPictureDb({ put: async (n, d, c) => { put.push([n, d.toString(), c]); }, get: async () => null });
+    expect(databaseMode()).toBe(true);
+    const p = await saveFile(NAME, Buffer.from('db-bytes'));
+    expect(p).toBe('/uploads/' + NAME);
+    expect(put).toEqual([[NAME, 'db-bytes', 'image/webp']]);
+    await expect(readFile(join(dir, NAME))).rejects.toThrow();
+    setPictureDb(null);
+    await expect(saveFile(NAME, Buffer.from('x'))).rejects.toThrow(/not ready/);
+  });
+
+  it('a complete cloud bucket wins over the database setting, and the setting is off by default', async () => {
+    expect(databaseMode()).toBe(false);
+    Object.assign(process.env, CLOUD, { PICTURE_STORAGE: 'database' });
+    expect(databaseMode()).toBe(false);
   });
 });

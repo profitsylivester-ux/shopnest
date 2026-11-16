@@ -225,3 +225,12 @@ model Review {
   @@index([storeId, status])
   @@index([status, createdAt])
 }
+
+// Pictures kept inside the database (used on the live server when no cloud bucket is set up).
+// The name is the same random file name used in /uploads/<name>.
+model Picture {
+  name        String   @id
+  data        Bytes
+  contentType String   @default("image/webp")
+  createdAt   DateTime @default(now())
+}

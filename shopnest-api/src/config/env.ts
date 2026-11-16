@@ -45,5 +45,10 @@ export function checkRequiredEnv(env: NodeJS.ProcessEnv = process.env): string[]
   if (!env.DATABASE_URL) problems.push('DATABASE_URL is missing');
   if (!env.JWT_SECRET || env.JWT_SECRET.length < 32) problems.push('JWT_SECRET is missing or shorter than 32 characters');
   if (!env.FRONTEND_ORIGINS) problems.push('FRONTEND_ORIGINS is missing (the website address that may call this API)');
+  // pictures need a home that survives restarts: the database or a cloud bucket (never the host's temporary disk)
+  const bucketNames = ['S3_ENDPOINT', 'S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY', 'S3_PUBLIC_URL'];
+  const bucketSet = bucketNames.filter((n) => !!env[n]).length;
+  if (bucketSet === 0 && env.PICTURE_STORAGE !== 'database') problems.push('Pictures have no safe home: set PICTURE_STORAGE=database (or all five S3_* bucket settings)');
+  if (env.PICTURE_STORAGE && env.PICTURE_STORAGE !== 'database') problems.push('PICTURE_STORAGE must be exactly: database');
   return problems;
 }

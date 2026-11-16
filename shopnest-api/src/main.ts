@@ -4,7 +4,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { ValidationPipe } from '@nestjs/common';
 import { json, urlencoded, static as serveStatic } from 'express';
-import { uploadDir, cloudConfig, cloudUrlFor } from './uploads/storage.js';
+import { uploadDir, cloudConfig, cloudUrlFor, databaseMode, getPictureDb } from './uploads/storage.js';
+import { createPictureHandler } from './uploads/picture-db.js';
 import { checkRequiredEnv, frontendOrigins, jsonLimit, listenPort, rateLimitPerMinute, trustProxyHops } from './config/env.js';
 import { createRateLimiter } from './common/rate-limit.js';
 
@@ -62,6 +63,12 @@ async function bootstrap() {
       res.setHeader('Cache-Control', 'public, max-age=86400');
       res.redirect(302, target);
     });
+  } else if (databaseMode()) {
+    // pictures live inside the database: read them from there (the picture store is ready once the app has started)
+    app.use('/uploads', createPictureHandler({
+      put: async (n, d, c) => { await getPictureDb()!.put(n, d, c); },
+      get: async (n) => getPictureDb()!.get(n),
+    }));
   } else {
     // uploaded pictures: names are random, so browsers can keep them for a long time
     app.use('/uploads', serveStatic(uploadDir(), { maxAge: '30d', immutable: true, index: false, dotfiles: 'ignore' }));
@@ -79,6 +86,6 @@ async function bootstrap() {
 
   const port = listenPort();
   await app.listen(port);
-  console.log(`Backend running on port ${port} (${cloudConfig() ? 'pictures in the cloud bucket' : 'pictures on local disk'})`);
+  console.log(`Backend running on port ${port} (${cloudConfig() ? 'pictures in the cloud bucket' : databaseMode() ? 'pictures in the database' : 'pictures on local disk'})`);
 }
 bootstrap();

@@ -24,8 +24,17 @@ describe('env settings', () => {
   it('the live server must have its main settings, your computer need not', () => {
     expect(checkRequiredEnv({})).toEqual([]);
     const p = checkRequiredEnv({ NODE_ENV: 'production' });
-    expect(p.length).toBe(3);
-    expect(checkRequiredEnv({ NODE_ENV: 'production', DATABASE_URL: 'x', JWT_SECRET: 'a'.repeat(32), FRONTEND_ORIGINS: 'https://x.com' })).toEqual([]);
-    expect(checkRequiredEnv({ NODE_ENV: 'production', DATABASE_URL: 'x', JWT_SECRET: 'short', FRONTEND_ORIGINS: 'https://x.com' })).toHaveLength(1);
+    expect(p.length).toBe(4);
+    const ok = { NODE_ENV: 'production', DATABASE_URL: 'x', JWT_SECRET: 'a'.repeat(32), FRONTEND_ORIGINS: 'https://x.com', PICTURE_STORAGE: 'database' };
+    expect(checkRequiredEnv(ok)).toEqual([]);
+    expect(checkRequiredEnv({ ...ok, JWT_SECRET: 'short' })).toHaveLength(1);
+  });
+  it('the live server must say where pictures live: the database or a complete bucket', () => {
+    const base = { NODE_ENV: 'production', DATABASE_URL: 'x', JWT_SECRET: 'a'.repeat(32), FRONTEND_ORIGINS: 'https://x.com' };
+    expect(checkRequiredEnv(base)).toHaveLength(1);
+    expect(checkRequiredEnv({ ...base, PICTURE_STORAGE: 'database' })).toEqual([]);
+    expect(checkRequiredEnv({ ...base, PICTURE_STORAGE: 'disk' }).length).toBeGreaterThan(0);
+    const bucket = { S3_ENDPOINT: 'https://e', S3_BUCKET: 'b', S3_ACCESS_KEY_ID: 'k', S3_SECRET_ACCESS_KEY: 's', S3_PUBLIC_URL: 'https://p' };
+    expect(checkRequiredEnv({ ...base, ...bucket })).toEqual([]);
   });
 });
