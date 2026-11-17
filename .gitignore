@@ -5,9 +5,8 @@ dist/
 .DS_Store
 *.mp4
 shopnest-api/uploads/
-# the two background videos the site uses (every other .mp4 stays ignored)
-!shopnest-web/public/7287924-uhd_3840_2160_25fps.mp4
-!shopnest-web/public/8938253-hd_1080_1920_30fps.mp4
+# the background videos the site uses (every other .mp4 stays ignored)
+!shopnest-web/public/video/*.mp4
 
 # local backups and readout files: never commit these (database copies, console readouts)
 *.dump

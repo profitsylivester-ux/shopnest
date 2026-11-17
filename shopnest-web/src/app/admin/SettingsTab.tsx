@@ -60,7 +60,7 @@ export default function SettingsTab() {
             <div style={{ display: "grid", gap: "1rem" }}>
               <Field label="Headline" hint="Built-in: Everything You Need"><input value={v.slide1Title} onChange={set("slide1Title")} style={inputStyle} maxLength={120} /></Field>
               <Field label="Description" hint={v.slide1Desc.length + " / 300"}><textarea value={v.slide1Desc} onChange={set("slide1Desc")} style={{ ...inputStyle, minHeight: "90px", resize: "vertical" }} maxLength={300} /></Field>
-              <Field label="Background video" hint="A video file already on the site, such as /7287924-uhd_3840_2160_25fps.mp4, or a full address starting with https:// - empty uses the built-in video."><input value={v.slide1Video} onChange={set("slide1Video")} style={inputStyle} maxLength={300} /></Field>
+              <Field label="Background video" hint="A full address starting with https:// (or a file on the site, such as /video/hero-720.mp4). It is used on every device, so keep it small. Empty uses the built-in video, which adapts to each device."><input value={v.slide1Video} onChange={set("slide1Video")} style={inputStyle} maxLength={300} /></Field>
             </div>
           </Panel>
           <Panel>

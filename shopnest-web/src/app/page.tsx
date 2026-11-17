@@ -5,6 +5,7 @@ import AccountMenu from "../components/AccountMenu";
 import Assistant from "../components/Assistant";
 import InstallApp from "../components/InstallApp";
 import AuthModal from "../components/AuthModal";
+import BgVideo from "../components/BgVideo";
 import NavMenu from "../components/NavMenu";
 import ProductCard, { toCardStore } from "../components/ProductCard";
 import ThemeToggle from "../components/ThemeToggle";
@@ -195,9 +196,7 @@ export default function Home() {
           {/* SLIDE 1 */}
           <section className={`slide ${currentSlide === 0 ? 'active' : ''}`} data-theme="dark">
             <div className="bg" style={{ backgroundColor: '#1a0f0a' }}>
-              <video autoPlay muted loop playsInline className="bg" key={sysSettings.slide1Video || "default"}>
-                <source src={sysSettings.slide1Video || "/7287924-uhd_3840_2160_25fps.mp4"} type="video/mp4" />
-              </video>
+              <BgVideo kind="hero" src={sysSettings.slide1Video} active={currentSlide === 0} />
             </div>
             <div>
               <div className="eyebrow">{text.slide1Eyebrow}</div>
@@ -343,7 +342,7 @@ export default function Home() {
           {/* SLIDE 4 */}
           <section className={`slide ${currentSlide === 3 ? 'active' : ''}`} data-theme="dark">
             <div className="bg" style={{ backgroundColor: '#1a0f0a' }}>
-              <video autoPlay muted loop playsInline className="bg"><source src="/8938253-hd_1080_1920_30fps.mp4" type="video/mp4" /></video>
+              <BgVideo kind="story" active={currentSlide === 3} start={currentSlide >= 2} />
             </div>
             <div>
               <div className="eyebrow">{text.slide4Eyebrow}</div><h1>{text.slide4Title}</h1><p>{text.slide4Desc}</p>
